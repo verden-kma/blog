@@ -174,3 +174,4 @@ src\main\frontend\npm-debug.log*
 src\main\frontend\yarn-debug.log*
 src\main\frontend\yarn-error.log*
 /.idea/
+/src/main/frontend/src/react-app-env.d.ts
