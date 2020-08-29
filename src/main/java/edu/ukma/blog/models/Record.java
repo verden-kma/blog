@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class Record {
 
     private String caption;
 
+    @NotEmpty
     private String imgPath;
 
     private LocalDateTime timestamp;

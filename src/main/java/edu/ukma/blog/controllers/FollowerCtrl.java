@@ -10,19 +10,19 @@ import java.util.List;
 @RequestMapping("/users/{userId}/followers")
 public class FollowerCtrl {
     @GetMapping
-    public List<User> getFollowers(@PathVariable long userId) {
+    public List<User> getFollowers(@PathVariable String userId) {
         throw new NotImplementedException();
     }
 
     @PutMapping(path = "/{followerId}")
-    public void follow(@PathVariable long userId,
-                       @PathVariable long followerId) {
+    public void follow(@PathVariable String userId,
+                       @PathVariable String followerId) {
         throw new NotImplementedException();
     }
 
     @DeleteMapping(path = "/{followerId}")
-    public void unfollow(@PathVariable long userId,
-                         @PathVariable long followerId) {
+    public void unfollow(@PathVariable String userId,
+                         @PathVariable String followerId) {
         throw new NotImplementedException();
     }
 }

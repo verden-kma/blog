@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Embeddable
 public class RecordID implements Serializable {
-    private long publisherId;
+    private String publisherId;
 
     private int recordId;
 }

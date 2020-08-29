@@ -1,28 +1,39 @@
 package edu.ukma.blog.models;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+//@Table(name = "users")
 public class User {
-    @Id
-    @GeneratedValue
-    private long id;
+    public User(String id, String username) {
+        this.id = id;
+        this.username = username;
+    }
 
+    @Id
+    private String id;
+
+    @NotBlank
     private String username;
 
-    private String status;
+    private String status; // short description
 
-    private String desc;
+    private String description;
 
     @ElementCollection
-    private List<Long> followers;
+    private List<String> followers;
+
+    @ElementCollection
+    private List<String> subscriptions;
 
     @ElementCollection
     private List<Integer> records;

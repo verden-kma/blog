@@ -12,11 +12,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Embeddable
 public class CommentID implements Serializable {
-    private long publisherId;
+    private String publisherId;
 
     private int recordId;
 
-    private long userId;
+    private String userId;
 
     private int commentId;
 }

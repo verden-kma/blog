@@ -7,16 +7,16 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 @RequestMapping("/users{publisherId}/{userId}/records/{recordId}/dislikes")
 public class DislikeCtrl {
     @PostMapping
-    public void dislikeRecord(@PathVariable long publisherId,
+    public void dislikeRecord(@PathVariable String publisherId,
                               @PathVariable int recordId,
-                              @PathVariable long userId) {
+                              @PathVariable String userId) {
         throw new NotImplementedException();
     }
 
     @DeleteMapping
-    public void removeDislike(@PathVariable long publisherId,
+    public void removeDislike(@PathVariable String publisherId,
                               @PathVariable int recordId,
-                              @PathVariable long userId) {
+                              @PathVariable String userId) {
         throw new NotImplementedException();
     }
 }

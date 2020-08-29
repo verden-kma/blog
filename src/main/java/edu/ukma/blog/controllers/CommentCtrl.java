@@ -16,14 +16,14 @@ public class CommentCtrl {
      * @return valid id of a new comment in a database
      */
     @PostMapping
-    public int addComment(@PathVariable long publisherId,
+    public int addComment(@PathVariable String publisherId,
                           @PathVariable int recordId,
                           @RequestBody Comment newComment) {
         throw new NotImplementedException();
     }
 
     @DeleteMapping(path = "/{commentId}")
-    public void removeComment(@PathVariable long publisherId,
+    public void removeComment(@PathVariable String publisherId,
                               @PathVariable int recordId,
                               @PathVariable int commentId) {
         throw new NotImplementedException();
