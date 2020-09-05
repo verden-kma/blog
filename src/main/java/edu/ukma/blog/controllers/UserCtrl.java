@@ -1,11 +1,10 @@
 package edu.ukma.blog.controllers;
 
 import edu.ukma.blog.models.Page;
-import edu.ukma.blog.models.User;
-import edu.ukma.blog.repositories.UsersRepo;
+import edu.ukma.blog.models.user.RequestUserSignup;
+import edu.ukma.blog.models.user.ResponseUser;
+import edu.ukma.blog.services.implementations.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -14,23 +13,17 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class UserCtrl {
 
     @Autowired
-    private UsersRepo usersRepo;
+    private UserService userService;
 
     @PostMapping
-    public String addUser(@AuthenticationPrincipal OAuth2User authentication/*, UsersRepo usersRepo*/) {
-        if (usersRepo.findById(authentication.getAttribute("sub").toString()).isPresent()) {
-            throw new IllegalStateException("such user is already registered");
-        }
-        User newUser = new User(authentication.getAttribute("sub").toString(), authentication.getAttribute("name").toString());
-        usersRepo.save(newUser);
-        System.out.println(newUser);
-        return newUser.getId();
+    public long addUser(@RequestBody RequestUserSignup user) {
+        return userService.addUser(user).getId();
     }
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{userId}")
-    public User getUserData(@PathVariable String userId) {
-        throw new NotImplementedException();
+    public ResponseUser getUserData(@PathVariable long userId) {
+        return userService.getUser(userId);
     }
 
     /**
@@ -39,13 +32,13 @@ public class UserCtrl {
      * @return data about which images should be fetched from server and textual data for {@code pageNum} page
      */
     @GetMapping(path = "/{userId}/{pageNum}")
-    public Page getUserPage(@PathVariable String userId,
+    public Page getUserPage(@PathVariable long userId,
                             @PathVariable int pageNum) {
         throw new NotImplementedException();
     }
 
     @DeleteMapping("/{userId}")
-    public void banUser(@PathVariable String userId) {
-        throw new NotImplementedException();
+    public boolean banUser(@PathVariable long userId) {
+        return userService.banUser(userId);
     }
 }

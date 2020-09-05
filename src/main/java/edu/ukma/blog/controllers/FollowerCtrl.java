@@ -1,6 +1,6 @@
 package edu.ukma.blog.controllers;
 
-import edu.ukma.blog.models.User;
+import edu.ukma.blog.models.user.UserEntity;
 import org.springframework.web.bind.annotation.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -10,7 +10,7 @@ import java.util.List;
 @RequestMapping("/users/{userId}/followers")
 public class FollowerCtrl {
     @GetMapping
-    public List<User> getFollowers(@PathVariable String userId) {
+    public List<UserEntity> getFollowers(@PathVariable String userId) {
         throw new NotImplementedException();
     }
 
