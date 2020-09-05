@@ -9,20 +9,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import static edu.ukma.blog.security.SecurityConstants.SIGN_UP_URL;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private static final String SIGNUP_ENDPOINT = "/users";
     private final IUserService userDetailService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGNUP_ENDPOINT)
+                .antMatchers(HttpMethod.POST, SIGN_UP_URL)
                 .permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));
     }
 
     @Override
