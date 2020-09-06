@@ -22,8 +22,9 @@ public class UserCtrl {
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{userId}")
-    public ResponseUser getUserData(@PathVariable long userId) {
-        return userService.getUser(userId);
+    public ResponseUser getUserData(@PathVariable String userId) {
+        return new ResponseUser();
+//        return userService.getUser(userId);
     }
 
     /**

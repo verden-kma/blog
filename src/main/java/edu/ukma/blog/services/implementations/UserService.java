@@ -52,4 +52,10 @@ public class UserService implements IUserService {
         if (user == null) throw new UsernameNotFoundException(username);
         return new User(user.getUsername(), user.getEncryptedPassword(), Collections.emptyList());
     }
+
+    public UserEntity getUserEntity(String username) {
+        UserEntity user = usersRepo.findByUsername(username);
+        if (user == null) throw new UsernameNotFoundException(username);
+        return user;
+    }
 }

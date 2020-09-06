@@ -11,4 +11,6 @@ public interface IUserService extends UserDetailsService {
     ResponseUser getUser(Long userId);
 
     boolean banUser(Long userId);
+
+    UserEntity getUserEntity(String username);
 }

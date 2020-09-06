@@ -23,11 +23,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL)
                 .permitAll()
                 .anyRequest()
-                .authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));
+                .authenticated()
+                .and()
+                .addFilter(getAuthFilter())
+                .addFilter(new JWTValidationFilter(authenticationManager()));
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder authMng) throws Exception {
         authMng.userDetailsService(userDetailService).passwordEncoder(passwordEncoder);
+    }
+
+    private AuthenticationFilter getAuthFilter() throws Exception {
+        AuthenticationFilter authFilter = new AuthenticationFilter(authenticationManager());
+        authFilter.setFilterProcessesUrl("/users/login");
+        return authFilter;
     }
 }
