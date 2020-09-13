@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "name": "expirationTime",
+      "type": "java.lang.Long"
+    },
+    {
+      "name": "tokenPrefix",
+      "type": "java.lang.String",
+      "description": "Type of authentication."
+    },
+    {
+      "name": "authHeader",
+      "type": "java.lang.String",
+      "description": "Header name used for authorization."
+    },
+    {
+      "name": "signUpUrl",
+      "type": "java.lang.String",
+      "description": "Url of an endpoint for users to sign up."
+    },
+    {
+      "name": "tokenSecret",
+      "type": "java.lang.String",
+      "description": "Private code used to build tokens."
+    }
+  ]
+}

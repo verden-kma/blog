@@ -23,4 +23,8 @@ public class BlogApplication {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
+	public PropertyAccessor getPropertyAccessor() {
+		return new PropertyAccessor();
+	}
 }

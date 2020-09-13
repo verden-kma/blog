@@ -23,7 +23,7 @@ public class JWTValidationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String authHeader = request.getHeader(SecurityConstants.HEADER);
+        String authHeader = request.getHeader(SecurityConstants.AUTH_HEADER);
         if (authHeader != null && authHeader.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             UsernamePasswordAuthenticationToken authToken = getAuthToken(authHeader);
             SecurityContextHolder.getContext().setAuthentication(authToken);
