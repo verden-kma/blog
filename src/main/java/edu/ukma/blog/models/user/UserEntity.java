@@ -14,8 +14,8 @@ public class UserEntity {
     @GeneratedValue
     private Long id;
 
-    @NotBlank
-    private String publicId;
+//    @NotBlank
+//    private String publicId;
 
     @NotBlank
     private String encryptedPassword;

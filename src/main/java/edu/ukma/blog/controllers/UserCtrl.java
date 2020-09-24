@@ -1,5 +1,6 @@
 package edu.ukma.blog.controllers;
 
+import edu.ukma.blog.exceptions.UsernameDuplicateException;
 import edu.ukma.blog.models.Page;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
@@ -16,30 +17,34 @@ public class UserCtrl {
     private UserService userService;
 
     @PostMapping
-    public long addUser(@RequestBody RequestUserSignup user) {
-        return userService.addUser(user).getId();
+    public boolean addUser(@RequestBody RequestUserSignup user) {
+        try {
+            userService.addUser(user);
+        } catch (UsernameDuplicateException e) {
+            return false;
+        }
+        return true;
     }
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{userId}")
     public ResponseUser getUserData(@PathVariable String userId) {
-        return new ResponseUser();
-//        return userService.getUser(userId);
+        return userService.getUser(userId);
     }
 
     /**
-     * @param userId  id of a user whose page is needed
-     * @param pageNum number of a page in question
+     * @param username id of a user whose page is needed
+     * @param pageNum  number of a page in question
      * @return data about which images should be fetched from server and textual data for {@code pageNum} page
      */
-    @GetMapping(path = "/{userId}/{pageNum}")
-    public Page getUserPage(@PathVariable long userId,
+    @GetMapping(path = "/{username}/{pageNum}")
+    public Page getUserPage(@PathVariable String username,
                             @PathVariable int pageNum) {
         throw new NotImplementedException();
     }
 
     @DeleteMapping("/{userId}")
-    public boolean banUser(@PathVariable long userId) {
+    public boolean banUser(@PathVariable String userId) {
         return userService.banUser(userId);
     }
 }

@@ -1,0 +1,1 @@
+no Auth is needed to create a new user or to log in (/users/login)

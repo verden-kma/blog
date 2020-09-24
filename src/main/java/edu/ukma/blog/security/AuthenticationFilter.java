@@ -1,11 +1,7 @@
 package edu.ukma.blog.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.user.RequestUserLogin;
-import edu.ukma.blog.models.user.UserEntity;
-import edu.ukma.blog.services.IUserService;
-import edu.ukma.blog.services.implementations.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +21,14 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private static final String USER_SERVICE_BEAN_NAME;
+//    private static final String USER_SERVICE_BEAN_NAME;
 
     private final AuthenticationManager authMng;
 
-    static {
-        String implClassName = UserService.class.getSimpleName();
-        USER_SERVICE_BEAN_NAME = implClassName.substring(0, 1).toLowerCase() + implClassName.substring(1);
-    }
+//    static {
+//        String implClassName = UserService.class.getSimpleName();
+//        USER_SERVICE_BEAN_NAME = implClassName.substring(0, 1).toLowerCase() + implClassName.substring(1);
+//    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -61,10 +57,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
 
-        IUserService userService = (IUserService) SpringApplicationContext.getBean(USER_SERVICE_BEAN_NAME);
-        UserEntity user = userService.getUserEntity(username);
+//        IUserService userService = (IUserService) SpringApplicationContext.getBean(USER_SERVICE_BEAN_NAME);
+//        UserEntity user = userService.getUserEntity(username);
         response.addHeader(SecurityConstants.AUTH_HEADER, SecurityConstants.TOKEN_PREFIX + token);
-        response.addHeader("UserID", user.getPublicId());
+//        response.addHeader("UserID", user.getPublicId());
     }
 
 }

@@ -22,7 +22,7 @@ public class Record {
     private String caption;
 
     @NotEmpty
-    private String imgPath;
+    private String imgLocation;
 
     private LocalDateTime timestamp;
 

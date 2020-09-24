@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsersRepo extends JpaRepository<UserEntity, Long> {
+public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
     boolean existsUserByUsername(String username);
 
     UserEntity findByUsername(String username);
+
+    boolean deleteByUsername(String username);
 }

@@ -8,9 +8,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 public interface IUserService extends UserDetailsService {
     UserEntity addUser(RequestUserSignup userData);
 
-    ResponseUser getUser(Long userId);
+    ResponseUser getUser(String userId);
 
-    boolean banUser(Long userId);
+    boolean banUser(String userId);
 
     UserEntity getUserEntity(String username);
 }

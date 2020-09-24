@@ -1,11 +1,11 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.exceptions.UsernameDuplicateException;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.models.user.UserEntity;
-import edu.ukma.blog.repositories.UsersRepo;
+import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IUserService;
-import edu.ukma.blog.utils.PasswordUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -18,9 +18,9 @@ import java.util.Collections;
 
 @Service
 public class UserService implements IUserService {
-    private static final int PUBLIC_PASSWORD_LENGTH = 15;
+    //    private static final int PUBLIC_PASSWORD_LENGTH = 15;
     @Autowired
-    private UsersRepo usersRepo;
+    private IUsersRepo usersRepo;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -28,22 +28,28 @@ public class UserService implements IUserService {
     @Override
     public UserEntity addUser(RequestUserSignup userData) {
         if (usersRepo.existsUserByUsername(userData.getUsername()))
-            throw new RuntimeException("username duplicated");
+            throw new UsernameDuplicateException(userData.getUsername());
         UserEntity newUser = new UserEntity();
         BeanUtils.copyProperties(userData, newUser);
-        newUser.setPublicId(PasswordUtil.generate(PUBLIC_PASSWORD_LENGTH));
+//        String publicId;
+//        do {
+//            publicId = PasswordUtil.generate(PUBLIC_PASSWORD_LENGTH);
+//        }while (usersRepo.existsByPublicId(publicId));
+//        newUser.setPublicId(publicId);
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
         return usersRepo.save(newUser);
     }
 
     @Override
-    public ResponseUser getUser(Long userId) {
-        return null;
+    public ResponseUser getUser(String username) {
+        ResponseUser respUser = new ResponseUser();
+        BeanUtils.copyProperties(usersRepo.findByUsername(username), respUser);
+        return respUser;
     }
 
     @Override
-    public boolean banUser(Long userId) {
-        return false;
+    public boolean banUser(String username) {
+        return usersRepo.deleteByUsername(username);
     }
 
     @Override
