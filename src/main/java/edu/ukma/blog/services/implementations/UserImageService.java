@@ -1,5 +1,6 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.exceptions.ServerError;
 import edu.ukma.blog.exceptions.WrongFileFormatException;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IUserImageManager;
@@ -64,7 +65,7 @@ public class UserImageService implements IUserImageManager {
      * @throws WrongFileFormatException - if the <code>original</code> is not an image in acceptable format
      */
     @Override
-    public String saveImage(MultipartFile original) throws IOException {
+    public String saveImage(MultipartFile original) throws ServerError, WrongFileFormatException {
 /*
 todo: check if incoming image format is a desirable one and if so, save it as a file, without ImageIO
 aim is to prevent image loosing quality (dpi)
@@ -72,27 +73,31 @@ aim is to prevent image loosing quality (dpi)
 https://stackoverflow.com/questions/21204627/how-to-prevent-loss-of-image-quality-while-using-imageio-write-method
 */
 
-        validateFormat(original);
+        FormatType imgType = validateFormat(original);
 
-        BufferedImage originalImg = ImageIO.read(original.getInputStream());
-        String path = String.format(PATH_TEMPLATE, random.nextInt(FOLDERS_WIDTH), random.nextInt(FOLDERS_WIDTH));
-        String location;
-        do {
-            location = path + AlphaNumGenerator.generate(IMG_ID_LENGTH);
-        } while (recordsRepo.existsByImgLocation(location));
+        try {
+            BufferedImage originalImg = ImageIO.read(original.getInputStream());
+            String path = String.format(PATH_TEMPLATE, random.nextInt(FOLDERS_WIDTH), random.nextInt(FOLDERS_WIDTH));
+            String location;
+            do {
+                location = path + AlphaNumGenerator.generate(IMG_ID_LENGTH);
+            } while (recordsRepo.existsByImgLocation(location));
 
-        ImageIO.write(originalImg, TARGET_IMAGE_FORMAT,
-                new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT));
+            ImageIO.write(originalImg, TARGET_IMAGE_FORMAT,
+                    new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT));
 
-        if (original.getSize() > COMPRESSION_THRESHOLD) {
-            saveCompressed(originalImg, location);
+            if (original.getSize() > COMPRESSION_THRESHOLD) {
+                saveCompressed(originalImg, location);
+            }
+
+            saveIcon(originalImg, location);
+
+            originalImg.flush();
+            System.out.println("location: " + location);
+            return location;
+        } catch (IOException e) {
+            throw new ServerError(e);
         }
-
-        saveIcon(originalImg, location);
-
-        originalImg.flush();
-        System.out.println("location: " + location);
-        return location;
     }
 
     private void saveIcon(final BufferedImage original, String location) throws IOException {
@@ -128,15 +133,28 @@ https://stackoverflow.com/questions/21204627/how-to-prevent-loss-of-image-qualit
         writer.dispose();
     }
 
-    private static void validateFormat(MultipartFile origin) {
+    /**
+     * check that a file passed is of an appropriate format or throw exception otherwise
+     *
+     * @param origin file to validate
+     * @return type of a valid file's format
+     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
+     */
+    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
         String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
         if (fileFormat == null) {
             throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
         }
+        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
         for (String acceptableFormat : ACCEPTABLE_FORMATS) {
-            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return;
+            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
         }
         throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
+    }
+
+    enum FormatType {
+        TARGET,
+        ACCEPTABLE
     }
 
     @Override

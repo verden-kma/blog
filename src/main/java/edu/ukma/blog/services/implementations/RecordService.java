@@ -1,5 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.exceptions.ServerError;
+import edu.ukma.blog.exceptions.WrongFileFormatException;
 import edu.ukma.blog.models.Record;
 import edu.ukma.blog.models.RequestRecord;
 import edu.ukma.blog.models.compositeIDs.RecordID;
@@ -27,27 +29,20 @@ public class RecordService implements IRecordService {
     private IUserImageManager imageService;
 
     @Override
-    public int addRecord(String username, RequestRecord record) {
-        try {
+    public int addRecord(String username, RequestRecord record) throws ServerError, WrongFileFormatException {
+        UserEntity publisher = usersRepo.findByUsername(username);
+        Optional<Record> lastRecord = recordsRepo.findTopByIdPublisherIdOrderByIdRecordIdDesc(publisher.getId());
+        int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
 
-            UserEntity publisher = usersRepo.findByUsername(username);
-            Optional<Record> lastRecord = recordsRepo.findLastByIdPublisherIdOrderByIdRecordId(publisher.getId());
-            int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
+        Record recordEntity = new Record();
+        recordEntity.setId(new RecordID(publisher.getId(), recordId));
+        recordEntity.setCaption(record.getCaption());
+        recordEntity.setTimestamp(LocalDateTime.parse(record.getTimestamp(), DateTimeFormatter.ISO_DATE_TIME));
+        String imgLocation = imageService.saveImage(record.getImage());
+        recordEntity.setImgLocation(imgLocation);
+        recordsRepo.save(recordEntity);
 
-            Record recordEntity = new Record();
-            recordEntity.setId(new RecordID(publisher.getId(), recordId));
-            recordEntity.setCaption(record.getCaption());
-            recordEntity.setTimestamp(LocalDateTime.parse(record.getTimestamp(), DateTimeFormatter.ISO_DATE_TIME));
-            String imgLocation = imageService.saveImage(record.getImage());
-            recordEntity.setImgLocation(imgLocation);
-            recordsRepo.save(recordEntity);
-
-            return recordId;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return -1;
+        return recordId;
     }
 
     @Override
