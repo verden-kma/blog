@@ -31,7 +31,7 @@ public class UserImageService implements IUserImageManager {
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
     private static final String PATH_TEMPLATE = "/%d/%d/";
     private static final String TARGET_IMAGE_FORMAT = "jpg";
-    private static final String[] ACCEPTABLE_FORMATS = new String[]{"jpg", "jpeg", "png"};
+    private static final String[] ACCEPTABLE_FORMATS = new String[]{"jpg", "jpeg", "png", "bmp"};
     private static final long COMPRESSION_THRESHOLD = 512 * 1024;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
     private static final int FOLDERS_WIDTH = 128;
@@ -61,32 +61,27 @@ public class UserImageService implements IUserImageManager {
      *
      * @param original - file to be saved as an image
      * @return location of the original image in jpg format (distinct part of the path to the image)
-     * @throws IOException              - if internal server error occurs
-     * @throws WrongFileFormatException - if the <code>original</code> is not an image in acceptable format
+     * @throws ServerError              - if internal server error occurs
+     * @throws WrongFileFormatException - if the <code>original</code> is not an image of acceptable format
      */
     @Override
     public String saveImage(MultipartFile original) throws ServerError, WrongFileFormatException {
-/*
-todo: check if incoming image format is a desirable one and if so, save it as a file, without ImageIO
-aim is to prevent image loosing quality (dpi)
-
-https://stackoverflow.com/questions/21204627/how-to-prevent-loss-of-image-quality-while-using-imageio-write-method
-*/
-
         FormatType imgType = validateFormat(original);
 
         try {
-            BufferedImage originalImg = ImageIO.read(original.getInputStream());
             String path = String.format(PATH_TEMPLATE, random.nextInt(FOLDERS_WIDTH), random.nextInt(FOLDERS_WIDTH));
             String location;
             do {
                 location = path + AlphaNumGenerator.generate(IMG_ID_LENGTH);
             } while (recordsRepo.existsByImgLocation(location));
 
-            ImageIO.write(originalImg, TARGET_IMAGE_FORMAT,
-                    new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT));
+            BufferedImage originalImg = ImageIO.read(original.getInputStream());
+            File originalStored = new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT);
+            if (imgType == FormatType.TARGET) original.transferTo(originalStored);
+            else ImageIO.write(originalImg, TARGET_IMAGE_FORMAT, originalStored);
 
-            if (original.getSize() > COMPRESSION_THRESHOLD) {
+
+            if (originalStored.length() > COMPRESSION_THRESHOLD) {
                 saveCompressed(originalImg, location);
             }
 

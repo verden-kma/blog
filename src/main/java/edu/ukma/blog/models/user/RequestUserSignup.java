@@ -2,16 +2,15 @@ package edu.ukma.blog.models.user;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 
 @Data
 public class RequestUserSignup {
-    @NotBlank
-    @Size(min = 3, max = 20)
+
+    @Pattern(regexp = "\\w{3,20}")
     private String username;
 
-    @NotBlank
+    @Pattern(regexp = "^[\\w\\d@$!%*#?&]{5,25}$")
     private String password;
 
     private String status; // short description about user occupation
