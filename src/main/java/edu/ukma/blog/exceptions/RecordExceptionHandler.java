@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+
 @RestControllerAdvice
 public class RecordExceptionHandler {
     @ExceptionHandler(value = {WrongFileFormatException.class})
@@ -17,5 +18,15 @@ public class RecordExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleServerError(ServerError e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleUsernameMissing(UsernameMissingException e, WebRequest r) {
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleUsernameMissing(NoSuchRecordException e, WebRequest r) {
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }

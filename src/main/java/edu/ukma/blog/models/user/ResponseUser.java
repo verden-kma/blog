@@ -12,4 +12,6 @@ public class ResponseUser {
     private String status; // short description about user occupation
 
     private String description;
+
+    private String avaPath;
 }

@@ -1,4 +1,4 @@
-package edu.ukma.blog.models;
+package edu.ukma.blog.models.record;
 
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import lombok.Data;
@@ -10,12 +10,10 @@ import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// Basically on uploading the profile picture, rename it to something that is unique for that user. E.g. uid_001.jpg
-
 @Data
 @Entity
-public class Record {
-
+public class RecordEntity {
+    // idea for feature: look through all likers, dislikers, find influencers, save them separately
     @EmbeddedId
     private RecordID id;
 

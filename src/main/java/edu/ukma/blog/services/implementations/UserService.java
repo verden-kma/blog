@@ -18,7 +18,7 @@ import java.util.Collections;
 
 @Service
 public class UserService implements IUserService {
-    //    private static final int PUBLIC_PASSWORD_LENGTH = 15;
+
     @Autowired
     private IUsersRepo usersRepo;
 
@@ -31,11 +31,6 @@ public class UserService implements IUserService {
             throw new UsernameDuplicateException(userData.getUsername());
         UserEntity newUser = new UserEntity();
         BeanUtils.copyProperties(userData, newUser);
-//        String publicId;
-//        do {
-//            publicId = PasswordUtil.generate(PUBLIC_PASSWORD_LENGTH);
-//        }while (usersRepo.existsByPublicId(publicId));
-//        newUser.setPublicId(publicId);
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
         return usersRepo.save(newUser);
     }

@@ -14,9 +14,6 @@ public class UserEntity {
     @GeneratedValue
     private Long id;
 
-//    @NotBlank
-//    private String publicId;
-
     @NotBlank
     private String encryptedPassword;
 
@@ -28,6 +25,8 @@ public class UserEntity {
     private String status; // short description
 
     private String description;
+
+    private String avaPath; // if null then use default avatar icon
 
     @ElementCollection
     private List<Long> followers;
