@@ -1,4 +1,4 @@
-package edu.ukma.blog.controllers;
+package edu.ukma.blog.controllers.actors;
 
 import org.springframework.web.bind.annotation.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;

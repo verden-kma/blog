@@ -16,7 +16,7 @@ public class RecordExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Object> handleServerError(ServerError e, WebRequest r) {
+    public ResponseEntity<Object> handleServerError(ServerCriticalException e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

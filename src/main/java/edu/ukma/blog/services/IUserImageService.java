@@ -1,21 +1,20 @@
 package edu.ukma.blog.services;
 
-import edu.ukma.blog.exceptions.ServerError;
-import edu.ukma.blog.exceptions.WrongFileFormatException;
-import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.util.Optional;
 
 public interface IUserImageService {
-    String TARGET_MEDIA_TYPE = MediaType.IMAGE_JPEG_VALUE;
-    String TARGET_IMAGE_FORMAT = "jpg";
-    String[] ACCEPTABLE_FORMATS = new String[]{"jpg", "jpeg", "png", "bmp"};
+    Optional<File> getAvatar(long userId);
 
-    String saveImage(MultipartFile original) throws ServerError, WrongFileFormatException;
+    void setAvatar(MultipartFile image, long userId);
 
-    File getImage(String location);
+    void removeAvatar(long userId);
 
-    File getImageMin(String location);
+    Optional<File> getMainPageImage(long userId);
+
+    void setMainPageImage(MultipartFile image, long userId);
+
+    void removeMainPageImage(long userId);
 }

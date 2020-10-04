@@ -1,24 +1,34 @@
-package edu.ukma.blog.controllers;
+package edu.ukma.blog.controllers.actors;
 
+import edu.ukma.blog.constants.ImageConstants;
+import edu.ukma.blog.exceptions.ServerCriticalException;
+import edu.ukma.blog.exceptions.UsernameMissingException;
 import edu.ukma.blog.models.Page;
 import edu.ukma.blog.models.user.RequestUserDataUpdate;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
-import edu.ukma.blog.services.implementations.UserService;
+import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.services.IUserImageService;
+import edu.ukma.blog.services.IUserService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class UserCtrl {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
     @PostMapping
     public void addUser(@RequestBody RequestUserSignup user) {
@@ -37,17 +47,6 @@ public class UserCtrl {
         throw new NotImplementedException();
     }
 
-    @PutMapping(value = "/{username}/avatar", consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public void setAvatarImage(@PathVariable String username,
-                               @RequestBody MultipartFile icon) {
-        throw new NotImplementedException();
-    }
-
-    @GetMapping(value = "/{username}/avatar", produces = {MediaType.IMAGE_JPEG_VALUE})
-    public byte[] getAvatarImage(@PathVariable String username) {
-        throw new NotImplementedException();
-    }
-
     /**
      * @param username id of a user whose page is needed
      * @param pageNum  number of a page in question
@@ -59,8 +58,8 @@ public class UserCtrl {
         throw new NotImplementedException();
     }
 
-    @DeleteMapping("/{userId}")
-    public boolean banUser(@PathVariable String userId) {
-        return userService.banUser(userId);
+    @DeleteMapping("/{username}")
+    public boolean banUser(@PathVariable String username) {
+        return userService.banUser(username);
     }
 }

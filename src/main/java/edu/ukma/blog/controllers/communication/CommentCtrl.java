@@ -1,4 +1,4 @@
-package edu.ukma.blog.controllers;
+package edu.ukma.blog.controllers.communication;
 
 import edu.ukma.blog.models.Comment;
 import org.springframework.web.bind.annotation.*;

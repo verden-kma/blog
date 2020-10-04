@@ -1,7 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.exceptions.NoSuchRecordException;
-import edu.ukma.blog.exceptions.ServerError;
+import edu.ukma.blog.exceptions.ServerCriticalException;
 import edu.ukma.blog.exceptions.WrongFileFormatException;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RecordEntity;
@@ -12,7 +12,7 @@ import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IRecordService;
-import edu.ukma.blog.services.IUserImageService;
+import edu.ukma.blog.services.IRecordImageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,10 +34,10 @@ public class RecordService implements IRecordService {
     private ICommentsRepo commentsRepo;
 
     @Autowired
-    private IUserImageService imageService;
+    private IRecordImageService imageService;
 
     @Override
-    public int addRecord(String username, RequestRecord record) throws ServerError, WrongFileFormatException {
+    public int addRecord(String username, RequestRecord record) throws ServerCriticalException, WrongFileFormatException {
         UserEntity publisher = usersRepo.findByUsername(username);
         Optional<RecordEntity> lastRecord = recordsRepo.findTopByIdPublisherIdOrderByIdRecordIdDesc(publisher.getId());
         int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);

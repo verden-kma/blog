@@ -1,6 +1,7 @@
-package edu.ukma.blog.controllers;
+package edu.ukma.blog.controllers.communication;
 
-import edu.ukma.blog.exceptions.ServerError;
+import edu.ukma.blog.constants.ImageConstants;
+import edu.ukma.blog.exceptions.ServerCriticalException;
 import edu.ukma.blog.exceptions.UsernameMissingException;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RequestRecord;
@@ -8,7 +9,7 @@ import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IRecordService;
-import edu.ukma.blog.services.IUserImageService;
+import edu.ukma.blog.services.IRecordImageService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ public class RecordCtrl {
     private IRecordsRepo recordsRepo;
 
     @Autowired
-    private IUserImageService imageService;
+    private IRecordImageService imageService;
 
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
@@ -54,13 +55,13 @@ public class RecordCtrl {
         return recordService.getRecord(new RecordID(publisherId, recordId));
     }
 
-    @GetMapping(path = "/{recordId}/image", produces = IUserImageService.TARGET_MEDIA_TYPE)
+    @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImage(@PathVariable String publisher,
                            @PathVariable int recordId) {
         return getSelectedImage(imageService::getImage, publisher, recordId);
     }
 
-    @GetMapping(path = "/{recordId}/image-min", produces = IUserImageService.TARGET_MEDIA_TYPE)
+    @GetMapping(path = "/{recordId}/image-min", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageMin(@PathVariable String publisher,
                               @PathVariable int recordId) {
         return getSelectedImage(imageService::getImageMin, publisher, recordId);
@@ -70,13 +71,12 @@ public class RecordCtrl {
         Optional<Long> publisherMaybeId = usersRepo.getIdByUsername(publisher);
         long publisherId = publisherMaybeId.orElseThrow(() -> new UsernameMissingException(publisher));
         String location = recordsRepo.getImgLocation(new RecordID(publisherId, recordId))
-                .orElseThrow(() -> new ServerError(new FileNotFoundException(String.format("image location not found, publisher = %s, record id = %d", publisher, recordId))));
+                .orElseThrow(() -> new ServerCriticalException(new FileNotFoundException(String.format("image location not found, publisher = %s, record id = %d", publisher, recordId))));
         File image = selector.apply(location);
-        try {
-            InputStream input = new FileInputStream(image);
+        try (InputStream input = new FileInputStream(image)) {
             return IOUtils.toByteArray(input);
         } catch (IOException e) {
-            throw new ServerError(e);
+            throw new ServerCriticalException(e);
         }
     }
 
