@@ -5,12 +5,14 @@ import edu.ukma.blog.exceptions.WrongFileFormatException;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface IRecordService {
     int addRecord(String username, RequestRecord record) throws ServerError, WrongFileFormatException;
 
     ResponseRecord getRecord(RecordID id);
-
 
     void editRecord();
 

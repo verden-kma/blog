@@ -3,7 +3,7 @@ package edu.ukma.blog.services.implementations;
 import edu.ukma.blog.exceptions.ServerError;
 import edu.ukma.blog.exceptions.WrongFileFormatException;
 import edu.ukma.blog.repositories.IRecordsRepo;
-import edu.ukma.blog.services.IUserImageManager;
+import edu.ukma.blog.services.IUserImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import org.apache.commons.io.FilenameUtils;
 import org.imgscalr.Scalr;
@@ -26,12 +26,10 @@ import java.util.Iterator;
 import java.util.Random;
 
 @Service
-public class UserImageService implements IUserImageManager {
+public class UserImageService implements IUserImageService {
     private static final String PATH_PREFIX = new File("").getAbsolutePath() + "/userImages";
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
     private static final String PATH_TEMPLATE = "/%d/%d/";
-    private static final String TARGET_IMAGE_FORMAT = "jpg";
-    private static final String[] ACCEPTABLE_FORMATS = new String[]{"jpg", "jpeg", "png", "bmp"};
     private static final long COMPRESSION_THRESHOLD = 512 * 1024;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
     private static final int FOLDERS_WIDTH = 128;
@@ -153,12 +151,12 @@ public class UserImageService implements IUserImageManager {
     }
 
     @Override
-    public Path getImage(String location) {
-        return null;
+    public File getImage(String location) {
+        return new File(IMAGE_ROOT, location + '.' + TARGET_IMAGE_FORMAT);
     }
 
     @Override
-    public Path getMinImage(String location) {
-        return null;
+    public File getImageMin(String location) {
+        return new File(IMAGE_ROOT, location + COMPRESSED_SUFFIX);
     }
 }

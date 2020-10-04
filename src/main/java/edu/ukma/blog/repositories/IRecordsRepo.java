@@ -3,6 +3,8 @@ package edu.ukma.blog.repositories;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -18,4 +20,7 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordID> {
     Optional<RecordEntity> findTopByIdPublisherIdOrderByIdRecordIdDesc(long publisherId);
 
     boolean existsByImgLocation(String location);
+
+    @Query("SELECT record.imgLocation FROM RecordEntity record WHERE record.id=:id")
+    Optional<String> getImgLocation(@Param(value = "id") RecordID id);
 }

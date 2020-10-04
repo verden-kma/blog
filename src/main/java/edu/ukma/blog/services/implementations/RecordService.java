@@ -12,7 +12,7 @@ import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IRecordService;
-import edu.ukma.blog.services.IUserImageManager;
+import edu.ukma.blog.services.IUserImageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class RecordService implements IRecordService {
     private ICommentsRepo commentsRepo;
 
     @Autowired
-    private IUserImageManager imageService;
+    private IUserImageService imageService;
 
     @Override
     public int addRecord(String username, RequestRecord record) throws ServerError, WrongFileFormatException {
