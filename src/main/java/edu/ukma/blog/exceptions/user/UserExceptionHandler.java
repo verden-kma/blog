@@ -1,4 +1,4 @@
-package edu.ukma.blog.exceptions;
+package edu.ukma.blog.exceptions.user;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -7,19 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-
 @RestControllerAdvice
-public class RecordExceptionHandler {
-    @ExceptionHandler(value = {WrongFileFormatException.class})
-    public ResponseEntity<Object> handleWrongFileFormat(WrongFileFormatException e, WebRequest r) {
-        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Object> handleServerError(ServerCriticalException e, WebRequest r) {
-        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
+public class UserExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<Object> handleUsernameDuplicate(UsernameDuplicateException e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT);
@@ -27,11 +16,6 @@ public class RecordExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<Object> handleUsernameMissing(UsernameMissingException e, WebRequest r) {
-        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<Object> handleNoSuchRecord(NoSuchRecordException e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 }

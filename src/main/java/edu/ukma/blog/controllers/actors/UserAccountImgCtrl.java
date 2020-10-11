@@ -1,8 +1,8 @@
 package edu.ukma.blog.controllers.actors;
 
 import edu.ukma.blog.constants.ImageConstants;
-import edu.ukma.blog.exceptions.ServerCriticalException;
-import edu.ukma.blog.exceptions.UsernameMissingException;
+import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
+import edu.ukma.blog.exceptions.user.UsernameMissingException;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IUserImageService;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +40,7 @@ public class UserAccountImgCtrl {
             try (InputStream stream = new FileInputStream(icon.get())) {
                 return IOUtils.toByteArray(stream);
             } catch (IOException e) {
-                throw new ServerCriticalException(e);
+                throw new ServerCriticalError(e);
             }
         } else {
             return null;
@@ -52,4 +52,6 @@ public class UserAccountImgCtrl {
         long id = usersRepo.getIdByUsername(username).orElseThrow(() -> new UsernameMissingException(username));
         imageService.removeAvatar(id);
     }
+
+    //todo: crud for user's background image
 }

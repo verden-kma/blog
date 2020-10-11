@@ -1,27 +1,13 @@
 package edu.ukma.blog.controllers.actors;
 
-import edu.ukma.blog.constants.ImageConstants;
-import edu.ukma.blog.exceptions.ServerCriticalException;
-import edu.ukma.blog.exceptions.UsernameMissingException;
 import edu.ukma.blog.models.Page;
 import edu.ukma.blog.models.user.RequestUserDataUpdate;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
-import edu.ukma.blog.repositories.IUsersRepo;
-import edu.ukma.blog.services.IUserImageService;
 import edu.ukma.blog.services.IUserService;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")

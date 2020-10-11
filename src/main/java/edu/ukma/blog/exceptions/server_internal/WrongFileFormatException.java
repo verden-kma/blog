@@ -1,4 +1,4 @@
-package edu.ukma.blog.exceptions;
+package edu.ukma.blog.exceptions.server_internal;
 
 import java.util.Arrays;
 

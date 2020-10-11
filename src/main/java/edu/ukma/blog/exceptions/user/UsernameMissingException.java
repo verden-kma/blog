@@ -1,4 +1,4 @@
-package edu.ukma.blog.exceptions;
+package edu.ukma.blog.exceptions.user;
 
 public class UsernameMissingException extends RuntimeException {
     final String usernamePassed;

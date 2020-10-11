@@ -1,8 +1,8 @@
 package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.constants.ImageConstants;
-import edu.ukma.blog.exceptions.ServerCriticalException;
-import edu.ukma.blog.exceptions.WrongFileFormatException;
+import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
+import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
@@ -37,8 +37,9 @@ public class RecordImageService implements IRecordImageService {
     private static final String PATH_TEMPLATE = "/%d/%d/";
     private static final long COMPRESSION_THRESHOLD = 512 * 1024;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
-    private static final String ICON_SUFFIX = "-icon." + TARGET_IMAGE_FORMAT;
+    private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;
     private static final String COMPRESSED_SUFFIX = "-min." + TARGET_IMAGE_FORMAT;
+    private static final String ICON_SUFFIX = "-icon." + TARGET_IMAGE_FORMAT;
 
 
     private final Random random = new Random();
@@ -62,11 +63,11 @@ public class RecordImageService implements IRecordImageService {
      *
      * @param original - file to be saved as an image
      * @return location of the original image in jpg format (distinct part of the path to the image)
-     * @throws ServerCriticalException              - if internal server error occurs
+     * @throws ServerCriticalError              - if internal server error occurs
      * @throws WrongFileFormatException - if the <code>original</code> is not an image of acceptable format
      */
     @Override
-    public String saveImage(MultipartFile original) throws ServerCriticalException, WrongFileFormatException {
+    public String saveImage(MultipartFile original) throws ServerCriticalError, WrongFileFormatException {
         FormatType imgType = validateFormat(original);
 
         try {
@@ -92,7 +93,7 @@ public class RecordImageService implements IRecordImageService {
             System.out.println("location: " + location);
             return location;
         } catch (IOException e) {
-            throw new ServerCriticalException(e);
+            throw new ServerCriticalError(e);
         }
     }
 
@@ -143,7 +144,7 @@ public class RecordImageService implements IRecordImageService {
 
     @Override
     public File getImage(String location) {
-        return new File(IMAGE_ROOT, location + '.' + TARGET_IMAGE_FORMAT);
+        return new File(IMAGE_ROOT, location + TARGET_SUFFIX);
     }
 
     @Override
@@ -154,5 +155,13 @@ public class RecordImageService implements IRecordImageService {
     @Override
     public File getImageIcon(String location) {
         return new File(IMAGE_ROOT, location + ICON_SUFFIX);
+    }
+
+    @Override
+    public boolean deleteImage(String location) {
+        File original = new File(IMAGE_ROOT, location + TARGET_SUFFIX);
+        File compressed = new File(IMAGE_ROOT, location + COMPRESSED_SUFFIX);
+        File icon = new File(IMAGE_ROOT, location + ICON_SUFFIX);
+        return original.delete() & compressed.delete() & icon.delete();
     }
 }

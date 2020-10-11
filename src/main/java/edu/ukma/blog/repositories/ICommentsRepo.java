@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface ICommentsRepo extends JpaRepository<Comment, CommentID> {
     List<Comment> findTop10ByIdUserIdAndIdRecordIdOrderByTimestamp(long publisherId, int recordId);
+
+    void deleteById_PublisherIdAndId_RecordId(long userId, int recordId);
 }

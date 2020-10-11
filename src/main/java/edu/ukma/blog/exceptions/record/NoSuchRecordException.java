@@ -1,4 +1,4 @@
-package edu.ukma.blog.exceptions;
+package edu.ukma.blog.exceptions.record;
 
 public class NoSuchRecordException extends RuntimeException {
     final int missingRecordId;

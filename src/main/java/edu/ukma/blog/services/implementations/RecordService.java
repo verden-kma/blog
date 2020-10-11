@@ -1,9 +1,12 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.exceptions.NoSuchRecordException;
-import edu.ukma.blog.exceptions.ServerCriticalException;
-import edu.ukma.blog.exceptions.WrongFileFormatException;
+import edu.ukma.blog.exceptions.record.BlankRecordEditException;
+import edu.ukma.blog.exceptions.record.NoSuchRecordException;
+import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
+import edu.ukma.blog.exceptions.server_internal.ServerLogicsError;
+import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.models.compositeIDs.RecordID;
+import edu.ukma.blog.models.record.EditRequestRecord;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
@@ -37,9 +40,9 @@ public class RecordService implements IRecordService {
     private IRecordImageService imageService;
 
     @Override
-    public int addRecord(String username, RequestRecord record) throws ServerCriticalException, WrongFileFormatException {
+    public int addRecord(String username, RequestRecord record) throws ServerCriticalError, WrongFileFormatException {
         UserEntity publisher = usersRepo.findByUsername(username);
-        Optional<RecordEntity> lastRecord = recordsRepo.findTopByIdPublisherIdOrderByIdRecordIdDesc(publisher.getId());
+        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordIdDesc(publisher.getId());
         int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
 
         RecordEntity recordEntity = new RecordEntity();
@@ -67,12 +70,30 @@ public class RecordService implements IRecordService {
     }
 
     @Override
-    public void editRecord() {
-
+    public void editRecord(RecordID id, EditRequestRecord editRequest) {
+        String caption = editRequest.getCaption();
+        String adText = editRequest.getAdText();
+        if (caption != null)
+            if (adText != null)
+                recordsRepo.updateRecord(id, caption, adText);
+            else
+                recordsRepo.updateCaption(id, caption);
+        else if (adText != null)
+            recordsRepo.updateAdText(id, adText);
+        else
+            throw new BlankRecordEditException("no update data provided");
     }
 
-    @Override
-    public void removeRecord() {
 
+    @Override
+    public void removeRecord(RecordID id) {
+        Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
+        maybeRecord.ifPresent(record -> {
+            String imgPath = record.getImgLocation();
+            /*assert*/
+            if (!imageService.deleteImage(imgPath)) throw  new ServerLogicsError("record image missing");
+            commentsRepo.deleteById_PublisherIdAndId_RecordId(id.getPublisherId(), id.getRecordId());
+            recordsRepo.deleteById(id);
+        });
     }
 }

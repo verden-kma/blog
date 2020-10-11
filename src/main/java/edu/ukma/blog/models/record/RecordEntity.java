@@ -2,6 +2,10 @@ package edu.ukma.blog.models.record;
 
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import lombok.Data;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
@@ -13,16 +17,21 @@ import java.util.List;
 @Data
 @Entity
 public class RecordEntity {
-    // idea for feature: look through all likers, dislikers, find influencers, save them separately
+    // idea for a feature: look through all likers, dislikers, find influencers, save them separately
     @EmbeddedId
     private RecordID id;
 
+    @NotEmpty
     private String caption;
 
     @NotEmpty
     private String imgLocation;
 
+    private String adText;
+
     private LocalDateTime timestamp;
+
+    private boolean isEdited;
 
     @ElementCollection
     private List<Long> likeUsers;

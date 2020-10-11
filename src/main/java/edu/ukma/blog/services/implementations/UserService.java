@@ -1,6 +1,6 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.exceptions.UsernameDuplicateException;
+import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.models.user.UserEntity;

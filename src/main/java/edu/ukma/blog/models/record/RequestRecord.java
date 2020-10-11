@@ -10,4 +10,6 @@ public class RequestRecord {
     private MultipartFile image;
 
     private String timestamp;
+
+    private String adText;
 }

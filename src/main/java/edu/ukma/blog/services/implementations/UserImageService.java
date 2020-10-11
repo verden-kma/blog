@@ -1,13 +1,12 @@
 package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.constants.ImageConstants;
-import edu.ukma.blog.exceptions.ServerCriticalException;
+import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.services.IUserImageService;
 import edu.ukma.blog.utils.IconHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import sun.security.x509.AVA;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.Optional;
 public class UserImageService implements IUserImageService {
     private static final String PATH_PREFIX = ImageConstants.PATH_PREFIX + "/account";
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
+    //all user images are stored in one folder for easy debug, but they will be distributed in release version
 //    private static final String PATH_TEMPLATE = "/%d/%d/";
     private static final String AVATAR_SUFFIX = "-ava." + ImageConstants.TARGET_IMAGE_FORMAT;
     private static final String BACKGROUND_SUFFIX = "-bgr." + ImageConstants.TARGET_IMAGE_FORMAT;
@@ -44,7 +44,7 @@ public class UserImageService implements IUserImageService {
             IconHandler.saveIcon(ImageIO.read(multipartImage.getInputStream()),
                     new File(IMAGE_ROOT, userId + AVATAR_SUFFIX).getPath());
         } catch (IOException e) {
-            throw new ServerCriticalException(e);
+            throw new ServerCriticalError(e);
         }
     }
 
