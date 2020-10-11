@@ -1,6 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
+import edu.ukma.blog.exceptions.user.UsernameMissingException;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.models.user.UserEntity;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class UserService implements IUserService {
@@ -33,6 +35,12 @@ public class UserService implements IUserService {
         BeanUtils.copyProperties(userData, newUser);
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
         return usersRepo.save(newUser);
+    }
+
+    @Override
+    public long getUserId(String username) {
+        Optional<Long> maybePublisherId = usersRepo.getIdByUsername(username);
+        return maybePublisherId.orElseThrow(() -> new UsernameMissingException(username));
     }
 
     @Override

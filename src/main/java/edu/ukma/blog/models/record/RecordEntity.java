@@ -29,7 +29,7 @@ public class RecordEntity {
 
     private String adText;
 
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     private boolean isEdited;
 

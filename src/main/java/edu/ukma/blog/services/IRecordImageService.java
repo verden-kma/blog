@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
+// works with binary (image files) data only
 public interface IRecordImageService {
     String saveImage(MultipartFile original) throws ServerCriticalError, WrongFileFormatException;
 

@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -31,24 +32,20 @@ public class RecordService implements IRecordService {
     private IRecordsRepo recordsRepo;
 
     @Autowired
-    private IUsersRepo usersRepo;
-
-    @Autowired
     private ICommentsRepo commentsRepo;
 
     @Autowired
     private IRecordImageService imageService;
 
     @Override
-    public int addRecord(String username, RequestRecord record) throws ServerCriticalError, WrongFileFormatException {
-        UserEntity publisher = usersRepo.findByUsername(username);
-        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordIdDesc(publisher.getId());
+    public int addRecord(long publisherId, RequestRecord record) throws ServerCriticalError, WrongFileFormatException {
+        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordIdDesc(publisherId);
         int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
 
         RecordEntity recordEntity = new RecordEntity();
-        recordEntity.setId(new RecordID(publisher.getId(), recordId));
+        recordEntity.setId(new RecordID(publisherId, recordId));
         recordEntity.setCaption(record.getCaption());
-        recordEntity.setTimestamp(LocalDateTime.parse(record.getTimestamp(), DateTimeFormatter.ISO_DATE_TIME));
+        recordEntity.setTimestamp(Instant.now().toString());
         String imgLocation = imageService.saveImage(record.getImage());
         recordEntity.setImgLocation(imgLocation);
         recordsRepo.save(recordEntity);
@@ -57,16 +54,20 @@ public class RecordService implements IRecordService {
     }
 
     @Override
-    public ResponseRecord getRecord(RecordID id) {
+    public ResponseRecord getRecordCore(RecordID id) {
+        // todo: replace 1 huge load to RAM with 3 count queries to DB
         RecordEntity record = recordsRepo.findById(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordId()));
         ResponseRecord res = new ResponseRecord();
-        res.setCaption(record.getCaption());
-        res.setTimestamp(record.getTimestamp().format(DateTimeFormatter.ISO_DATE_TIME));
         BeanUtils.copyProperties(record, res);
         res.setLikes(record.getLikeUsers().size());
         res.setDislikes(record.getDislikeUsers().size());
         res.setNumOfComments(record.getComments().size());
         return res;
+    }
+
+    @Override
+    public String getImgLocation(RecordID id) {
+        return recordsRepo.getImgLocation(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordId()));
     }
 
     @Override
@@ -90,8 +91,8 @@ public class RecordService implements IRecordService {
         Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
         maybeRecord.ifPresent(record -> {
             String imgPath = record.getImgLocation();
-            /*assert*/
             if (!imageService.deleteImage(imgPath)) throw  new ServerLogicsError("record image missing");
+            //todo: is it necessary that `commentsRepo` is injected?
             commentsRepo.deleteById_PublisherIdAndId_RecordId(id.getPublisherId(), id.getRecordId());
             recordsRepo.deleteById(id);
         });
