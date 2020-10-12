@@ -10,6 +10,8 @@ public class ResponseRecord {
 
     private String adText;
 
+    private boolean isEdited;
+
     private int likes;
 
     private int dislikes;

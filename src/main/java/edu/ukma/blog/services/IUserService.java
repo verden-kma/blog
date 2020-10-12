@@ -10,7 +10,7 @@ public interface IUserService extends UserDetailsService {
 
     long getUserId(String username);
 
-    ResponseUser getUser(String userId);
+    ResponseUser getUser(String username);
 
-    boolean banUser(String userId);
+    boolean banUser(String username);
 }

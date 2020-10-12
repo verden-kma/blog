@@ -26,8 +26,6 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordID> {
     @Query("SELECT record.imgLocation FROM RecordEntity record WHERE record.id=:id")
     Optional<String> getImgLocation(@Param("id") RecordID id);
 
-    // fixme: javax.persistence.TransactionRequiredException
-
     @Transactional
     @Modifying // try custom object, if fail then primitive types
     @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.isEdited=true WHERE rec.id=:id")
@@ -42,5 +40,4 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordID> {
     @Modifying
     @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.adText=:adText, rec.isEdited=true WHERE rec.id=:id")
     void updateRecord(@Param("id") RecordID id, @Param("title") String title, @Param("adText") String adText);
-
 }

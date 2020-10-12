@@ -6,23 +6,19 @@ import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.ServerLogicsError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.models.compositeIDs.RecordID;
-import edu.ukma.blog.models.record.EditRequestRecord;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
-import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
-import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IRecordImageService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -38,7 +34,8 @@ public class RecordService implements IRecordService {
     private IRecordImageService imageService;
 
     @Override
-    public int addRecord(long publisherId, RequestRecord record) throws ServerCriticalError, WrongFileFormatException {
+    public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
+            throws ServerCriticalError, WrongFileFormatException {
         Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordIdDesc(publisherId);
         int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
 
@@ -46,7 +43,7 @@ public class RecordService implements IRecordService {
         recordEntity.setId(new RecordID(publisherId, recordId));
         recordEntity.setCaption(record.getCaption());
         recordEntity.setTimestamp(Instant.now().toString());
-        String imgLocation = imageService.saveImage(record.getImage());
+        String imgLocation = imageService.saveImage(image);
         recordEntity.setImgLocation(imgLocation);
         recordsRepo.save(recordEntity);
 
@@ -71,7 +68,7 @@ public class RecordService implements IRecordService {
     }
 
     @Override
-    public void editRecord(RecordID id, EditRequestRecord editRequest) {
+    public void editRecord(RecordID id, RequestRecord editRequest) {
         String caption = editRequest.getCaption();
         String adText = editRequest.getAdText();
         if (caption != null)

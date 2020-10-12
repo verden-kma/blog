@@ -7,7 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class RequestRecord {
     private String caption;
 
-    private MultipartFile image;
-
     private String adText;
 }

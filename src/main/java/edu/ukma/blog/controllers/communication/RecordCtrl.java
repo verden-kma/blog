@@ -3,7 +3,6 @@ package edu.ukma.blog.controllers.communication;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.models.compositeIDs.RecordID;
-import edu.ukma.blog.models.record.EditRequestRecord;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.services.IRecordService;
@@ -37,9 +36,8 @@ public class RecordCtrl {
     public int addRecord(@PathVariable String publisher,
                          @RequestPart RequestRecord recordData,
                          @RequestPart MultipartFile image) {
-        recordData.setImage(image);
         long publisherId = userService.getUserId(publisher);
-        return recordService.addRecord(publisherId, recordData);
+        return recordService.addRecord(publisherId, recordData, image);
     }
 
     @GetMapping(path = "/{recordId}")
@@ -81,7 +79,7 @@ public class RecordCtrl {
     @PutMapping(path = "/{recordId}")
     public void editRecord(@PathVariable String publisher,
                            @PathVariable int recordId,
-                           @RequestBody EditRequestRecord updatedRecord) {
+                           @RequestBody RequestRecord updatedRecord) {
         long publisherId = userService.getUserId(publisher);
         recordService.editRecord(new RecordID(publisherId, recordId), updatedRecord);
     }
