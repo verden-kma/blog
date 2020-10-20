@@ -12,9 +12,9 @@ public interface IUserImageService {
 
     void removeAvatar(long userId);
 
-    Optional<File> getMainPageImage(long userId);
+    Optional<File> getTopBanner(long userId);
 
-    void setMainPageImage(MultipartFile image, long userId);
+    void setTopBanner(MultipartFile image, long userId);
 
-    void removeMainPageImage(long userId);
+    void removeTopBanner(long userId);
 }

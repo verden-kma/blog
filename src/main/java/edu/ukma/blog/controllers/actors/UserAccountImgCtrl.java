@@ -27,13 +27,12 @@ public class UserAccountImgCtrl {
     @PutMapping(path = "/avatar") // , consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE}
     public void setAvatarImage(@PathVariable String username,
                                @RequestPart MultipartFile image) {
-        long id = userService.getUserId(username);
-        imageService.setAvatar(image, id);
+        imageService.setAvatar(image, userService.getUserId(username));
     }
 
     @GetMapping(value = "/avatar", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getAvatarImage(@PathVariable String username) { // if image is present then length of content is > 0
-        long id = userService.getUserId(username);Optional<File> icon = imageService.getAvatar(id);
+        Optional<File> icon = imageService.getAvatar(userService.getUserId(username));
         if (icon.isPresent()) {
             try (InputStream stream = new FileInputStream(icon.get())) {
                 return IOUtils.toByteArray(stream);
@@ -41,15 +40,37 @@ public class UserAccountImgCtrl {
                 throw new ServerCriticalError(e);
             }
         } else {
-            return null;
+            return null; // null avatar means default image icon
         }
     }
 
     @DeleteMapping(path = "/avatar")
     public void restoreDefaultAvatar(@PathVariable String username) {
-        long id = userService.getUserId(username);
-        imageService.removeAvatar(id);
+        imageService.removeAvatar(userService.getUserId(username));
     }
 
-    //todo: crud for user's background image
+    @PostMapping(path = "/top-banner")
+    public void setTopBanner(@PathVariable String username,
+                             @RequestPart MultipartFile image) {
+        imageService.setTopBanner(image, userService.getUserId(username));
+    }
+
+    @GetMapping(path = "/top-banner", produces = ImageConstants.TARGET_MEDIA_TYPE)
+    public byte[] getTopBanner(@PathVariable String username) {
+        Optional<File> banner = imageService.getTopBanner(userService.getUserId(username));
+        if (banner.isPresent()) {
+            try (InputStream stream = new FileInputStream(banner.get())) {
+                return IOUtils.toByteArray(stream);
+            }catch (IOException e) {
+                throw new ServerCriticalError(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    @DeleteMapping(path = "/top-banner")
+    public void removeTopBanner(@PathVariable String username) {
+        imageService.removeTopBanner(userService.getUserId(username));
+    }
 }

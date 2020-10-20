@@ -7,7 +7,6 @@ import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +26,7 @@ import java.util.Random;
 
 import static edu.ukma.blog.constants.ImageConstants.*;
 
+
 @Service
 public class RecordImageService implements IRecordImageService {
     // note: maximum number of images that can be stored is ~2^41.
@@ -40,7 +40,6 @@ public class RecordImageService implements IRecordImageService {
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;
     private static final String COMPRESSED_SUFFIX = "-min." + TARGET_IMAGE_FORMAT;
     private static final String ICON_SUFFIX = "-icon." + TARGET_IMAGE_FORMAT;
-
 
     private final Random random = new Random();
 
@@ -63,23 +62,25 @@ public class RecordImageService implements IRecordImageService {
      *
      * @param original - file to be saved as an image
      * @return location of the original image in jpg format (distinct part of the path to the image)
-     * @throws ServerCriticalError              - if internal server error occurs
+     * @throws ServerCriticalError      - if internal server error occurs
      * @throws WrongFileFormatException - if the <code>original</code> is not an image of acceptable format
      */
     @Override
     public String saveImage(MultipartFile original) throws ServerCriticalError, WrongFileFormatException {
-        FormatType imgType = validateFormat(original);
+        if (original.isEmpty() || original.getContentType() == null
+                || !ACCEPTABLE_MEDIA_TYPES.contains(original.getContentType()))
+            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, original.getContentType());
+
+        String path = String.format(PATH_TEMPLATE, random.nextInt(FOLDERS_WIDTH), random.nextInt(FOLDERS_WIDTH));
+        String location;
+        do {
+            location = path + AlphaNumGenerator.generate(IMG_ID_LENGTH);
+        } while (recordsRepo.existsByImgLocation(location));
 
         try {
-            String path = String.format(PATH_TEMPLATE, random.nextInt(FOLDERS_WIDTH), random.nextInt(FOLDERS_WIDTH));
-            String location;
-            do {
-                location = path + AlphaNumGenerator.generate(IMG_ID_LENGTH);
-            } while (recordsRepo.existsByImgLocation(location));
-
             BufferedImage originalImg = ImageIO.read(original.getInputStream());
             File originalStored = new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT);
-            if (imgType == FormatType.TARGET) original.transferTo(originalStored);
+            if (original.getContentType().equals(TARGET_MEDIA_TYPE)) original.transferTo(originalStored);
             else ImageIO.write(originalImg, TARGET_IMAGE_FORMAT, originalStored);
 
 
@@ -118,29 +119,29 @@ public class RecordImageService implements IRecordImageService {
         writer.dispose();
     }
 
-    /**
-     * check that a file passed is of an appropriate format or throw exception otherwise
-     *
-     * @param origin file to validate
-     * @return type of a valid file's format
-     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
-     */
-    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
-        String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
-        if (fileFormat == null) {
-            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
-        }
-        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
-        for (String acceptableFormat : ACCEPTABLE_FORMATS) {
-            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
-        }
-        throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
-    }
-
-    enum FormatType {
-        TARGET,
-        ACCEPTABLE
-    }
+//    /**
+//     * check that a file passed is of an appropriate format or throw exception otherwise
+//     *
+//     * @param origin file to validate
+//     * @return type of a valid file's format
+//     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
+//     */
+//    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
+//        String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
+//        if (fileFormat == null) {
+//            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
+//        }
+//        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
+//        for (String acceptableFormat : ACCEPTABLE_FORMATS) {
+//            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
+//        }
+//        throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
+//    }
+//
+//    enum FormatType {
+//        TARGET,
+//        ACCEPTABLE
+//    }
 
     @Override
     public File getImage(String location) {
