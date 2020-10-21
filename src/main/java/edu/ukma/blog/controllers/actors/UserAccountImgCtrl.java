@@ -27,12 +27,12 @@ public class UserAccountImgCtrl {
     @PutMapping(path = "/avatar") // , consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE}
     public void setAvatarImage(@PathVariable String username,
                                @RequestPart MultipartFile image) {
-        imageService.setAvatar(image, userService.getUserId(username));
+        imageService.setAvatar(image, username);
     }
 
     @GetMapping(value = "/avatar", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getAvatarImage(@PathVariable String username) { // if image is present then length of content is > 0
-        Optional<File> icon = imageService.getAvatar(userService.getUserId(username));
+        Optional<File> icon = imageService.getAvatar(username);
         if (icon.isPresent()) {
             try (InputStream stream = new FileInputStream(icon.get())) {
                 return IOUtils.toByteArray(stream);
@@ -46,18 +46,18 @@ public class UserAccountImgCtrl {
 
     @DeleteMapping(path = "/avatar")
     public void restoreDefaultAvatar(@PathVariable String username) {
-        imageService.removeAvatar(userService.getUserId(username));
+        imageService.removeAvatar(username);
     }
 
     @PostMapping(path = "/top-banner")
     public void setTopBanner(@PathVariable String username,
                              @RequestPart MultipartFile image) {
-        imageService.setTopBanner(image, userService.getUserId(username));
+        imageService.setTopBanner(image, username);
     }
 
     @GetMapping(path = "/top-banner", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getTopBanner(@PathVariable String username) {
-        Optional<File> banner = imageService.getTopBanner(userService.getUserId(username));
+        Optional<File> banner = imageService.getTopBanner(username);
         if (banner.isPresent()) {
             try (InputStream stream = new FileInputStream(banner.get())) {
                 return IOUtils.toByteArray(stream);
@@ -71,6 +71,6 @@ public class UserAccountImgCtrl {
 
     @DeleteMapping(path = "/top-banner")
     public void removeTopBanner(@PathVariable String username) {
-        imageService.removeTopBanner(userService.getUserId(username));
+        imageService.removeTopBanner(username);
     }
 }

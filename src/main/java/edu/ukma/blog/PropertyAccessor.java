@@ -30,4 +30,12 @@ public class PropertyAccessor {
     public String getTokenSecret() {
         return environment.getProperty("tokenSecret");
     }
+
+    public int getMinUsernameLen() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("minUsernameLen")));
+    }
+
+    public int getMaxUsernameLen() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("maxUsernameLen")));
+    }
 }

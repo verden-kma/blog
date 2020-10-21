@@ -23,6 +23,16 @@
       "name": "tokenSecret",
       "type": "java.lang.String",
       "description": "Private code used to build tokens."
+    },
+    {
+      "name": "minUsernameLen",
+      "type": "java.lang.String",
+      "description": "Users with username shorter than this are not allowed."
+    },
+    {
+      "name": "maxUsernameLen",
+      "type": "java.lang.String",
+      "description": "Users with username longer than this are not allowed."
     }
   ]
 }
