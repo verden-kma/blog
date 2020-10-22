@@ -49,7 +49,7 @@ public class UserAccountImgCtrl {
         imageService.removeAvatar(username);
     }
 
-    @PostMapping(path = "/top-banner")
+    @PutMapping(path = "/top-banner")
     public void setTopBanner(@PathVariable String username,
                              @RequestPart MultipartFile image) {
         imageService.setTopBanner(image, username);

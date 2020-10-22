@@ -16,7 +16,5 @@ public class CommentID implements Serializable {
 
     private int recordId;
 
-    private long userId;
-
     private int commentId;
 }

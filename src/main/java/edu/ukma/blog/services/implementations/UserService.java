@@ -1,11 +1,14 @@
 package edu.ukma.blog.services.implementations;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.repositories.projections.UserEntityIdsView;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +19,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -53,6 +58,16 @@ public class UserService implements IUserService {
     @Override
     public boolean banUser(String username) {
         return usersRepo.deleteByUsername(username);
+    }
+
+    @Override
+    public BiMap<Long, String> getUserIdentifiersBimap(List<Long> ids) {
+        return usersRepo.getUsernamesByIds(ids)
+                .stream()
+                .collect(Collectors.toMap(UserEntityIdsView::getId,
+                        UserEntityIdsView::getUsername,
+                        (String a, String b) -> b,
+                        HashBiMap::create));
     }
 
     @Override

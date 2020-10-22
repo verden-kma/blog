@@ -1,7 +1,10 @@
-package edu.ukma.blog.models;
+package edu.ukma.blog.models.comment;
 
 import edu.ukma.blog.models.compositeIDs.CommentID;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -11,13 +14,16 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class Comment {
+@AllArgsConstructor
+@NoArgsConstructor
+public class CommentEntity {
     @EmbeddedId
     private CommentID id;
+
+    private long commentatorId;
 
     @NotEmpty
     private String text;
 
-    @NotNull
-    private LocalDateTime timestamp;
+    private String timestamp;
 }

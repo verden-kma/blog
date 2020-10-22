@@ -18,4 +18,9 @@ public class UserExceptionHandler {
     public ResponseEntity<Object> handleUsernameMissing(UsernameMissingException e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleNoSuchUserException(NoSuchUserException e, WebRequest r) {
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
 }

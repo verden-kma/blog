@@ -29,7 +29,7 @@ public class RecordEntity {
 
     private String adText;
 
-    private String timestamp;
+    private String timestamp; // LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC) ?
 
     private boolean isEdited;
 
