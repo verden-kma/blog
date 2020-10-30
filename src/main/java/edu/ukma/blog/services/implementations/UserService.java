@@ -4,9 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
-import edu.ukma.blog.models.user.RequestUserSignup;
-import edu.ukma.blog.models.user.ResponseUser;
-import edu.ukma.blog.models.user.UserEntity;
+import edu.ukma.blog.models.user.*;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.UserEntityIdsView;
 import edu.ukma.blog.services.IUserService;
@@ -17,7 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private IUsersRepo usersRepo;
@@ -53,6 +60,28 @@ public class UserService implements IUserService {
         ResponseUser respUser = new ResponseUser();
         BeanUtils.copyProperties(usersRepo.findByUsername(username), respUser);
         return respUser;
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(String username, EditUserRequestModel editUser) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<UserEntity> criteriaUpdate = cb.createCriteriaUpdate(UserEntity.class);
+        Root<UserEntity> root = criteriaUpdate.from(UserEntity.class);
+
+        if (editUser.getPassword() != null) {
+            criteriaUpdate.set(root.get(UserEntity_.encryptedPassword), passwordEncoder.encode(editUser.getPassword()))
+                    .where(cb.equal(root.get(UserEntity_.username), username));
+        }
+        if (editUser.getStatus() != null) {
+            criteriaUpdate.set(root.get(UserEntity_.status), editUser.getStatus())
+                    .where(cb.equal(root.get(UserEntity_.username), username));
+        }
+        if (editUser.getDescription() != null) {
+            criteriaUpdate.set(root.get(UserEntity_.description), editUser.getDescription())
+                    .where(cb.equal(root.get(UserEntity_.username), username));
+        }
+        entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 
     @Override

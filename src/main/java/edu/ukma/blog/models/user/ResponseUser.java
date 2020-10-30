@@ -13,5 +13,4 @@ public class ResponseUser {
 
     private String description;
 
-    private String avaPath;
 }

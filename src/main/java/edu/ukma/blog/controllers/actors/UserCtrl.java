@@ -1,7 +1,7 @@
 package edu.ukma.blog.controllers.actors;
 
 import edu.ukma.blog.models.Page;
-import edu.ukma.blog.models.user.RequestUserDataUpdate;
+import edu.ukma.blog.models.user.EditUserRequestModel;
 import edu.ukma.blog.models.user.RequestUserSignup;
 import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.services.IUserService;
@@ -29,8 +29,8 @@ public class UserCtrl {
 
     @PutMapping("/{username}")
     public void updateUserData(@PathVariable String username,
-                               @RequestBody RequestUserDataUpdate update) {
-        throw new NotImplementedException();
+                               @RequestBody EditUserRequestModel update) {
+        userService.updateUser(username, update);
     }
 
     /**

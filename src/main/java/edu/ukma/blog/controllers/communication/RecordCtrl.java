@@ -1,12 +1,13 @@
 package edu.ukma.blog.controllers.communication;
 
 import edu.ukma.blog.constants.ImageConstants;
+import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
-import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IRecordImageService;
+import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Function;
 
 @RestController
@@ -80,6 +84,8 @@ public class RecordCtrl {
     public void editRecord(@PathVariable String publisher,
                            @PathVariable int recordId,
                            @RequestBody RequestRecord updatedRecord) {
+        if (updatedRecord.getCaption() == null && updatedRecord.getAdText() == null)
+            throw new BlankRecordEditException("no update data provided");
         long publisherId = userService.getUserId(publisher);
         recordService.editRecord(new RecordID(publisherId, recordId), updatedRecord);
     }

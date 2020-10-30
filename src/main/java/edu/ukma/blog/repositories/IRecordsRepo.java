@@ -3,11 +3,9 @@ package edu.ukma.blog.repositories;
 import edu.ukma.blog.models.compositeIDs.RecordID;
 import edu.ukma.blog.models.record.RecordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,19 +23,21 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordID> {
 
     @Query("SELECT record.imgLocation FROM RecordEntity record WHERE record.id=:id")
     Optional<String> getImgLocation(@Param("id") RecordID id);
+//    Optional<String> findImgLocationById(RecordID id); todo: test with projection
 
-    @Transactional
-    @Modifying // try custom object, if fail then primitive types
-    @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.isEdited=true WHERE rec.id=:id")
-    void updateCaption(@Param("id") RecordID id, @Param("title") String title);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE RecordEntity rec SET rec.adText=:adText, rec.isEdited=true WHERE rec.id=:id")
-    void updateAdText(@Param("id") RecordID id, @Param("adText") String adText);
-
-    @Transactional
-    @Modifying
-    @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.adText=:adText, rec.isEdited=true WHERE rec.id=:id")
-    void updateRecord(@Param("id") RecordID id, @Param("title") String title, @Param("adText") String adText);
+//    as an example to remember
+//    @Transactional
+//    @Modifying // try custom object, if fail then primitive types
+//    @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.isEdited=true WHERE rec.id=:id")
+//    void updateCaption(@Param("id") RecordID id, @Param("title") String title);
+//
+//    @Transactional
+//    @Modifying
+//    @Query("UPDATE RecordEntity rec SET rec.adText=:adText, rec.isEdited=true WHERE rec.id=:id")
+//    void updateAdText(@Param("id") RecordID id, @Param("adText") String adText);
+//
+//    @Transactional
+//    @Modifying
+//    @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.adText=:adText, rec.isEdited=true WHERE rec.id=:id")
+//    void updateRecord(@Param("id") RecordID id, @Param("title") String title, @Param("adText") String adText);
 }

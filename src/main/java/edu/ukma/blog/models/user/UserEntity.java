@@ -26,8 +26,6 @@ public class UserEntity {
 
     private String description;
 
-    private String avaPath; // if null then use default avatar icon
-
     @ElementCollection
     private List<Long> followers;
 
