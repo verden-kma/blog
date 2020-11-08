@@ -10,36 +10,34 @@ public class SecurityConstants {
     public static final String SIGN_UP_URL;
     public static final String TOKEN_SECRET;
 
-    private static final String propertyAccessorBeanName;
-
     static {
         String beanName = PropertyAccessor.class.getSimpleName();
-        propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
 
-        EXPIRATION_TIME = getExpirationTime();
-        TOKEN_PREFIX = getTokenPrefix();
-        AUTH_HEADER = getAuthHeader();
-        SIGN_UP_URL = getSignUpUrl();
-        TOKEN_SECRET = getTokenSecret();
+        EXPIRATION_TIME = getExpirationTime(propertyAccessorBeanName);
+        TOKEN_PREFIX = getTokenPrefix(propertyAccessorBeanName);
+        AUTH_HEADER = getAuthHeader(propertyAccessorBeanName);
+        SIGN_UP_URL = getSignUpUrl(propertyAccessorBeanName);
+        TOKEN_SECRET = getTokenSecret(propertyAccessorBeanName);
     }
 
-    private static long getExpirationTime() {
+    private static long getExpirationTime(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getExpirationTime();
     }
 
-    private static String getTokenPrefix() {
+    private static String getTokenPrefix(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getTokenPrefix();
     }
 
-    private static String getAuthHeader() {
+    private static String getAuthHeader(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getAuthHeader();
     }
 
-    private static String getSignUpUrl() {
+    private static String getSignUpUrl(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getSignUpUrl();
     }
 
-    private static String getTokenSecret() {
+    private static String getTokenSecret(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getTokenSecret();
     }
 }

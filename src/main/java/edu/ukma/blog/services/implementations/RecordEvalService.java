@@ -1,5 +1,6 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.models.EvalPage;
 import edu.ukma.blog.models.Evaluation;
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
@@ -8,6 +9,8 @@ import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.UserEntityIdsView;
 import edu.ukma.blog.services.IRecordEvalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,8 +43,8 @@ public class RecordEvalService implements IRecordEvalService {
     }
 
     @Override
-    public List<String> getLikers(RecordId recordId) {
-        return getEvalKind(recordId, true);
+    public EvalPage getLikers(RecordId recordId, Pageable pageable) {
+        return getEvalKind(recordId, true, pageable);
     }
 
     @Override
@@ -55,18 +58,21 @@ public class RecordEvalService implements IRecordEvalService {
     }
 
     @Override
-    public List<String> getDislikers(RecordId recordId) {
-        return getEvalKind(recordId, false);
+    public EvalPage getDislikers(RecordId recordId, Pageable pageable) {
+        return getEvalKind(recordId, false, pageable);
     }
 
-    private List<String> getEvalKind(RecordId recordId, boolean isLiker) {
-        List<Evaluation> evals = evaluatorsRepo.findAllById_RecordIdAndIsLiker(recordId, isLiker);
-        return usersRepo.getUsernamesByIds(evals
+    private EvalPage getEvalKind(RecordId recordId, boolean isLiker, Pageable pageable) {
+        Slice<Evaluation> evals = evaluatorsRepo.findAllById_RecordIdAndIsLiker(recordId, isLiker, pageable);
+
+        List<String> evaluators = usersRepo.getUsernamesByIds(evals
+                .getContent()
                 .stream()
                 .map(x -> x.getId().getEvaluatorId())
                 .collect(Collectors.toList()))
                 .stream()
                 .map(UserEntityIdsView::getUsername)
                 .collect(Collectors.toList());
+        return new EvalPage(evaluators, evals.isLast());
     }
 }

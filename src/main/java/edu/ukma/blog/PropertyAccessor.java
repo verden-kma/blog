@@ -38,4 +38,14 @@ public class PropertyAccessor {
     public int getMaxUsernameLen() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("maxUsernameLen")));
     }
+
+    public int getPageSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("recordsPerPage")));
+    }
+
+    public int getEvalBlockSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("evaluatorsPerBlock")));
+    }
+
+
 }

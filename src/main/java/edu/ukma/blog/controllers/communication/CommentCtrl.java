@@ -55,7 +55,7 @@ public class CommentCtrl {
         return comments.stream().map(commentEntity -> {
             ResponseComment response = new ResponseComment();
             BeanUtils.copyProperties(commentEntity, response);
-            response.setCommentId(commentEntity.getId().getCommentId());
+            response.setCommentId(commentEntity.getId().getCommentOwnId());
             response.setCommentator(userIds.get(commentEntity.getCommentatorId()));
             return response;
         }).collect(Collectors.toList());

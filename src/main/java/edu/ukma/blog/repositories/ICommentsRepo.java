@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface ICommentsRepo extends JpaRepository<CommentEntity, CommentId> {
-    Optional<CommentEntity> findTopById_RecordIdOrderById_CommentIdDesc(RecordId recordId);
+    Optional<CommentEntity> findTopById_RecordIdOrderById_CommentOwnIdDesc(RecordId recordId);
 
 //    List<CommentEntity> findTop10ByCommentatorIdAndIdRecordIdOrderByTimestamp(long publisherId, int recordId);
 

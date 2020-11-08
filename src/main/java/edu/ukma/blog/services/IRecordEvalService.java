@@ -1,8 +1,9 @@
 package edu.ukma.blog.services;
 
+import edu.ukma.blog.models.EvalPage;
 import edu.ukma.blog.models.compositeIDs.RecordId;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface IRecordEvalService {
     Boolean getReaction(RecordId recordId, long userId);
@@ -11,11 +12,11 @@ public interface IRecordEvalService {
 
     void removeLike(RecordId recordId, long userId);
 
-    List<String> getLikers(RecordId recordId);
+    EvalPage getLikers(RecordId recordId, Pageable pageable);
 
     void putDislike(RecordId recordId, long userId);
 
     void removeDislike(RecordId recordId, long userId);
 
-    List<String> getDislikers(RecordId recordId);
+    EvalPage getDislikers(RecordId recordId, Pageable pageable);
 }

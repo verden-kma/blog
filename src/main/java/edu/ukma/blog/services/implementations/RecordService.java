@@ -51,8 +51,8 @@ public class RecordService implements IRecordService {
     @Override
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
-        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordIdDesc(publisherId);
-        int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
+        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordOwnIdDesc(publisherId);
+        int recordId = lastRecord.map(value -> value.getId().getRecordOwnId() + 1).orElse(1);
 
         RecordEntity recordEntity = new RecordEntity();
         recordEntity.setId(new RecordId(publisherId, recordId));
@@ -68,9 +68,9 @@ public class RecordService implements IRecordService {
     @Override
     public ResponseRecord getRecordCore(RecordId recordId, long userId) {
         RecordEntity record = recordsRepo.findById(recordId)
-                .orElseThrow(() -> new NoSuchRecordException(recordId.getRecordId()));
+                .orElseThrow(() -> new NoSuchRecordException(recordId.getRecordOwnId()));
         ResponseRecord res = new ResponseRecord();
-        res.setId(recordId.getRecordId());
+        res.setId(recordId.getRecordOwnId());
         BeanUtils.copyProperties(record, res);
         res.setLikes(evaluatorsRepo.countAllById_RecordIdAndIsLiker(recordId, true));
         res.setDislikes(evaluatorsRepo.countAllById_RecordIdAndIsLiker(recordId, false));
@@ -84,7 +84,7 @@ public class RecordService implements IRecordService {
 
     @Override
     public String getImgLocation(RecordId id) {
-        return recordsRepo.getImgLocation(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordId()));
+        return recordsRepo.getImgLocation(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordOwnId()));
     }
 
     @Override

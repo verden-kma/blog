@@ -1,16 +1,18 @@
 package edu.ukma.blog.controllers.communication;
 
+import edu.ukma.blog.PropertyAccessor;
+import edu.ukma.blog.SpringApplicationContext;
+import edu.ukma.blog.models.EvalPage;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.services.IRecordEvalService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/users/{publisher}/records/{recordId}")
-public class ReactionCtrl {
+public class EvaluationCtrl {
     /*
      * user can load page on 2 devices (tabs) [null]
      * put like on d1, this like will not be displayed on d2 [true]
@@ -18,21 +20,31 @@ public class ReactionCtrl {
      * therefore there are separate put and delete endpoints
      * */
 
+    private static final int EVAL_BLOCK_SIZE;
+
+    static {
+        String beanName = PropertyAccessor.class.getSimpleName();
+        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+        EVAL_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
+                .getBean(propertyAccessorBeanName)).getEvalBlockSize();
+    }
+
     @Autowired
     private IRecordEvalService reactionService;
 
     @Autowired
     private IUserService userService;
 
+
     @GetMapping("/likers")
-    public List<String> getLikers(@PathVariable String publisher,
-                                  @PathVariable int recordId,
-                                  @RequestParam int block) {
+    public EvalPage getLikers(@PathVariable String publisher,
+                              @PathVariable int recordId,
+                              @RequestParam int block) {
         long publisherId = userService.getUserId(publisher);
-        return reactionService.getLikers(new RecordId(publisherId, recordId));
+        return reactionService.getLikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
-    @PutMapping("/likes/{username}")
+    @PutMapping("/likers/{username}")
     public void likeRecord(@PathVariable String publisher,
                            @PathVariable int recordId,
                            @PathVariable String username) {
@@ -41,7 +53,7 @@ public class ReactionCtrl {
         reactionService.putLike(new RecordId(publisherId, recordId), userId);
     }
 
-    @DeleteMapping("/likes/{username}")
+    @DeleteMapping("/likers/{username}")
     public void removeLike(@PathVariable String publisher,
                            @PathVariable int recordId,
                            @PathVariable String username) {
@@ -51,14 +63,14 @@ public class ReactionCtrl {
     }
 
     @GetMapping("/dislikers")
-    public List<String> getDislikers(@PathVariable String publisher,
-                                     @PathVariable int recordId,
-                                     @RequestParam int block) {
+    public EvalPage getDislikers(@PathVariable String publisher,
+                                 @PathVariable int recordId,
+                                 @RequestParam int block) {
         long publisherId = userService.getUserId(publisher);
-        return reactionService.getDislikers(new RecordId(publisherId, recordId));
+        return reactionService.getDislikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
-    @PutMapping("/dislikes/{username}")
+    @PutMapping("/dislikers/{username}")
     public void dislikeRecord(@PathVariable String publisher,
                               @PathVariable int recordId,
                               @PathVariable String username) {
@@ -67,7 +79,7 @@ public class ReactionCtrl {
         reactionService.putDislike(new RecordId(publisherId, recordId), userId);
     }
 
-    @DeleteMapping("/dislikes/{username}")
+    @DeleteMapping("/dislikers/{username}")
     public void removeDislike(@PathVariable String publisher,
                               @PathVariable int recordId,
                               @PathVariable String username) {

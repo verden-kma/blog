@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class CommentId implements Serializable {
     private RecordId recordId;
 
-    private int commentId;
+    private int commentOwnId;
 }

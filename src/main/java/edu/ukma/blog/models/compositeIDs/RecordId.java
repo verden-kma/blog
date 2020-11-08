@@ -14,5 +14,5 @@ import java.io.Serializable;
 public class RecordId implements Serializable {
     private long publisherId;
 
-    private int recordId;
+    private int recordOwnId;
 }

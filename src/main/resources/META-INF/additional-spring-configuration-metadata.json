@@ -33,6 +33,16 @@
       "name": "maxUsernameLen",
       "type": "java.lang.String",
       "description": "Users with username longer than this are not allowed."
+    },
+    {
+      "name": "recordsPerPage",
+      "type": "java.lang.String",
+      "description": "Defines parameter for user content pagination."
+    },
+    {
+      "name": "evaluatorsPerBlock",
+      "type": "java.lang.String",
+      "description": "Defines number of evaluators loaded in one block (when user wants to know who liked a specified record.."
     }
   ]
 }

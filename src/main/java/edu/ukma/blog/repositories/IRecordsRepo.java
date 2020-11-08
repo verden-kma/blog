@@ -18,7 +18,7 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
      * @param publisherId - id of a user who has published a record
      * @return <code>Record</code> with the largest <code>recordId</code>
      */
-    Optional<RecordEntity> findTopById_PublisherIdOrderById_RecordIdDesc(long publisherId);
+    Optional<RecordEntity> findTopById_PublisherIdOrderById_RecordOwnIdDesc(long publisherId);
 
     boolean existsByImgLocation(String location);
 
