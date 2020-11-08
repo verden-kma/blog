@@ -11,8 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class RecordID implements Serializable {
-    private long publisherId;
-
-    private int recordId;
+public class EvaluatorId implements Serializable {
+    private RecordId recordId;
+    private long evaluatorId;
 }

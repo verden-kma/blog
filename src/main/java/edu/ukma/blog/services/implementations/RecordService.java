@@ -4,12 +4,15 @@ import edu.ukma.blog.exceptions.record.NoSuchRecordException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.ServerLogicsError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
-import edu.ukma.blog.models.compositeIDs.RecordID;
+import edu.ukma.blog.models.Evaluation;
+import edu.ukma.blog.models.compositeIDs.EvaluatorId;
+import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.repositories.ICommentsRepo;
+import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
@@ -42,6 +45,9 @@ public class RecordService implements IRecordService {
     @Autowired
     private IRecordImageService imageService;
 
+    @Autowired
+    private IEvaluatorsRepo evaluatorsRepo;
+
     @Override
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
@@ -49,7 +55,7 @@ public class RecordService implements IRecordService {
         int recordId = lastRecord.map(value -> value.getId().getRecordId() + 1).orElse(1);
 
         RecordEntity recordEntity = new RecordEntity();
-        recordEntity.setId(new RecordID(publisherId, recordId));
+        recordEntity.setId(new RecordId(publisherId, recordId));
         recordEntity.setCaption(record.getCaption());
         recordEntity.setTimestamp(Instant.now().toString());
         String imgLocation = imageService.saveImage(image);
@@ -60,25 +66,30 @@ public class RecordService implements IRecordService {
     }
 
     @Override
-    public ResponseRecord getRecordCore(RecordID id) {
-        // todo: replace 1 huge load to RAM with 3 count queries to DB
-        RecordEntity record = recordsRepo.findById(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordId()));
+    public ResponseRecord getRecordCore(RecordId recordId, long userId) {
+        RecordEntity record = recordsRepo.findById(recordId)
+                .orElseThrow(() -> new NoSuchRecordException(recordId.getRecordId()));
         ResponseRecord res = new ResponseRecord();
+        res.setId(recordId.getRecordId());
         BeanUtils.copyProperties(record, res);
-        res.setLikes(record.getLikeUsers().size());
-        res.setDislikes(record.getDislikeUsers().size());
-        res.setNumOfComments(record.getComments().size());
+        res.setLikes(evaluatorsRepo.countAllById_RecordIdAndIsLiker(recordId, true));
+        res.setDislikes(evaluatorsRepo.countAllById_RecordIdAndIsLiker(recordId, false));
+        res.setReaction(evaluatorsRepo.findById(new EvaluatorId(recordId, userId))
+                .map(Evaluation::getIsLiker)
+                .orElse(null));
+
+        res.setNumOfComments(commentsRepo.countAllById_RecordId(recordId));
         return res;
     }
 
     @Override
-    public String getImgLocation(RecordID id) {
+    public String getImgLocation(RecordId id) {
         return recordsRepo.getImgLocation(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordId()));
     }
 
     @Override
     @Transactional
-    public void editRecord(RecordID id, RequestRecord editRequest) {
+    public void editRecord(RecordId id, RequestRecord editRequest) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<RecordEntity> criteriaUpdate = cb.createCriteriaUpdate(RecordEntity.class);
         Root<RecordEntity> root = criteriaUpdate.from(RecordEntity.class);
@@ -96,13 +107,12 @@ public class RecordService implements IRecordService {
 
 
     @Override
-    public void removeRecord(RecordID id) {
+    public void removeRecord(RecordId id) {
         Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
         maybeRecord.ifPresent(record -> {
             String imgPath = record.getImgLocation();
             if (!imageService.deleteImage(imgPath)) throw new ServerLogicsError("record image missing");
-            //todo: is it necessary that `commentsRepo` is injected?
-            commentsRepo.deleteById_PublisherIdAndId_RecordId(id.getPublisherId(), id.getRecordId());
+            commentsRepo.deleteById_RecordId(id);
             recordsRepo.deleteById(id);
         });
     }

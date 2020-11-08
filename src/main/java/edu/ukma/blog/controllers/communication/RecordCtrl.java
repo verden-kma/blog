@@ -3,7 +3,7 @@ package edu.ukma.blog.controllers.communication;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
-import edu.ukma.blog.models.compositeIDs.RecordID;
+import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.services.IRecordImageService;
@@ -44,16 +44,18 @@ public class RecordCtrl {
         return recordService.addRecord(publisherId, recordData, image);
     }
 
-    @GetMapping(path = "/{recordId}")
+    @GetMapping(path = "/{recordId}/{username}")
     public ResponseRecord getRecord(@PathVariable String publisher,
-                                    @PathVariable int recordId) {
+                                    @PathVariable int recordId,
+                                    @PathVariable String username) {
         long publisherId = userService.getUserId(publisher);
-        return recordService.getRecordCore(new RecordID(publisherId, recordId));
+        long userId = userService.getUserId(username);
+        return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
     }
 
     private byte[] getSelectedImage(Function<String, File> selector, String publisher, int recordId) {
         long publisherId = userService.getUserId(publisher);
-        String location = recordService.getImgLocation(new RecordID(publisherId, recordId));
+        String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
         File image = selector.apply(location);
         try (InputStream input = new FileInputStream(image)) {
             return IOUtils.toByteArray(input);
@@ -87,13 +89,13 @@ public class RecordCtrl {
         if (updatedRecord.getCaption() == null && updatedRecord.getAdText() == null)
             throw new BlankRecordEditException("no update data provided");
         long publisherId = userService.getUserId(publisher);
-        recordService.editRecord(new RecordID(publisherId, recordId), updatedRecord);
+        recordService.editRecord(new RecordId(publisherId, recordId), updatedRecord);
     }
 
     @DeleteMapping(path = "/{recordId}")
     public void removeRecord(@PathVariable String publisher,
                              @PathVariable int recordId) {
         long publisherId = userService.getUserId(publisher);
-        recordService.removeRecord(new RecordID(publisherId, recordId));
+        recordService.removeRecord(new RecordId(publisherId, recordId));
     }
 }

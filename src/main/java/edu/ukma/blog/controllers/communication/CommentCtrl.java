@@ -5,8 +5,8 @@ import edu.ukma.blog.exceptions.comment.NoSuchCommentException;
 import edu.ukma.blog.models.comment.CommentEntity;
 import edu.ukma.blog.models.comment.RequestComment;
 import edu.ukma.blog.models.comment.ResponseComment;
-import edu.ukma.blog.models.compositeIDs.CommentID;
-import edu.ukma.blog.models.compositeIDs.RecordID;
+import edu.ukma.blog.models.compositeIDs.CommentId;
+import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.services.ICommentService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
@@ -39,7 +39,7 @@ public class CommentCtrl {
                           @PathVariable int recordId,
                           @RequestBody RequestComment newComment) {
         long publisherId = userService.getUserId(publisher);
-        RecordID fullRecordId = new RecordID(publisherId, recordId);
+        RecordId fullRecordId = new RecordId(publisherId, recordId);
         long commenterId = userService.getUserId(newComment.getCommenter());
         return commentService.addComment(fullRecordId, commenterId, newComment.getText());
     }
@@ -48,7 +48,7 @@ public class CommentCtrl {
     public List<ResponseComment> getComments(@PathVariable String publisher,
                                              @PathVariable int recordId) {
         long publisherId = userService.getUserId(publisher);
-        List<CommentEntity> comments = commentService.getComments(new RecordID(publisherId, recordId));
+        List<CommentEntity> comments = commentService.getComments(new RecordId(publisherId, recordId));
         List<Long> ids = comments.stream().map(CommentEntity::getCommentatorId).collect(Collectors.toList());
         final BiMap<Long, String> userIds = userService.getUserIdentifiersBimap(ids);
 
@@ -67,7 +67,7 @@ public class CommentCtrl {
                               @PathVariable int commentId) {
         long publisherId = userService.getUserId(publisher);
         try {
-            commentService.removeComment(new CommentID(publisherId, recordId, commentId));
+            commentService.removeComment(new CommentId(new RecordId(publisherId, recordId), commentId));
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchCommentException(publisher, recordId, commentId);
         }

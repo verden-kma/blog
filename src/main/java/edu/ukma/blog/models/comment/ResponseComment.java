@@ -1,10 +1,6 @@
 package edu.ukma.blog.models.comment;
 
-import edu.ukma.blog.models.compositeIDs.CommentID;
 import lombok.Data;
-
-import javax.persistence.EmbeddedId;
-import javax.validation.constraints.NotEmpty;
 
 @Data
 public class ResponseComment {

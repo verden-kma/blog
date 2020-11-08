@@ -11,10 +11,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class CommentID implements Serializable {
-    private long publisherId;
+public class FollowerId implements Serializable {
+    private long publisher;
 
-    private int recordId;
-
-    private int commentId;
+    private long subscriber;
 }

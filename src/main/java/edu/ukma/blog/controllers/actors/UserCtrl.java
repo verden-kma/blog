@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/users")
 public class UserCtrl {
@@ -29,7 +31,7 @@ public class UserCtrl {
 
     @PutMapping("/{username}")
     public void updateUserData(@PathVariable String username,
-                               @RequestBody EditUserRequestModel update) {
+                               @Valid @RequestBody EditUserRequestModel update) {
         userService.updateUser(username, update);
     }
 
