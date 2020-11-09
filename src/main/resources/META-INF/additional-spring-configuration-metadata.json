@@ -43,6 +43,11 @@
       "name": "evaluatorsPerBlock",
       "type": "java.lang.String",
       "description": "Defines number of evaluators loaded in one block (when user wants to know who liked a specified record.."
+    },
+    {
+      "name": "commentsPerBlock",
+      "type": "java.lang.String",
+      "description": "How name comments are displayed in a block."
     }
   ]
 }

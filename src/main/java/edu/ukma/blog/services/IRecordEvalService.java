@@ -1,7 +1,7 @@
 package edu.ukma.blog.services;
 
-import edu.ukma.blog.models.EvalPage;
 import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.record.evaluation.EvalPage;
 import org.springframework.data.domain.Pageable;
 
 

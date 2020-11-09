@@ -47,5 +47,7 @@ public class PropertyAccessor {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("evaluatorsPerBlock")));
     }
 
-
+    public int getCommentBlockSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("commentsPerBlock")));
+    }
 }

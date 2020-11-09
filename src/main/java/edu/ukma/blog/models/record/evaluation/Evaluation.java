@@ -1,4 +1,4 @@
-package edu.ukma.blog.models;
+package edu.ukma.blog.models.record.evaluation;
 
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,13 @@
 package edu.ukma.blog.controllers.communication;
 
+import edu.ukma.blog.PropertyAccessor;
+import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.record.RecordEntity_;
+import edu.ukma.blog.models.record.RecordsPage;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.services.IRecordImageService;
@@ -11,6 +15,9 @@ import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +40,25 @@ public class RecordCtrl {
 
     @Autowired
     private IRecordImageService recordImageService;
+
+    private static final int RECORD_PAGE_SIZE;
+
+    static {
+        String beanName = PropertyAccessor.class.getSimpleName();
+        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+        RECORD_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
+                .getBean(propertyAccessorBeanName)).getPageSize();
+    }
+
+    @GetMapping
+    public RecordsPage getRecordsPage(@PathVariable String publisher,
+                                      @RequestPart String username,
+                                      @RequestParam int page) {
+        long publisherId = userService.getUserId(publisher);
+        long userId = userService.getUserId(username);
+        Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
+        return recordService.getRecordsPage(publisherId, userId, pageable);
+    }
 
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}

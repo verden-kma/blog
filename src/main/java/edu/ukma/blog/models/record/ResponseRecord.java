@@ -9,9 +9,9 @@ public class ResponseRecord {
 
     private String caption;
 
-    private String timestamp;
-
     private String adText;
+
+    private String timestamp;
 
     private boolean isEdited;
 

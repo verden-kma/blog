@@ -2,11 +2,13 @@ package edu.ukma.blog.repositories;
 
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,8 +26,11 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     @Query("SELECT record.imgLocation FROM RecordEntity record WHERE record.id=:id")
     Optional<String> getImgLocation(@Param("id") RecordId id);
-//    Optional<String> findImgLocationById(RecordId id); //todo: test with projection
+//    Optional<RecordImgLocationView> findImgLocationById(RecordId id); //todo: test with projection
 
+    int countAllById_PublisherId(long publisherId);
+
+    List<RecordEntity> findAllById_PublisherId(long publisherId, Pageable pageable);
 
     //    @Query("SELECT CASE WHEN :likerId IN (SELECT rec.likeUsers FROM RecordEntity rec WHERE rec.id=:id) " +
 //            "THEN TRUE ELSE FALSE END FROM ")

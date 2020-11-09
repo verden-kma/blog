@@ -6,6 +6,7 @@ import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.services.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -31,6 +32,11 @@ public class CommentService implements ICommentService {
     @Override
     public List<CommentEntity> getComments(RecordId recordId) {
         return commentsRepo.findAllById_RecordId(recordId);
+    }
+
+    @Override
+    public List<CommentEntity> getCommentsBlock(RecordId recordId, Pageable pageable) {
+        return commentsRepo.findAllById_RecordId(recordId, pageable);
     }
 
     @Override

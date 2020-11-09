@@ -1,9 +1,9 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.models.EvalPage;
-import edu.ukma.blog.models.Evaluation;
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.record.evaluation.EvalPage;
+import edu.ukma.blog.models.record.evaluation.Evaluation;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.UserEntityIdsView;
@@ -68,7 +68,7 @@ public class RecordEvalService implements IRecordEvalService {
         List<String> evaluators = usersRepo.getUsernamesByIds(evals
                 .getContent()
                 .stream()
-                .map(x -> x.getId().getEvaluatorId())
+                .map(x -> x.getId().getEvaluatorOwnId())
                 .collect(Collectors.toList()))
                 .stream()
                 .map(UserEntityIdsView::getUsername)
