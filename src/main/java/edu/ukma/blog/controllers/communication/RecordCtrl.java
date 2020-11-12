@@ -79,17 +79,6 @@ public class RecordCtrl {
         return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
     }
 
-    private byte[] getSelectedImage(Function<String, File> selector, String publisher, int recordId) {
-        long publisherId = userService.getUserId(publisher);
-        String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
-        File image = selector.apply(location);
-        try (InputStream input = new FileInputStream(image)) {
-            return IOUtils.toByteArray(input);
-        } catch (IOException e) {
-            throw new ServerCriticalError(e);
-        }
-    }
-
     @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImage(@PathVariable String publisher,
                            @PathVariable int recordId) {
@@ -106,6 +95,17 @@ public class RecordCtrl {
     public byte[] getImageIcon(@PathVariable String publisher,
                                @PathVariable int recordId) {
         return getSelectedImage(recordImageService::getImageIcon, publisher, recordId);
+    }
+
+    private byte[] getSelectedImage(Function<String, File> selector, String publisher, int recordId) {
+        long publisherId = userService.getUserId(publisher);
+        String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
+        File image = selector.apply(location);
+        try (InputStream input = new FileInputStream(image)) {
+            return IOUtils.toByteArray(input);
+        } catch (IOException e) {
+            throw new ServerCriticalError(e);
+        }
     }
 
     @PutMapping(path = "/{recordId}")

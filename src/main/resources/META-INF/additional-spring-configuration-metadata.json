@@ -48,6 +48,11 @@
       "name": "commentsPerBlock",
       "type": "java.lang.String",
       "description": "How name comments are displayed in a block."
+    },
+    {
+      "name": "followersPerBlock",
+      "type": "java.lang.String",
+      "description": "How many followers are loaded at a time."
     }
   ]
 }

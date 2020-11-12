@@ -1,20 +1,20 @@
 package edu.ukma.blog.services;
 
 import com.google.common.collect.BiMap;
-import edu.ukma.blog.models.user.EditUserRequestModel;
-import edu.ukma.blog.models.user.RequestUserSignup;
-import edu.ukma.blog.models.user.ResponseUser;
 import edu.ukma.blog.models.user.UserEntity;
+import edu.ukma.blog.models.user.requests.EditUserRequestModel;
+import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.UserPageResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
 public interface IUserService extends UserDetailsService {
-    UserEntity addUser(RequestUserSignup userData);
+    UserEntity addUser(UserSignupRequest userData);
 
     long getUserId(String username);
 
-    ResponseUser getUser(String username);
+    UserPageResponse getUser(String username);
 
     void updateUser(String username, EditUserRequestModel update);
 
@@ -22,4 +22,5 @@ public interface IUserService extends UserDetailsService {
 
     BiMap<Long, String> getUserIdentifiersBimap(List<Long> ids);
 
+    List<String> getUsernames(List<Long> userIds);
 }

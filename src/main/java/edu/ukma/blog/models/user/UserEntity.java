@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 public class UserEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @NotBlank
     @Size(min = 3, max = 20)

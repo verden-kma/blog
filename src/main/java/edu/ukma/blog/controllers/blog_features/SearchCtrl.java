@@ -12,8 +12,18 @@ import java.util.List;
 @RestController
 @RequestMapping("/search")
 public class SearchCtrl {
-    @GetMapping
-    public List<UserEntity> findUsers(@RequestParam String username) {
+    @GetMapping("/all")
+    public List<UserEntity> findByKey(@RequestParam String key) {
+        throw new NotImplementedException();
+    }
+
+    @GetMapping("/publishers")
+    public List<UserEntity> findPublishers(@RequestParam String name) {
+        throw new NotImplementedException();
+    }
+
+    @GetMapping("/records")
+    public List<UserEntity> findRecords(@RequestParam String title) {
         throw new NotImplementedException();
     }
 }

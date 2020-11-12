@@ -1,13 +1,11 @@
 package edu.ukma.blog.controllers.actors;
 
-import edu.ukma.blog.models.Page;
-import edu.ukma.blog.models.user.EditUserRequestModel;
-import edu.ukma.blog.models.user.RequestUserSignup;
-import edu.ukma.blog.models.user.ResponseUser;
+import edu.ukma.blog.models.user.requests.EditUserRequestModel;
+import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.UserPageResponse;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.Valid;
 
@@ -19,13 +17,13 @@ public class UserCtrl {
     private IUserService userService;
 
     @PostMapping
-    public void addUser(@RequestBody RequestUserSignup user) {
+    public void addUser(@RequestBody UserSignupRequest user) {
         userService.addUser(user);
     }
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{username}")
-    public ResponseUser getUserData(@PathVariable String username) {
+    public UserPageResponse getUserData(@PathVariable String username) {
         return userService.getUser(username);
     }
 
@@ -33,17 +31,6 @@ public class UserCtrl {
     public void updateUserData(@PathVariable String username,
                                @Valid @RequestBody EditUserRequestModel update) {
         userService.updateUser(username, update);
-    }
-
-    /**
-     * @param username id of a user whose page is needed
-     * @param pageNum  number of a page in question
-     * @return data about which images should be fetched from server and textual data for {@code pageNum} page
-     */
-    @GetMapping(path = "/{username}/{pageNum}")
-    public Page getUserPage(@PathVariable String username,
-                            @PathVariable int pageNum) {
-        throw new NotImplementedException();
     }
 
     @DeleteMapping("/{username}")

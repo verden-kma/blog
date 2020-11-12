@@ -50,4 +50,8 @@ public class PropertyAccessor {
     public int getCommentBlockSize() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("commentsPerBlock")));
     }
+
+    public int getFollowersBlockSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("followersPerBlock")));
+    }
 }

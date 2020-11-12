@@ -1,7 +1,7 @@
 package edu.ukma.blog.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ukma.blog.models.user.RequestUserLogin;
+import edu.ukma.blog.models.user.requests.UserLoginRequest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
         try {
-            RequestUserLogin loginData = new ObjectMapper().readValue(request.getInputStream(), RequestUserLogin.class);
+            UserLoginRequest loginData = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequest.class);
             return authMng.authenticate(new UsernamePasswordAuthenticationToken(
                     loginData.getUsername(),
                     loginData.getPassword(),

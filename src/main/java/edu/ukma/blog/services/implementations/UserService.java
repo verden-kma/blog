@@ -4,9 +4,14 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
-import edu.ukma.blog.models.user.*;
+import edu.ukma.blog.models.user.UserEntity;
+import edu.ukma.blog.models.user.UserEntity_;
+import edu.ukma.blog.models.user.requests.EditUserRequestModel;
+import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.UserPageResponse;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.UserEntityIdsView;
+import edu.ukma.blog.repositories.projections.UserNameView;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +45,7 @@ public class UserService implements IUserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public UserEntity addUser(RequestUserSignup userData) {
+    public UserEntity addUser(UserSignupRequest userData) {
         if (usersRepo.existsUserByUsername(userData.getUsername()))
             throw new UsernameDuplicateException(userData.getUsername());
         UserEntity newUser = new UserEntity();
@@ -56,8 +61,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public ResponseUser getUser(String username) {
-        ResponseUser respUser = new ResponseUser();
+    public UserPageResponse getUser(String username) {
+        UserPageResponse respUser = new UserPageResponse();
         BeanUtils.copyProperties(usersRepo.findByUsername(username), respUser);
         return respUser;
     }
@@ -97,6 +102,12 @@ public class UserService implements IUserService {
                         UserEntityIdsView::getUsername,
                         (String a, String b) -> b,
                         HashBiMap::create));
+    }
+
+    @Override
+    public List<String> getUsernames(List<Long> userIds) {
+        return usersRepo.findAllByIdIn(userIds).stream()
+                .map(UserNameView::getUsername).collect(Collectors.toList());
     }
 
     @Override
