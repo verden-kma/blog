@@ -4,14 +4,17 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
+import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
 import edu.ukma.blog.models.user.requests.EditUserRequestModel;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.PublisherPreview;
 import edu.ukma.blog.models.user.responses.UserPageResponse;
 import edu.ukma.blog.repositories.IUsersRepo;
-import edu.ukma.blog.repositories.projections.UserEntityIdsView;
-import edu.ukma.blog.repositories.projections.UserNameView;
+import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
+import edu.ukma.blog.repositories.projections.user.UserNameView;
+import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,9 @@ public class UserService implements IUserService {
     private IUsersRepo usersRepo;
 
     @Autowired
+    private IRecordService recordService;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Override
@@ -51,6 +57,7 @@ public class UserService implements IUserService {
         UserEntity newUser = new UserEntity();
         BeanUtils.copyProperties(userData, newUser);
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
+        newUser.setStatistics(new PublisherStats(newUser));
         return usersRepo.save(newUser);
     }
 
@@ -63,8 +70,20 @@ public class UserService implements IUserService {
     @Override
     public UserPageResponse getUser(String username) {
         UserPageResponse respUser = new UserPageResponse();
-        BeanUtils.copyProperties(usersRepo.findByUsername(username), respUser);
+        UserEntity pUser = usersRepo.findByUsername(username);
+        BeanUtils.copyProperties(pUser, respUser);
+        BeanUtils.copyProperties(pUser.getStatistics(), respUser);
         return respUser;
+    }
+
+    @Override
+    public PublisherPreview getUserPreview(String username, int recPrevNum) {
+        PublisherPreview preview = new PublisherPreview();
+        preview.setUsername(username);
+        preview.setLastRecordIds(recordService.getLatestRecordsIds(recPrevNum));
+        PublisherStats stats = getUserEntity(username).getStatistics();
+        BeanUtils.copyProperties(stats, preview);
+        return preview;
     }
 
     @Override
@@ -112,8 +131,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = usersRepo.findByUsername(username);
-        if (user == null) throw new UsernameNotFoundException(username);
+        UserEntity user = getUserEntity(username);
         return new User(user.getUsername(), user.getEncryptedPassword(), Collections.emptyList());
     }
 

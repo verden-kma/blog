@@ -8,15 +8,11 @@ import org.springframework.data.domain.Pageable;
 public interface IRecordEvalService {
     Boolean getReaction(RecordId recordId, long userId);
 
-    void putLike(RecordId recordId, long userId);
+    void putEvaluation(RecordId recordId, long userId, boolean eval);
 
-    void removeLike(RecordId recordId, long userId);
+    void removeEvaluation(RecordId recordId, long userId, boolean eval);
 
     EvalPage getLikers(RecordId recordId, Pageable pageable);
-
-    void putDislike(RecordId recordId, long userId);
-
-    void removeDislike(RecordId recordId, long userId);
 
     EvalPage getDislikers(RecordId recordId, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package edu.ukma.blog.repositories;
 
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
+import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,6 +32,8 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
     int countAllById_PublisherId(long publisherId);
 
     List<RecordEntity> findAllById_PublisherId(long publisherId, Pageable pageable);
+
+    List<RecordOwnIdView> findBy(Pageable pageable);
 
     //    @Query("SELECT CASE WHEN :likerId IN (SELECT rec.likeUsers FROM RecordEntity rec WHERE rec.id=:id) " +
 //            "THEN TRUE ELSE FALSE END FROM ")

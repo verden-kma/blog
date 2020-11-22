@@ -50,7 +50,7 @@ public class EvaluationCtrl {
                            @RequestParam String username) {
         long publisherId = userService.getUserId(publisher);
         long userId = userService.getUserId(username);
-        reactionService.putLike(new RecordId(publisherId, recordId), userId);
+        reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, true);
     }
 
     @DeleteMapping("/likers")
@@ -59,7 +59,7 @@ public class EvaluationCtrl {
                            @RequestParam String username) {
         long publisherId = userService.getUserId(publisher);
         long userId = userService.getUserId(username);
-        reactionService.removeLike(new RecordId(publisherId, recordId), userId);
+        reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, true);
     }
 
     @GetMapping("/dislikers")
@@ -76,7 +76,7 @@ public class EvaluationCtrl {
                               @RequestParam String username) {
         long publisherId = userService.getUserId(publisher);
         long userId = userService.getUserId(username);
-        reactionService.putDislike(new RecordId(publisherId, recordId), userId);
+        reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, false);
     }
 
     @DeleteMapping("/dislikers")
@@ -85,6 +85,6 @@ public class EvaluationCtrl {
                               @RequestParam String username) {
         long publisherId = userService.getUserId(publisher);
         long userId = userService.getUserId(username);
-        reactionService.removeDislike(new RecordId(publisherId, recordId), userId);
+        reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, false);
     }
 }

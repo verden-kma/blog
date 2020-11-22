@@ -60,6 +60,7 @@ public class RecordCtrl {
         return recordService.getRecordsPage(publisherId, userId, pageable);
     }
 
+    // todo: handle validation in controller to avoid 500 error when persisting
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )

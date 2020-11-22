@@ -1,8 +1,9 @@
 package edu.ukma.blog.repositories;
 
 import edu.ukma.blog.models.user.UserEntity;
-import edu.ukma.blog.repositories.projections.UserEntityIdsView;
-import edu.ukma.blog.repositories.projections.UserNameView;
+import edu.ukma.blog.repositories.projections.user.StatisticsView;
+import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
+import edu.ukma.blog.repositories.projections.user.UserNameView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +18,8 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
     boolean existsUserByUsername(String username);
 
     UserEntity findByUsername(String username);
+
+    StatisticsView getByUsername(String username);
 
     List<UserNameView> findAllByIdIn(Collection<Long> id);
 

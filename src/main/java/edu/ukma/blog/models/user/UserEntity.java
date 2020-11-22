@@ -2,18 +2,17 @@ package edu.ukma.blog.models.user;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Data
 @Entity
+@Table(name = "user_entity")
 public class UserEntity {
     @Id
     @GeneratedValue
+    @Column(name = "id")
     private long id;
 
     @NotBlank
@@ -27,4 +26,8 @@ public class UserEntity {
     private String status; // short description
 
     private String description;
+
+    @OneToOne(mappedBy = "publisher", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private PublisherStats statistics;
 }

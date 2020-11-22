@@ -1,4 +1,4 @@
-package edu.ukma.blog.repositories.projections;
+package edu.ukma.blog.repositories.projections.user;
 
 public interface UserEntityIdsView {
     String getUsername();

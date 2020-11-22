@@ -10,7 +10,7 @@ public class PublisherPreview {
 
     private int followers;
 
-    private int posts;
+    private int uploads;
 
     private List<Integer> lastRecordIds;
 }

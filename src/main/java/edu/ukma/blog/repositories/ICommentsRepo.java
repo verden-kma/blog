@@ -3,7 +3,7 @@ package edu.ukma.blog.repositories;
 import edu.ukma.blog.models.comment.CommentEntity;
 import edu.ukma.blog.models.compositeIDs.CommentId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
-import edu.ukma.blog.repositories.projections.RecordCommentsNumView;
+import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +16,6 @@ import java.util.Optional;
 @Repository
 public interface ICommentsRepo extends JpaRepository<CommentEntity, CommentId> {
     Optional<CommentEntity> findTopById_RecordIdOrderById_CommentOwnIdDesc(RecordId recordId);
-
-//    List<CommentEntity> findTop10ByCommentatorIdAndIdRecordIdOrderByTimestamp(long publisherId, int recordId);
 
     int countAllById_RecordId(RecordId recordId);
 

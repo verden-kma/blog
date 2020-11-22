@@ -1,4 +1,4 @@
-package edu.ukma.blog.repositories.projections;
+package edu.ukma.blog.repositories.projections.record;
 
 public interface MultiRecordEvalView {
     int getRecord_Own_Id();

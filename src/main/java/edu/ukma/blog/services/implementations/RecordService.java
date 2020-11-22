@@ -12,13 +12,16 @@ import edu.ukma.blog.models.record.*;
 import edu.ukma.blog.models.record.evaluation.Evaluation;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
+import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
-import edu.ukma.blog.repositories.projections.RecordCommentsNumView;
+import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +57,9 @@ public class RecordService implements IRecordService {
     @Autowired
     private IEvaluatorsRepo evaluatorsRepo;
 
+    @Autowired
+    private IPublisherStatsRepo publisherStatsRepo;
+
     @Override
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
@@ -62,12 +68,13 @@ public class RecordService implements IRecordService {
 
         RecordEntity recordEntity = new RecordEntity();
         recordEntity.setId(new RecordId(publisherId, recordId));
-        recordEntity.setCaption(record.getCaption());
+        BeanUtils.copyProperties(record, recordEntity);
         recordEntity.setTimestamp(Instant.now().toString());
         String imgLocation = imageService.saveImage(image);
         recordEntity.setImgLocation(imgLocation);
         recordsRepo.save(recordEntity);
 
+        publisherStatsRepo.incUploadsCount(publisherId);
         return recordId;
     }
 
@@ -103,7 +110,6 @@ public class RecordService implements IRecordService {
                         .collect(ArrayListMultimap::create, (map, entry) -> map.put(entry.getRecord_Own_Id(),
                                 Pair.of(entry.getIs_Liker(), entry.getMono_Eval_Count())), Multimap::putAll);
 
-        // todo: set num of comments
         Map<Integer, Integer> commentsNum = commentsRepo.getCommentsNumForRecords(publisherId, recordOwnIds)
                 .stream()
                 .collect(Collectors.toMap(RecordCommentsNumView::getRecord_Own_Id,
@@ -122,6 +128,12 @@ public class RecordService implements IRecordService {
         }
 
         return new RecordsPage(respRecs, numPages);
+    }
+
+    @Override
+    public List<Integer> getLatestRecordsIds(int n) {
+        Pageable pageable = PageRequest.of(0, n, Sort.by(RecordEntity_.TIMESTAMP).descending());
+        return recordsRepo.findBy(pageable).stream().map(x -> x.getId().getRecordOwnId()).collect(Collectors.toList());
     }
 
     @Override
@@ -164,7 +176,6 @@ public class RecordService implements IRecordService {
         entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 
-
     @Override
     public void removeRecord(RecordId id) {
         Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
@@ -173,6 +184,7 @@ public class RecordService implements IRecordService {
             if (!imageService.deleteImage(imgPath)) throw new ServerLogicsError("record image missing");
             commentsRepo.deleteById_RecordId(id);
             recordsRepo.deleteById(id);
+            publisherStatsRepo.decUploadsCount(id.getPublisherId());
         });
     }
 }

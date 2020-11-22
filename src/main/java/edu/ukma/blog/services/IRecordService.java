@@ -9,12 +9,16 @@ import edu.ukma.blog.models.record.ResponseRecord;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 // works with textual data only
 public interface IRecordService {
     int addRecord(long userId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException;
 
     RecordsPage getRecordsPage(long publisherId, long userId, Pageable pageable);
+
+    List<Integer> getLatestRecordsIds(int n);
 
     ResponseRecord getRecordCore(RecordId id, long userId);
 
