@@ -12,5 +12,5 @@ public class PublisherPreview {
 
     private int uploads;
 
-    private List<Integer> lastRecordIds;
+    private List<String> lastRecordsImgPaths;
 }

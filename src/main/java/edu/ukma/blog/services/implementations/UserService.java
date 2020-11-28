@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
+import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
@@ -18,6 +19,9 @@ import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -78,9 +82,11 @@ public class UserService implements IUserService {
 
     @Override
     public PublisherPreview getUserPreview(String username, int recPrevNum) {
+        long userId = usersRepo.getIdByUsername(username).orElseThrow(() -> new UsernameMissingException(username));
         PublisherPreview preview = new PublisherPreview();
         preview.setUsername(username);
-        preview.setLastRecordIds(recordService.getLatestRecordsIds(recPrevNum));
+        Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
+        preview.setLastRecordsImgPaths(recordService.getUserRecordsImgPaths(userId, pageable));
         PublisherStats stats = getUserEntity(username).getStatistics();
         BeanUtils.copyProperties(stats, preview);
         return preview;

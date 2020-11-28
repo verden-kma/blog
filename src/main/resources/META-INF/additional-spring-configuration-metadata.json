@@ -53,6 +53,11 @@
       "name": "followersPerBlock",
       "type": "java.lang.String",
       "description": "How many followers are loaded at a time."
+    },
+    {
+      "name": "digestPageSize",
+      "type": "java.lang.String",
+      "description": "The number of the most recent records displayed as a digest."
     }
   ]
 }

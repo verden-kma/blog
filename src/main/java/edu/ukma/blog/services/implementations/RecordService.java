@@ -1,6 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import edu.ukma.blog.exceptions.record.NoSuchRecordException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
@@ -14,14 +15,18 @@ import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
+import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
+import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
+import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.utils.EagerContentPage;
+import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +65,9 @@ public class RecordService implements IRecordService {
     @Autowired
     private IPublisherStatsRepo publisherStatsRepo;
 
+    @Autowired
+    private IUserService userService;
+
     @Override
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
@@ -79,7 +87,7 @@ public class RecordService implements IRecordService {
     }
 
     @Override
-    public RecordsPage getRecordsPage(long publisherId, long userId, Pageable pageable) {
+    public EagerContentPage<ResponseRecord> getRecordsPage(long publisherId, long userId, Pageable pageable) {
         int numPages = (int) Math.ceil((double) recordsRepo.countAllById_PublisherId(publisherId) / pageable.getPageSize());
         List<RecordEntity> pageRecords = recordsRepo.findAllById_PublisherId(publisherId, pageable);
 
@@ -117,7 +125,7 @@ public class RecordService implements IRecordService {
 
         for (ResponseRecord respRec : respRecs) {
             respRec.setReaction(userEvals.get(respRec.getId()));
-            // for i in range [0, 2]
+            // for i in range [0, 2)
             for (Pair<Boolean, Integer> pair : recordsEvaluations.get(respRec.getId())) {
                 if (pair.getFirst()) respRec.setLikes(pair.getSecond());
                 else respRec.setDislikes(pair.getSecond());
@@ -127,14 +135,29 @@ public class RecordService implements IRecordService {
                 respRec.setNumOfComments(commentsNum.get(respRec.getId()));
         }
 
-        return new RecordsPage(respRecs, numPages);
+        return new EagerContentPage<>(respRecs, numPages);
     }
 
     @Override
-    public List<Integer> getLatestRecordsIds(int n) {
-        Pageable pageable = PageRequest.of(0, n, Sort.by(RecordEntity_.TIMESTAMP).descending());
-        return recordsRepo.findBy(pageable).stream().map(x -> x.getId().getRecordOwnId()).collect(Collectors.toList());
+    public List<String> getUserRecordsImgPaths(long userId, Pageable pageable) {
+        return recordsRepo.findById_PublisherId(userId, pageable).stream()
+                .map(RecordImgLocationView::getImgLocation).collect(Collectors.toList());
     }
+
+    @Override
+    public LazyContentPage<MinResponseRecord> getMinResponsePage(Pageable pageable) {
+        Slice<MinRecordView> minRecs = recordsRepo.findAllBy(pageable);
+        List<Long> userIds = minRecs.stream().map(x -> x.getId().getPublisherId()).collect(Collectors.toList());
+        final BiMap<Long, String> userBiIds = userService.getUserIdentifiersBimap(userIds);
+
+        List<MinResponseRecord> minRespRecs = minRecs.stream().map(x -> {
+            String username = userBiIds.get(x.getId().getPublisherId());
+            return new MinResponseRecord(username, x.getId().getRecordOwnId(), x.getCaption(), x.getImgLocation());
+        }).collect(Collectors.toList());
+
+        return new LazyContentPage<MinResponseRecord>(minRespRecs, minRecs.isLast());
+    }
+
 
     @Override
     public ResponseRecord getRecordCore(RecordId recordId, long userId) {

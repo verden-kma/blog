@@ -7,12 +7,12 @@ import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity_;
-import edu.ukma.blog.models.record.RecordsPage;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.utils.EagerContentPage;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -51,9 +51,9 @@ public class RecordCtrl {
     }
 
     @GetMapping
-    public RecordsPage getRecordsPage(@PathVariable String publisher,
-                                      @RequestPart String username,
-                                      @RequestParam int page) {
+    public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
+                                                           @RequestPart String username,
+                                                           @RequestParam int page) {
         long publisherId = userService.getUserId(publisher);
         long userId = userService.getUserId(username);
         Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());

@@ -10,7 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @Entity
 public class RecordEntity {
-    // idea for a feature: look through all likers, dislikers, find influencers, save them separately
     @EmbeddedId
     private RecordId id;
 

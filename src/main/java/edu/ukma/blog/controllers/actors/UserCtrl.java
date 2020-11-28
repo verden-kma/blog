@@ -30,7 +30,7 @@ public class UserCtrl {
         return userService.getUser(username);
     }
 
-    // todo: use property accessor value
+    // todo: use property accessor min/max values
     @GetMapping("/{username}/short")
     public PublisherPreview getShortData(@PathVariable String username,
                                          @RequestParam @Min(1) @Max(10) int recPrevNum) {

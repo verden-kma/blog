@@ -2,8 +2,10 @@ package edu.ukma.blog.repositories;
 
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
-import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
+import edu.ukma.blog.repositories.projections.record.MinRecordView;
+import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +23,7 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
      * @param publisherId - id of a user who has published a record
      * @return <code>Record</code> with the largest <code>recordId</code>
      */
+    //todo: return RecordOwnIdView instead of RecordEntity
     Optional<RecordEntity> findTopById_PublisherIdOrderById_RecordOwnIdDesc(long publisherId);
 
     boolean existsByImgLocation(String location);
@@ -33,13 +36,9 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     List<RecordEntity> findAllById_PublisherId(long publisherId, Pageable pageable);
 
-    List<RecordOwnIdView> findBy(Pageable pageable);
+    List<RecordImgLocationView> findById_PublisherId(long publisherId, Pageable pageable);
 
-    //    @Query("SELECT CASE WHEN :likerId IN (SELECT rec.likeUsers FROM RecordEntity rec WHERE rec.id=:id) " +
-//            "THEN TRUE ELSE FALSE END FROM ")
-//    @Query("SELECT CASE WHEN :likerId IN (SELECT rec.likeUsers FROM RecordEntity rec WHERE rec.id=:recordId) " +
-//            "THEN TRUE ELSE FALSE END FROM RecordEntity re")
-//    boolean existsLiker(@Param("recordId") RecordId recordId, @Param("likerId") long likerId);
+    Slice<MinRecordView> findAllBy(Pageable pageable);
 
 //    @Query("SELECT rec.isEdited FROM RecordEntity rec JOIN rec.likeUsers lius WHERE rec.id=:recordId AND lius=:likerId")
 //    Boolean existsByLikeUsersIn(@Param("recordId") RecordId recordId, @Param("likerId") long likerId);

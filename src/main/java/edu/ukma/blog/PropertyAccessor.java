@@ -54,4 +54,8 @@ public class PropertyAccessor {
     public int getFollowersBlockSize() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("followersPerBlock")));
     }
+
+    public int getdigestPageSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("digestPageSize")));
+    }
 }
