@@ -20,7 +20,7 @@ public interface IRecordService {
 
     EagerContentPage<ResponseRecord> getRecordsPage(long publisherId, long userId, Pageable pageable);
 
-    List<String> getUserRecordsImgPaths(long userId, Pageable pageable);
+    List<String> getUserRecordsImgPaths(long userId, Pageable pageable); // used as get_last_records_imgs
 
     LazyContentPage<MinResponseRecord> getMinResponsePage(Pageable pageable);
 

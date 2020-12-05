@@ -1,7 +1,9 @@
 package edu.ukma.blog.models.record;
 
 import lombok.Data;
-import org.springframework.lang.Nullable;
+
+import javax.annotation.Nullable;
+
 //todo: maybe it is a better idea to return a location of the image associated with a record and not perform additional query?
 @Data
 public class ResponseRecord {
