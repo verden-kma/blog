@@ -6,7 +6,6 @@ import edu.ukma.blog.models.record.MinResponseRecord;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.utils.LazyContentPage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,8 +18,11 @@ public class DigestCtrl {
     private static final int DIGEST_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
             .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getDigestPageSize();
 
-    @Autowired
-    private IRecordService recordService;
+    private final IRecordService recordService;
+
+    public DigestCtrl(IRecordService recordService) {
+        this.recordService = recordService;
+    }
 
     @GetMapping("/digest")
     public LazyContentPage<MinResponseRecord> getDigest(@RequestParam int page) {

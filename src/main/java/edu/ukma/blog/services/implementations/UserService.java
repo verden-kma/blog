@@ -14,13 +14,13 @@ import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.PublisherPreview;
 import edu.ukma.blog.models.user.responses.UserPageResponse;
 import edu.ukma.blog.repositories.IFollowersRepo;
+import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
-import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,7 +38,6 @@ import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,17 +46,20 @@ public class UserService implements IUserService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private IUsersRepo usersRepo;
+    private final IUsersRepo usersRepo;
 
-    @Autowired
-    private IRecordService recordService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final IFollowersRepo followersRepo;
 
-    @Autowired
-    private IFollowersRepo followersRepo;
+    private final IRecordsRepo recordsRepo;
+
+    public UserService(IUsersRepo usersRepo, BCryptPasswordEncoder passwordEncoder, IFollowersRepo followersRepo, IRecordsRepo recordsRepo) {
+        this.usersRepo = usersRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.followersRepo = followersRepo;
+        this.recordsRepo = recordsRepo;
+    }
 
     @Override
     public UserEntity addUser(UserSignupRequest userData) {
@@ -72,8 +74,9 @@ public class UserService implements IUserService {
 
     @Override
     public long getUserId(String username) {
-        Optional<Long> maybePublisherId = usersRepo.getIdByUsername(username);
-        return maybePublisherId.orElseThrow(() -> new UsernameMissingException(username));
+        return usersRepo.getByUsername(username)
+                .orElseThrow(() -> new UsernameMissingException(username))
+                .getId();
     }
 
     @Override
@@ -95,11 +98,17 @@ public class UserService implements IUserService {
         preview.setPublisherName(publisher);
         preview.setFollowed(followersRepo.existsById(new FollowerId(publisherId, userId)));
         Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
-        preview.setLastRecordsImgPaths(recordService.getUserRecordsImgPaths(publisherId, pageable));
+        preview.setLastRecordsImgPaths(recordsRepo.findById_PublisherId(publisherId, pageable)
+                .stream()
+                .map(RecordImgLocationView::getImgLocation)
+                .collect(Collectors.toList()));
         PublisherStats stats = getUserEntity(user).getStatistics();
         BeanUtils.copyProperties(stats, preview);
         return preview;
     }
+
+
+//    recordsRepo.findById_PublisherId(publisherId, pageable).stream().map(RecordImgLocationView::getImgLocation).collect(Collectors.toList());
 
     @Override
     @Transactional
@@ -130,7 +139,7 @@ public class UserService implements IUserService {
 
     @Override
     public BiMap<Long, String> getUserIdentifiersBimap(List<Long> ids) {
-        return usersRepo.getUsernamesByIds(ids)
+        return usersRepo.findByIdIn(ids)
                 .stream()
                 .collect(Collectors.toMap(UserEntityIdsView::getId,
                         UserEntityIdsView::getUsername,

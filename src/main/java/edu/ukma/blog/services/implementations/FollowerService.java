@@ -42,14 +42,14 @@ public class FollowerService implements IFollowerService {
     @Override
     public List<Long> getFollowers(long publisherId) {
         return followersRepo.findAllById_PublisherId(publisherId)
-                .stream().map(x -> x.getId().getSubscriber()).collect(Collectors.toList());
+                .stream().map(x -> x.getId().getSubscriberId()).collect(Collectors.toList());
     }
 
 
     @Override
     public List<Long> getFollowersBlock(long publisherId, Pageable pageable) {
         return followersRepo.findAllById_PublisherId(publisherId, pageable)
-                .stream().map(x -> x.getId().getSubscriber()).collect(Collectors.toList());
+                .stream().map(x -> x.getId().getSubscriberId()).collect(Collectors.toList());
     }
 
     @Override

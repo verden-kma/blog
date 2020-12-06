@@ -1,5 +1,7 @@
 package edu.ukma.blog.controllers.actors;
 
+import edu.ukma.blog.PropertyAccessor;
+import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.user.requests.EditUserRequestModel;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.PublisherPreview;
@@ -9,16 +11,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/users")
 public class UserCtrl {
+    private static final int RECORDS_PREVIEW_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getRecordsPreviewBlock();
+
+    private final IUserService userService;
 
     @Autowired
-    private IUserService userService;
+    public UserCtrl(IUserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public void addUser(@RequestBody UserSignupRequest user) {
@@ -32,22 +38,22 @@ public class UserCtrl {
         return userService.getPublisher(principal.getName(), publisher);
     }
 
-    // todo: use property accessor min/max values
+    // will it be really used?
     @GetMapping("/{publisher}/short")
     public PublisherPreview getShortData(@PathVariable String publisher,
-                                         @RequestParam @Min(1) @Max(10) int recPrevNum,
                                          Principal principal) {
-        return userService.getPublisherPreview(publisher, principal.getName(), recPrevNum);
+        return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
-    @PutMapping("/{username}")
-    public void updateUserData(@PathVariable String username,
-                               @Valid @RequestBody EditUserRequestModel update) {
-        userService.updateUser(username, update);
+    @PutMapping
+    public void updateUserData(@Valid @RequestBody EditUserRequestModel update,
+                               Principal principal) {
+        userService.updateUser(principal.getName(), update);
     }
 
-    @DeleteMapping("/{username}")
-    public boolean banUser(@PathVariable String username) {
-        return userService.banUser(username);
+    // possible feature: add admins who can actually ban users, for now it is just self deletion
+    @DeleteMapping
+    public boolean banUser(Principal principal) {
+        return userService.banUser(principal.getName());
     }
 }

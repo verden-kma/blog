@@ -63,6 +63,16 @@
       "name": "searchPageSize",
       "type": "java.lang.String",
       "description": "The number of records or publishers returned on client's query."
+    },
+    {
+      "name": "recordsPreviewBlock",
+      "type": "java.lang.String",
+      "description": "Number of record images returned when publisher preview data gets queried."
+    },
+    {
+      "name": "passwordPattern.regexp",
+      "type": "java.lang.String",
+      "description": "Pattern that defines acceptable passwords for user registration."
     }
   ]
 }

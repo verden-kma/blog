@@ -1,6 +1,7 @@
 package edu.ukma.blog.repositories;
 
 import edu.ukma.blog.models.user.UserEntity;
+import edu.ukma.blog.repositories.projections.user.IdView;
 import edu.ukma.blog.repositories.projections.user.PublisherPreviewBaseView;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -25,12 +25,9 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
 
     boolean deleteByUsername(String username);
 
-    // todo: use projections&query methods
-    @Query("SELECT user.id FROM UserEntity user WHERE user.username=:username")
-    Optional<Long> getIdByUsername(@Param(value = "username") String username);
+    Optional<IdView> getByUsername(String username);
 
-    @Query("SELECT user.username as username, user.id as id FROM UserEntity user WHERE user.id IN (:idList)")
-    List<UserEntityIdsView> getUsernamesByIds(@Param(value = "idList") List<Long> idList);
+    List<UserEntityIdsView> findByIdIn(List<Long> ids);
 
     @Query("SELECT user FROM " +
             "UserEntity user INNER JOIN user.statistics stats " +

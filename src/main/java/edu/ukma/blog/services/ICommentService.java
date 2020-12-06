@@ -14,5 +14,5 @@ public interface ICommentService {
 
     List<CommentEntity> getCommentsBlock(RecordId recordId, Pageable pageable);
 
-    void removeComment(CommentId commentID);
+    void removeComment(CommentId commentID, long commentatorId);
 }

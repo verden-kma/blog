@@ -54,9 +54,9 @@ public class SearchService implements ISearchService {
 
         assert (previewBases.size() == publisherRecentImgs.size());
 
-        Set<Long> subs = followersRepo.findById_SubscriberIdAndId_PublisherIdIn(userId, publisherIds)
+        Set<Long> subscriptions = followersRepo.findById_SubscriberIdAndId_PublisherIdIn(userId, publisherIds)
                 .stream()
-                .map(x -> x.getId().getSubscriber())
+                .map(x -> x.getId().getPublisherId())
                 .collect(Collectors.toSet());
 
         List<PublisherPreview> res = new ArrayList<>(previewBases.size());
@@ -65,7 +65,7 @@ public class SearchService implements ISearchService {
             pp.setPublisherName(pb.getUsername());
             pp.setUploads(pb.getStatistics().getUploads());
             pp.setFollowers(pb.getStatistics().getFollowers());
-            pp.setFollowed(subs.contains(pb.getId()));
+            pp.setFollowed(subscriptions.contains(pb.getId()));
             pp.setLastRecordsImgPaths(publisherRecentImgs.get(pb.getId()));
             res.add(pp);
         }

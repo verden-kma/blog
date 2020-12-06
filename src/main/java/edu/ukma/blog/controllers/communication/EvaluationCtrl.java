@@ -6,9 +6,10 @@ import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.evaluation.EvalPage;
 import edu.ukma.blog.services.IRecordEvalService;
 import edu.ukma.blog.services.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/users/{publisher}/records/{recordId}")
@@ -23,12 +24,14 @@ public class EvaluationCtrl {
     private static final int EVAL_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
             .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getEvalBlockSize();
 
-    @Autowired
-    private IRecordEvalService reactionService;
+    private final IRecordEvalService reactionService;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
+    public EvaluationCtrl(IRecordEvalService reactionService, IUserService userService) {
+        this.reactionService = reactionService;
+        this.userService = userService;
+    }
 
     @GetMapping("/likers")
     public EvalPage getLikers(@PathVariable String publisher,
@@ -41,18 +44,18 @@ public class EvaluationCtrl {
     @PutMapping("/likers")
     public void likeRecord(@PathVariable String publisher,
                            @PathVariable int recordId,
-                           @RequestParam String username) {
+                           Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, true);
     }
 
     @DeleteMapping("/likers")
     public void removeLike(@PathVariable String publisher,
                            @PathVariable int recordId,
-                           @RequestParam String username) {
+                           Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, true);
     }
 
@@ -67,18 +70,18 @@ public class EvaluationCtrl {
     @PutMapping("/dislikers")
     public void dislikeRecord(@PathVariable String publisher,
                               @PathVariable int recordId,
-                              @RequestParam String username) {
+                              Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, false);
     }
 
     @DeleteMapping("/dislikers")
     public void removeDislike(@PathVariable String publisher,
                               @PathVariable int recordId,
-                              @RequestParam String username) {
+                              Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, false);
     }
 }

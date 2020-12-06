@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static edu.ukma.blog.constants.ImageConstants.*;
-import static edu.ukma.blog.constants.ImageConstants.ACCEPTABLE_FORMATS;
 
 @Service
 public class UserImageService implements IUserImageService {
@@ -95,7 +94,7 @@ public class UserImageService implements IUserImageService {
 
         File locationOnDisk = new File(IMAGE_ROOT, buildPathByUsername(username) + BANNER_SUFFIX);
         try {
-            BufferedImage bImg = ImageIO.read(imageFile.getInputStream()); // todo: stink of a cheaper way to get dims
+            BufferedImage bImg = ImageIO.read(imageFile.getInputStream());
             if (bImg.getWidth() == topBannerDims.getWidth() && bImg.getHeight() == topBannerDims.getHeight()) {
                 imageFile.transferTo(locationOnDisk);
             } else {

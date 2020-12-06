@@ -17,14 +17,13 @@ import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
-import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
+import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.EagerContentPage;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.util.Pair;
@@ -47,28 +46,31 @@ public class RecordService implements IRecordService {
     @PersistenceContext
     EntityManager entityManager;
 
-    @Autowired
-    private IRecordsRepo recordsRepo;
+    private final IRecordsRepo recordsRepo;
 
-    @Autowired
-    private ICommentsRepo commentsRepo;
+    private final ICommentsRepo commentsRepo;
 
-    @Autowired
-    private IRecordImageService imageService;
+    private final IRecordImageService imageService;
 
-    @Autowired
-    private IEvaluatorsRepo evaluatorsRepo;
+    private final IEvaluatorsRepo evaluatorsRepo;
 
-    @Autowired
-    private IPublisherStatsRepo publisherStatsRepo;
+    private final IPublisherStatsRepo publisherStatsRepo;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
+
+    public RecordService(IRecordsRepo recordsRepo, ICommentsRepo commentsRepo, IRecordImageService imageService, IEvaluatorsRepo evaluatorsRepo, IPublisherStatsRepo publisherStatsRepo, IUserService userService) {
+        this.recordsRepo = recordsRepo;
+        this.commentsRepo = commentsRepo;
+        this.imageService = imageService;
+        this.evaluatorsRepo = evaluatorsRepo;
+        this.publisherStatsRepo = publisherStatsRepo;
+        this.userService = userService;
+    }
 
     @Override
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
-        Optional<RecordEntity> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordOwnIdDesc(publisherId);
+        Optional<RecordOwnIdView> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordOwnIdDesc(publisherId);
         int recordId = lastRecord.map(value -> value.getId().getRecordOwnId() + 1).orElse(1);
 
         RecordEntity recordEntity = new RecordEntity();
@@ -198,11 +200,11 @@ public class RecordService implements IRecordService {
         return res;
     }
 
-    @Override
-    public List<String> getUserRecordsImgPaths(long userId, Pageable pageable) {
-        return recordsRepo.findById_PublisherId(userId, pageable).stream()
-                .map(RecordImgLocationView::getImgLocation).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<String> getUserRecordsImgPaths(long userId, Pageable pageable) {
+//        return recordsRepo.findById_PublisherId(userId, pageable).stream()
+//                .map(RecordImgLocationView::getImgLocation).collect(Collectors.toList());
+//    }
 
     @Override
     public LazyContentPage<MinResponseRecord> getMinResponsePage(Pageable pageable) {
@@ -215,7 +217,7 @@ public class RecordService implements IRecordService {
             return new MinResponseRecord(username, x.getId().getRecordOwnId(), x.getCaption(), x.getImgLocation());
         }).collect(Collectors.toList());
 
-        return new LazyContentPage<MinResponseRecord>(minRespRecs, minRecs.isLast());
+        return new LazyContentPage<>(minRespRecs, minRecs.isLast());
     }
 
 
@@ -238,7 +240,9 @@ public class RecordService implements IRecordService {
 
     @Override
     public String getImgLocation(RecordId id) {
-        return recordsRepo.getImgLocation(id).orElseThrow(() -> new NoSuchRecordException(id.getRecordOwnId()));
+        return recordsRepo.findImgLocationById(id)
+                .orElseThrow(() -> new NoSuchRecordException(id.getRecordOwnId()))
+                .getImgLocation();
     }
 
     @Override

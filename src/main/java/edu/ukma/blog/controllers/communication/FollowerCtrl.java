@@ -4,11 +4,11 @@ import edu.ukma.blog.PropertyAccessor;
 import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.services.IFollowerService;
 import edu.ukma.blog.services.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -17,15 +17,13 @@ public class FollowerCtrl {
     private static final int FOLLOWERS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
             .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getFollowersBlockSize();
 
-    @Autowired
-    private IFollowerService followerService;
-    @Autowired
-    private IUserService userService;
+    private final IFollowerService followerService;
 
-    @GetMapping(path = "/all")
-    public List<String> getFollowers(@PathVariable String publisher) {
-        long publisherId = userService.getUserId(publisher);
-        return userService.getUsernames(followerService.getFollowers(publisherId));
+    private final IUserService userService;
+
+    public FollowerCtrl(IFollowerService followerService, IUserService userService) {
+        this.followerService = followerService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -36,20 +34,21 @@ public class FollowerCtrl {
         return userService.getUsernames(followerService.getFollowersBlock(publisherId, pageable));
     }
 
-    @PutMapping(path = "/{subscriber}")
+    // used (in target view, in publisher page view, publisher preview)
+    @PutMapping
     public void follow(@PathVariable String publisher,
-                       @PathVariable String subscriber) {
+                       Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long subscriberId = userService.getUserId(subscriber);
+        long subscriberId = userService.getUserId(principal.getName());
         followerService.addFollower(publisherId, subscriberId);
     }
 
-
-    @DeleteMapping(path = "/{subscriber}")
+    // used (same)
+    @DeleteMapping
     public void unfollow(@PathVariable String publisher,
-                         @PathVariable String subscriber) {
+                         Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long subscriberId = userService.getUserId(subscriber);
+        long subscriberId = userService.getUserId(principal.getName());
         followerService.removeFollower(publisherId, subscriberId);
     }
 }

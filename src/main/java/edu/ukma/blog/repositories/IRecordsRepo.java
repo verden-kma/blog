@@ -5,6 +5,7 @@ import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordImgLocationAndPublisherIdView;
 import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
+import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,14 +26,11 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
      * @param publisherId - id of a user who has published a record
      * @return <code>Record</code> with the largest <code>recordId</code>
      */
-    //todo: return RecordOwnIdView instead of RecordEntity
-    Optional<RecordEntity> findTopById_PublisherIdOrderById_RecordOwnIdDesc(long publisherId);
+    Optional<RecordOwnIdView> findTopById_PublisherIdOrderById_RecordOwnIdDesc(long publisherId);
 
     boolean existsByImgLocation(String location);
 
-    @Query("SELECT record.imgLocation FROM RecordEntity record WHERE record.id=:id")
-    Optional<String> getImgLocation(@Param("id") RecordId id);
-//    Optional<RecordImgLocationView> findImgLocationById(RecordId id); //todo: test with projection
+    Optional<RecordImgLocationView> findImgLocationById(RecordId id);
 
     int countAllById_PublisherId(long publisherId);
 

@@ -69,4 +69,8 @@ public class PropertyAccessor {
     public int getSearchPageSize() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("searchPageSize")));
     }
+
+    public int getRecordsPreviewBlock() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("recordsPreviewBlock")));
+    }
 }

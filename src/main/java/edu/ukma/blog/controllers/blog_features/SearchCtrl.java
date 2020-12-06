@@ -8,7 +8,6 @@ import edu.ukma.blog.models.user.responses.PublisherPreview;
 import edu.ukma.blog.services.ISearchService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,39 +23,40 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/search")
 public class SearchCtrl {
+    private static final int SEARCH_PAGE_SIZE;
 
-    private static final int SEARCH_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
-            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getSearchPageSize();
+    private static final int RECORDS_PREVIEW_BLOCK_SIZE;
 
-    @Autowired
-    private ISearchService searchService;
+    static {
+        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
+                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
+        SEARCH_PAGE_SIZE = pa.getSearchPageSize();
+        RECORDS_PREVIEW_BLOCK_SIZE = pa.getRecordsPreviewBlock();
+    }
 
-    @Autowired
-    private IUserService userService;
+    private final ISearchService searchService;
 
-    // possible feature: add prioritizing options
-//    private static final Map<String, String> PRIORITIZING_METHOD;
-//
-//    static {
-//        //todo: initialize inline
-//        Map<String, String> initMap = new HashMap<>();
-//        initMap.put("most recent", RecordEntity_.TIMESTAMP);
-//        PRIORITIZING_METHOD = Collections.unmodifiableMap(initMap);
-//    }
+    private final IUserService userService;
 
-    // todo: get size of page prom property
-    // todo: add info if the user follows a publishers returned
-    // todo: check that validation works
+    public SearchCtrl(ISearchService searchService, IUserService userService) {
+        this.searchService = searchService;
+        this.userService = userService;
+    }
+
+    // feature-idea: add prioritizing options
+//    private static final Map<String, String> PRIORITIZING_METHOD = Collections.unmodifiableMap(
+//            new HashMap<String, String>() {{put("most recent", RecordEntity_.TIMESTAMP);}});
+
     @GetMapping("/publishers")
     public LazyContentPage<PublisherPreview> findPublishers(@RequestParam @NotEmpty String name,
                                                             @RequestParam @Min(0) int page,
                                                             Principal principal) {
         long userId = userService.getUserId(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE);
-        return searchService.findPopularPublishers(name, pageable, userId, 3);
+        return searchService.findPopularPublishers(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
-    //todo: add record_statistics entity to avoid querying stats every time
+    //feature-idea: add record_statistics entity to avoid querying stats every time
     @GetMapping("/records")
     public LazyContentPage<ResponseRecord> findRecords(@RequestParam @NotEmpty String title,
                                                        @RequestParam @Min(0) int page,

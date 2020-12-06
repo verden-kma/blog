@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class RecordEvalService implements IRecordEvalService {
-    // todo: update user stats
     @PersistenceContext
     private EntityManager em;
 
@@ -96,7 +95,7 @@ public class RecordEvalService implements IRecordEvalService {
     private EvalPage getEvalKind(RecordId recordId, boolean isLiker, Pageable pageable) {
         Slice<Evaluation> evals = evaluatorsRepo.findAllById_RecordIdAndIsLiker(recordId, isLiker, pageable);
 
-        List<String> evaluators = usersRepo.getUsernamesByIds(evals
+        List<String> evaluators = usersRepo.findByIdIn(evals
                 .getContent()
                 .stream()
                 .map(x -> x.getId().getEvaluatorOwnId())

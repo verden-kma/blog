@@ -4,13 +4,11 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 public class ImageConstants {
-    public static final ImgDims avatarDims = new ImgDims(200, 200); // maybe Pair is a better option?
+    public static final ImgDims avatarDims = new ImgDims(200, 200);
     public static final ImgDims topBannerDims = new ImgDims(2000, 315);
 
     public static final String TARGET_MEDIA_TYPE = MediaType.IMAGE_JPEG_VALUE;

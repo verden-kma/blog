@@ -13,27 +13,30 @@ import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.services.ICommentService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users/{publisher}/records/{recordId}/comments")
 public class CommentCtrl {
-    @Autowired
-    private ICommentService commentService;
-
-    @Autowired
-    private IUserService userService;
-
     private static final int COMMENTS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
             .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getCommentBlockSize();
+
+    private final ICommentService commentService;
+
+    private final IUserService userService;
+
+    public CommentCtrl(ICommentService commentService, IUserService userService) {
+        this.commentService = commentService;
+        this.userService = userService;
+    }
 
     /**
      * stores a comment in database, assigns it to publisher/record/nextComment
@@ -60,18 +63,7 @@ public class CommentCtrl {
         long publisherId = userService.getUserId(publisher);
         Pageable pageable = PageRequest.of(block, COMMENTS_BLOCK_SIZE, Sort.by(CommentEntity_.TIMESTAMP).descending());
         List<CommentEntity> comments = commentService.getCommentsBlock(new RecordId(publisherId, recordId), pageable);
-        return getResponseComments(comments);
-    }
 
-    @GetMapping(path = "/all")
-    public List<ResponseComment> getComments(@PathVariable String publisher,
-                                             @PathVariable int recordId) {
-        long publisherId = userService.getUserId(publisher);
-        List<CommentEntity> comments = commentService.getComments(new RecordId(publisherId, recordId));
-        return getResponseComments(comments);
-    }
-
-    private List<ResponseComment> getResponseComments(List<CommentEntity> comments) {
         // different comments are written by different users, users can write multiple comments
         // all records are posted by 1 publisher
         List<Long> ids = comments.stream().map(CommentEntity::getCommentatorId).collect(Collectors.toList());
@@ -89,10 +81,12 @@ public class CommentCtrl {
     @DeleteMapping(path = "/{commentId}")
     public void removeComment(@PathVariable String publisher,
                               @PathVariable int recordId,
-                              @PathVariable int commentId) {
+                              @PathVariable int commentId,
+                              Principal principal) {
         long publisherId = userService.getUserId(publisher);
+        long userId = userService.getUserId(principal.getName());
         try {
-            commentService.removeComment(new CommentId(new RecordId(publisherId, recordId), commentId));
+            commentService.removeComment(new CommentId(new RecordId(publisherId, recordId), commentId), userId);
         } catch (EmptyResultDataAccessException e) {
             throw new NoSuchCommentException(publisher, recordId, commentId);
         }

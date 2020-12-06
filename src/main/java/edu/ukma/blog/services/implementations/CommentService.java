@@ -54,14 +54,22 @@ public class CommentService implements ICommentService {
         return commentsRepo.findAllById_RecordId(recordId, pageable);
     }
 
+    /**
+     * deletes a comment denoted by the <code>commentId</code> if it is being deleted by a publisher of the comment
+     * in the event of successful deletion, publisher statistics is updated
+     *
+     * @param commentID     compound primary key of CommentEntity stored in database
+     * @param commentatorId id of a user who wants to delete a comment
+     */
     @Override
     @Transactional
-    public void removeComment(CommentId commentID) {
+    public void removeComment(CommentId commentID, long commentatorId) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<CommentEntity> criteriaDelete = cb.createCriteriaDelete(CommentEntity.class);
         Root<CommentEntity> root = criteriaDelete.from(CommentEntity.class);
 
-        criteriaDelete.where(cb.equal(root.get(CommentEntity_.ID), commentID));
+        criteriaDelete.where(cb.equal(root.get(CommentEntity_.ID), commentID),
+                cb.equal(root.get(CommentEntity_.COMMENTATOR_ID), commentatorId));
         boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
 
         if (hasDeleted) publisherStatsRepo.decCommentsCount(commentID.getRecordId().getPublisherId());

@@ -29,8 +29,6 @@ public interface IRecordService {
      */
     List<ResponseRecord> buildRespRecs(Collection<List<RecordEntity>> recordsChunks, long userId);
 
-    List<String> getUserRecordsImgPaths(long userId, Pageable pageable); // used as get_last_records_imgs
-
     LazyContentPage<MinResponseRecord> getMinResponsePage(Pageable pageable);
 
     ResponseRecord getRecordCore(RecordId id, long userId);

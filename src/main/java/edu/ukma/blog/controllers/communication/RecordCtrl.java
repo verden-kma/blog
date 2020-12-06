@@ -14,7 +14,6 @@ import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.EagerContentPage;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,66 +25,72 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.function.Function;
 
 @RestController
 @RequestMapping("/users/{publisher}/records")
 public class RecordCtrl {
-
-    @Autowired
-    private IRecordService recordService;
-
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private IRecordImageService recordImageService;
-
     private static final int RECORD_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
             .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getPageSize();
 
-    @GetMapping // todo: get data about user`s id from provided token
+    private final IRecordService recordService;
+
+    private final IUserService userService;
+
+    private final IRecordImageService recordImageService;
+
+    public RecordCtrl(IRecordService recordService, IUserService userService, IRecordImageService recordImageService) {
+        this.recordService = recordService;
+        this.userService = userService;
+        this.recordImageService = recordImageService;
+    }
+
+    @GetMapping
     public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
-                                                           @RequestPart String username,
-                                                           @RequestParam int page) {
+                                                           @RequestParam int page,
+                                                           Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
         return recordService.getRecordsPage(publisherId, userId, pageable);
     }
 
-    // todo: handle validation in controller to avoid 500 error when persisting
+    // todo: handle validation in controller to avoid 500 error while persisting
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
-    public int addRecord(@PathVariable String publisher,
-                         @RequestPart RequestRecord recordData,
-                         @RequestPart MultipartFile image) {
-        long publisherId = userService.getUserId(publisher);
+    public int addRecord(@RequestPart RequestRecord recordData,
+                         @RequestPart MultipartFile image,
+                         Principal principal) {
+        long publisherId = userService.getUserId(principal.getName());
         return recordService.addRecord(publisherId, recordData, image);
     }
 
-    @GetMapping(path = "/{recordId}/{username}")
+    @GetMapping(path = "/{recordId}")
     public ResponseRecord getRecord(@PathVariable String publisher,
                                     @PathVariable int recordId,
-                                    @PathVariable String username) {
+                                    Principal principal) {
         long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(username);
+        long userId = userService.getUserId(principal.getName());
         return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
     }
 
+    // used (for target view)
     @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImage(@PathVariable String publisher,
                            @PathVariable int recordId) {
         return getSelectedImage(recordImageService::getImage, publisher, recordId);
     }
 
+    // used (for general view)
     @GetMapping(path = "/{recordId}/image-min", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageMin(@PathVariable String publisher,
                               @PathVariable int recordId) {
         return getSelectedImage(recordImageService::getImageMin, publisher, recordId);
     }
 
+    // used (for digest, user preview)
     @GetMapping(path = "/{recordId}/image-icon", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageIcon(@PathVariable String publisher,
                                @PathVariable int recordId) {
@@ -104,19 +109,19 @@ public class RecordCtrl {
     }
 
     @PutMapping(path = "/{recordId}")
-    public void editRecord(@PathVariable String publisher,
-                           @PathVariable int recordId,
-                           @RequestBody RequestRecord updatedRecord) {
+    public void editRecord(@PathVariable int recordId,
+                           @RequestBody RequestRecord updatedRecord,
+                           Principal principal) {
         if (updatedRecord.getCaption() == null && updatedRecord.getAdText() == null)
             throw new BlankRecordEditException("no update data provided");
-        long publisherId = userService.getUserId(publisher);
+        long publisherId = userService.getUserId(principal.getName());
         recordService.editRecord(new RecordId(publisherId, recordId), updatedRecord);
     }
 
-    @DeleteMapping(path = "/{recordId}")
-    public void removeRecord(@PathVariable String publisher,
-                             @PathVariable int recordId) {
-        long publisherId = userService.getUserId(publisher);
-        recordService.removeRecord(new RecordId(publisherId, recordId));
+    @DeleteMapping(path = "/{recordOwnId}")
+    public void removeRecord(@PathVariable int recordOwnId,
+                             Principal principal) {
+        long publisherId = userService.getUserId(principal.getName());
+        recordService.removeRecord(new RecordId(publisherId, recordOwnId));
     }
 }
