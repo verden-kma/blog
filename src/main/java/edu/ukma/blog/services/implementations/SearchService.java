@@ -3,6 +3,7 @@ package edu.ukma.blog.services.implementations;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.PublisherPreview;
+import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.record.RecordImgLocationAndPublisherIdView;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,8 +31,12 @@ public class SearchService implements ISearchService {
     @Autowired
     private IRecordService recordService;
 
+    @Autowired
+    private IFollowersRepo followersRepo;
+
     @Override
-    public LazyContentPage<PublisherPreview> findPopularPublishers(String prefix, Pageable publisherPageable, long userId, int numPreviewImgs) {
+    public LazyContentPage<PublisherPreview> findPopularPublishers(String prefix, Pageable publisherPageable,
+                                                                   long userId, int numPreviewImgs) {
         Slice<PublisherPreviewBaseView> previewBasesSlice = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, publisherPageable);
         List<PublisherPreviewBaseView> previewBases = previewBasesSlice.getContent();
 
@@ -52,12 +54,18 @@ public class SearchService implements ISearchService {
 
         assert (previewBases.size() == publisherRecentImgs.size());
 
+        Set<Long> subs = followersRepo.findById_SubscriberIdAndId_PublisherIdIn(userId, publisherIds)
+                .stream()
+                .map(x -> x.getId().getSubscriber())
+                .collect(Collectors.toSet());
+
         List<PublisherPreview> res = new ArrayList<>(previewBases.size());
         for (PublisherPreviewBaseView pb : previewBases) {
             PublisherPreview pp = new PublisherPreview();
-            pp.setUsername(pb.getUsername());
+            pp.setPublisherName(pb.getUsername());
             pp.setUploads(pb.getStatistics().getUploads());
             pp.setFollowers(pb.getStatistics().getFollowers());
+            pp.setFollowed(subs.contains(pb.getId()));
             pp.setLastRecordsImgPaths(publisherRecentImgs.get(pb.getId()));
             res.add(pp);
         }

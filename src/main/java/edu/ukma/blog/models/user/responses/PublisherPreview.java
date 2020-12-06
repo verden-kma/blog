@@ -6,9 +6,8 @@ import java.util.List;
 
 @Data
 public class PublisherPreview {
-    private String username;
-
-    boolean isFollowed; // todo: handle in usages
+    boolean isFollowed;
+    private String publisherName;
 
     private int followers;
 

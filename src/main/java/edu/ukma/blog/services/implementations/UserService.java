@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
+import edu.ukma.blog.models.compositeIDs.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
@@ -12,6 +13,7 @@ import edu.ukma.blog.models.user.requests.EditUserRequestModel;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.PublisherPreview;
 import edu.ukma.blog.models.user.responses.UserPageResponse;
+import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
@@ -54,6 +56,9 @@ public class UserService implements IUserService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IFollowersRepo followersRepo;
+
     @Override
     public UserEntity addUser(UserSignupRequest userData) {
         if (usersRepo.existsUserByUsername(userData.getUsername()))
@@ -72,22 +77,26 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserPageResponse getUser(String username) {
+    public UserPageResponse getPublisher(String user, String publisher) {
         UserPageResponse respUser = new UserPageResponse();
-        UserEntity pUser = usersRepo.findByUsername(username);
+        UserEntity pUser = usersRepo.findByUsername(user);
+        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserId(user), getUserId(publisher))));
         BeanUtils.copyProperties(pUser, respUser);
         BeanUtils.copyProperties(pUser.getStatistics(), respUser);
         return respUser;
     }
 
     @Override
-    public PublisherPreview getUserPreview(String username, int recPrevNum) {
-        long userId = usersRepo.getIdByUsername(username).orElseThrow(() -> new UsernameMissingException(username));
+    public PublisherPreview getPublisherPreview(String publisher, String user, int recPrevNum) {
+        long userId = getUserId(user);
+        long publisherId = getUserId(publisher);
+
         PublisherPreview preview = new PublisherPreview();
-        preview.setUsername(username);
+        preview.setPublisherName(publisher);
+        preview.setFollowed(followersRepo.existsById(new FollowerId(publisherId, userId)));
         Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
-        preview.setLastRecordsImgPaths(recordService.getUserRecordsImgPaths(userId, pageable));
-        PublisherStats stats = getUserEntity(username).getStatistics();
+        preview.setLastRecordsImgPaths(recordService.getUserRecordsImgPaths(publisherId, pageable));
+        PublisherStats stats = getUserEntity(user).getStatistics();
         BeanUtils.copyProperties(stats, preview);
         return preview;
     }

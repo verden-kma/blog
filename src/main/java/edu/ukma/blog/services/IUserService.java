@@ -13,9 +13,9 @@ import java.util.List;
 public interface IUserService extends UserDetailsService {
     UserEntity addUser(UserSignupRequest userData);
 
-    UserPageResponse getUser(String username);
+    UserPageResponse getPublisher(String user, String publisher);
 
-    PublisherPreview getUserPreview(String username, int recPrevNum);
+    PublisherPreview getPublisherPreview(String publisher, String user, int recPrevNum);
 
     void updateUser(String username, EditUserRequestModel update);
 

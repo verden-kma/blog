@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/users")
@@ -25,16 +26,18 @@ public class UserCtrl {
     }
 
     // use to load user's page and to get old user data while editing user's profile
-    @GetMapping("/{username}")
-    public UserPageResponse getUserData(@PathVariable String username) {
-        return userService.getUser(username);
+    @GetMapping("/{publisher}")
+    public UserPageResponse getUserData(@PathVariable String publisher,
+                                        Principal principal) {
+        return userService.getPublisher(principal.getName(), publisher);
     }
 
     // todo: use property accessor min/max values
-    @GetMapping("/{username}/short")
-    public PublisherPreview getShortData(@PathVariable String username,
-                                         @RequestParam @Min(1) @Max(10) int recPrevNum) {
-        return userService.getUserPreview(username, recPrevNum);
+    @GetMapping("/{publisher}/short")
+    public PublisherPreview getShortData(@PathVariable String publisher,
+                                         @RequestParam @Min(1) @Max(10) int recPrevNum,
+                                         Principal principal) {
+        return userService.getPublisherPreview(publisher, principal.getName(), recPrevNum);
     }
 
     @PutMapping("/{username}")

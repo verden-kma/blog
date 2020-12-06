@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Embeddable
 public class FollowerId implements Serializable {
-    private long publisher;
+    private long publisherId;
 
-    private long subscriber;
+    private long subscriberId;
 }
