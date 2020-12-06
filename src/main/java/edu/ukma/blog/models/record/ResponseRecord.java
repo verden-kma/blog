@@ -17,6 +17,8 @@ public class ResponseRecord {
 
     private boolean isEdited;
 
+    private String imgLocation; // todo: add img path to older code
+
     @Nullable // like - true, dislike - false, ignore - null
     private Boolean reaction; // used for current user
 

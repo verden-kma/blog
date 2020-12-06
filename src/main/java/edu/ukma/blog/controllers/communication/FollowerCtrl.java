@@ -14,15 +14,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/users/{publisher}/followers")
 public class FollowerCtrl {
-    private static final int FOLLOWERS_BLOCK_SIZE;
-
-    static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
-        FOLLOWERS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName)).getFollowersBlockSize();
-
-    }
+    private static final int FOLLOWERS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getFollowersBlockSize();
 
     @Autowired
     private IFollowerService followerService;

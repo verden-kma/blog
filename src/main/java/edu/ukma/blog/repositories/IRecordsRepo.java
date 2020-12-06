@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     List<RecordImgLocationView> findById_PublisherId(long publisherId, Pageable pageable);
 
+    // TODO: maybe there is a way to make this query more general
     @Query(value = "SELECT publisher_id, img_location FROM (\n" +
             "    SELECT publisher_id, \n" +
             "           img_location, \n" +
@@ -50,8 +52,7 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     Slice<MinRecordView> findAllBy(Pageable pageable);
 
-//    @Query("SELECT rec.isEdited FROM RecordEntity rec JOIN rec.likeUsers lius WHERE rec.id=:recordId AND lius=:likerId")
-//    Boolean existsByLikeUsersIn(@Param("recordId") RecordId recordId, @Param("likerId") long likerId);
+    Slice<RecordEntity> findByCaptionContains(@NotEmpty String caption, Pageable pageable);
 
 //    as an example to remember
 //    @Transactional

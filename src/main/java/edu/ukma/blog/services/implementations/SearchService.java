@@ -1,14 +1,18 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.PublisherPreview;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.record.RecordImgLocationAndPublisherIdView;
 import edu.ukma.blog.repositories.projections.user.PublisherPreviewBaseView;
+import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.ISearchService;
+import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,9 +30,14 @@ public class SearchService implements ISearchService {
     @Autowired
     private IRecordsRepo recordsRepo;
 
+    @Autowired
+    private IRecordService recordService;
+
     @Override
-    public List<PublisherPreview> findPopularPublishers(String prefix, Pageable publisherPageable, int numPreviewImgs) {
-        List<PublisherPreviewBaseView> previewBases = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, publisherPageable);
+    public LazyContentPage<PublisherPreview> findPopularPublishers(String prefix, Pageable publisherPageable, long userId, int numPreviewImgs) {
+        Slice<PublisherPreviewBaseView> previewBasesSlice = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, publisherPageable);
+        List<PublisherPreviewBaseView> previewBases = previewBasesSlice.getContent();
+
         List<Long> publisherIds = previewBases.stream().map(PublisherPreviewBaseView::getId).collect(Collectors.toList());
         List<RecordImgLocationAndPublisherIdView> publishersRecentRecordsImgPathsAndIdsViews =
                 recordsRepo.getLastRecordsOfPublishers(publisherIds, numPreviewImgs);
@@ -52,11 +61,14 @@ public class SearchService implements ISearchService {
             pp.setLastRecordsImgPaths(publisherRecentImgs.get(pb.getId()));
             res.add(pp);
         }
-        return res;
+        return new LazyContentPage<>(res, previewBasesSlice.isLast());
     }
 
     @Override
-    public List<ResponseRecord> findRecords(String substr, Pageable pageable) {
-        return null;
+    public LazyContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId) {
+        Slice<RecordEntity> recEnts = recordsRepo.findByCaptionContains(titleSubstr, pageable);
+        Map<Long, List<RecordEntity>> samePublisherRecords = recEnts.stream()
+                .collect(Collectors.groupingBy(x -> x.getId().getPublisherId()));
+        return new LazyContentPage<>(recordService.buildRespRecs(samePublisherRecords.values(), userId), recEnts.isLast());
     }
 }

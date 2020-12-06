@@ -38,10 +38,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,51 +88,114 @@ public class RecordService implements IRecordService {
         int numPages = (int) Math.ceil((double) recordsRepo.countAllById_PublisherId(publisherId) / pageable.getPageSize());
         List<RecordEntity> pageRecords = recordsRepo.findAllById_PublisherId(publisherId, pageable);
 
-        List<ResponseRecord> respRecs = pageRecords.stream().map(x -> {
-            ResponseRecord resp = new ResponseRecord();
-            BeanUtils.copyProperties(x, resp);
-            resp.setId(x.getId().getRecordOwnId());
-            return resp;
-        }).collect(Collectors.toList());
+//        List<ResponseRecord> respRecs = pageRecords.stream().map(x -> {
+//            ResponseRecord resp = new ResponseRecord();
+//            BeanUtils.copyProperties(x, resp);
+//            resp.setId(x.getId().getRecordOwnId());
+//            return resp;
+//        }).collect(Collectors.toList());
+//
+//        List<Integer> recordOwnIds = pageRecords.stream().map(x -> x.getId().getRecordOwnId()).collect(Collectors.toList());
+//
+//        // get all (encapsulated in projection interfaces) recordIds associated with evaluations (maybe) made by a user
+//        // take data out of encapsulation noise
+//        Map<Integer, Boolean> userEvals =
+//                evaluatorsRepo.findAllById_EvaluatorOwnIdAndId_RecordId_PublisherIdAndId_RecordId_RecordOwnIdIn
+//                        (userId, publisherId, recordOwnIds)
+//                        .stream()
+//                        .collect(HashMap::new,
+//                                (m, proj) -> m.put(proj.getId().getRecordId().getRecordOwnId(), proj.getIsLiker()),
+//                                HashMap::putAll);
+//
+//        // associate each recordOwnId with pairs<isLike, numOfMarks>
+//        // i.e. for each record get a pair of likes and dislikes quantities
+//        Multimap<Integer, Pair<Boolean, Integer>> recordsEvaluations =
+//                evaluatorsRepo.getRecordsEvaluations(publisherId, recordOwnIds)
+//                        .stream()
+//                        .collect(ArrayListMultimap::create, (map, entry) -> map.put(entry.getRecord_Own_Id(),
+//                                Pair.of(entry.getIs_Liker(), entry.getMono_Eval_Count())), Multimap::putAll);
+//
+//        Map<Integer, Integer> commentsNum = commentsRepo.getCommentsNumForRecords(publisherId, recordOwnIds)
+//                .stream()
+//                .collect(Collectors.toMap(RecordCommentsNumView::getRecord_Own_Id,
+//                        RecordCommentsNumView::getComment_Count));
+//
+//        for (ResponseRecord respRec : respRecs) {
+//            respRec.setReaction(userEvals.get(respRec.getId()));
+//            // for i in range [0, 2)
+//            for (Pair<Boolean, Integer> pair : recordsEvaluations.get(respRec.getId())) {
+//                if (pair.getFirst()) respRec.setLikes(pair.getSecond());
+//                else respRec.setDislikes(pair.getSecond());
+//            }
+//
+//            if (commentsNum.containsKey(respRec.getId()))
+//                respRec.setNumOfComments(commentsNum.get(respRec.getId()));
+//        }
+//        return new EagerContentPage<>(respRecs, numPages);
 
-        List<Integer> recordOwnIds = pageRecords.stream().map(x -> x.getId().getRecordOwnId()).collect(Collectors.toList());
+        List<List<RecordEntity>> samePubRecEnts = new ArrayList<>(1);
+        samePubRecEnts.add(pageRecords);
+        return new EagerContentPage<>(buildRespRecs(samePubRecEnts, userId), numPages);
+    }
 
-        // get all (encapsulated in projection interfaces) recordIds associated with evaluations (maybe) made by a user
-        // take data out of encapsulation noise
-        Map<Integer, Boolean> userEvals =
-                evaluatorsRepo.findAllById_EvaluatorOwnIdAndId_RecordId_PublisherIdAndId_RecordId_RecordOwnIdIn
-                        (userId, publisherId, recordOwnIds)
-                        .stream()
-                        .collect(HashMap::new,
-                                (m, proj) -> m.put(proj.getId().getRecordId().getRecordOwnId(), proj.getIsLiker()),
-                                HashMap::putAll);
-
-        // associate each recordOwnId with pairs<isLike, numOfMarks>
-        // i.e. for each record get a pair of likes and dislikes quantities
-        Multimap<Integer, Pair<Boolean, Integer>> recordsEvaluations =
-                evaluatorsRepo.getRecordsEvaluations(publisherId, recordOwnIds)
-                        .stream()
-                        .collect(ArrayListMultimap::create, (map, entry) -> map.put(entry.getRecord_Own_Id(),
-                                Pair.of(entry.getIs_Liker(), entry.getMono_Eval_Count())), Multimap::putAll);
-
-        Map<Integer, Integer> commentsNum = commentsRepo.getCommentsNumForRecords(publisherId, recordOwnIds)
-                .stream()
-                .collect(Collectors.toMap(RecordCommentsNumView::getRecord_Own_Id,
-                        RecordCommentsNumView::getComment_Count));
-
-        for (ResponseRecord respRec : respRecs) {
-            respRec.setReaction(userEvals.get(respRec.getId()));
-            // for i in range [0, 2)
-            for (Pair<Boolean, Integer> pair : recordsEvaluations.get(respRec.getId())) {
-                if (pair.getFirst()) respRec.setLikes(pair.getSecond());
-                else respRec.setDislikes(pair.getSecond());
-            }
-
-            if (commentsNum.containsKey(respRec.getId()))
-                respRec.setNumOfComments(commentsNum.get(respRec.getId()));
+    public List<ResponseRecord> buildRespRecs(Collection<List<RecordEntity>> recordsChunks, long userId) {
+        int resSize = 0;
+        for (List<RecordEntity> records : recordsChunks) {
+            resSize += records.size();
         }
 
-        return new EagerContentPage<>(respRecs, numPages);
+        List<ResponseRecord> res = new ArrayList<>(resSize);
+
+        for (List<RecordEntity> records : recordsChunks) {
+            if (records.isEmpty()) continue;
+            long publisherId = records.get(0).getId().getPublisherId();
+
+            List<ResponseRecord> respRecs = records.stream().map(x -> {
+                ResponseRecord resp = new ResponseRecord();
+                BeanUtils.copyProperties(x, resp);
+                resp.setId(x.getId().getRecordOwnId());
+                return resp;
+            }).collect(Collectors.toList());
+
+            List<Integer> recordOwnIds = records.stream().map(x -> x.getId().getRecordOwnId()).collect(Collectors.toList());
+
+            // get all (encapsulated in projection interfaces) recordIds associated with evaluations (maybe) made by a user
+            // take data out of encapsulation noise
+            Map<Integer, Boolean> userEvals =
+                    evaluatorsRepo.findAllById_EvaluatorOwnIdAndId_RecordId_PublisherIdAndId_RecordId_RecordOwnIdIn
+                            (userId, publisherId, recordOwnIds)
+                            .stream()
+                            .collect(HashMap::new,
+                                    (m, proj) -> m.put(proj.getId().getRecordId().getRecordOwnId(), proj.getIsLiker()),
+                                    HashMap::putAll);
+
+            // associate each recordOwnId with pairs<isLike, numOfMarks>
+            // i.e. for each record get a pair of likes and dislikes quantities
+            Multimap<Integer, Pair<Boolean, Integer>> recordsEvaluations =
+                    evaluatorsRepo.getRecordsEvaluations(publisherId, recordOwnIds)
+                            .stream()
+                            .collect(ArrayListMultimap::create, (map, entry) -> map.put(entry.getRecord_Own_Id(),
+                                    Pair.of(entry.getIs_Liker(), entry.getMono_Eval_Count())), Multimap::putAll);
+
+            Map<Integer, Integer> commentsNum = commentsRepo.getCommentsNumForRecords(publisherId, recordOwnIds)
+                    .stream()
+                    .collect(Collectors.toMap(RecordCommentsNumView::getRecord_Own_Id,
+                            RecordCommentsNumView::getComment_Count));
+
+            for (ResponseRecord respRec : respRecs) {
+                respRec.setReaction(userEvals.get(respRec.getId()));
+                // for i in range [0, 2)
+                for (Pair<Boolean, Integer> pair : recordsEvaluations.get(respRec.getId())) {
+                    if (pair.getFirst()) respRec.setLikes(pair.getSecond());
+                    else respRec.setDislikes(pair.getSecond());
+                }
+
+                if (commentsNum.containsKey(respRec.getId()))
+                    respRec.setNumOfComments(commentsNum.get(respRec.getId()));
+            }
+            res.addAll(respRecs);
+        }
+        return res;
     }
 
     @Override

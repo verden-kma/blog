@@ -22,5 +22,7 @@ public class UserPageResponse {
 
     private int comments;
 
+    private boolean isFollowed; // todo: handle in usages
+
     private List<String> subscriptions;
 }

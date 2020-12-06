@@ -20,14 +20,8 @@ public class EvaluationCtrl {
      * therefore there are separate put and delete endpoints
      * */
 
-    private static final int EVAL_BLOCK_SIZE;
-
-    static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
-        EVAL_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName)).getEvalBlockSize();
-    }
+    private static final int EVAL_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getEvalBlockSize();
 
     @Autowired
     private IRecordEvalService reactionService;

@@ -11,6 +11,13 @@ public class PropertyAccessor {
     @Autowired
     private Environment environment;
 
+    public static final String PROPERTY_ACCESSOR_BEAN_NAME;
+
+    static {
+        String beanName = PropertyAccessor.class.getSimpleName();
+        PROPERTY_ACCESSOR_BEAN_NAME = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
+    }
+
     public long getExpirationTime() {
         return Long.parseLong(Objects.requireNonNull(environment.getProperty("expirationTime")));
     }
@@ -55,7 +62,11 @@ public class PropertyAccessor {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("followersPerBlock")));
     }
 
-    public int getdigestPageSize() {
+    public int getDigestPageSize() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("digestPageSize")));
+    }
+
+    public int getSearchPageSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("searchPageSize")));
     }
 }

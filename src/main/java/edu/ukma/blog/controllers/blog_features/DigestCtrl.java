@@ -16,14 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DigestCtrl {
-    private static final int DIGEST_PAGE_SIZE;
-
-    static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
-        DIGEST_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName)).getdigestPageSize();
-    }
+    private static final int DIGEST_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getDigestPageSize();
 
     @Autowired
     private IRecordService recordService;

@@ -41,16 +41,10 @@ public class RecordCtrl {
     @Autowired
     private IRecordImageService recordImageService;
 
-    private static final int RECORD_PAGE_SIZE;
+    private static final int RECORD_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getPageSize();
 
-    static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
-        RECORD_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName)).getPageSize();
-    }
-
-    @GetMapping
+    @GetMapping // todo: get data about user`s id from provided token
     public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
                                                            @RequestPart String username,
                                                            @RequestParam int page) {

@@ -8,6 +8,8 @@ import java.util.List;
 public class PublisherPreview {
     private String username;
 
+    boolean isFollowed; // todo: handle in usages
+
     private int followers;
 
     private int uploads;

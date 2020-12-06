@@ -32,14 +32,8 @@ public class CommentCtrl {
     @Autowired
     private IUserService userService;
 
-    private static final int COMMENTS_BLOCK_SIZE;
-
-    static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
-        COMMENTS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName)).getCommentBlockSize();
-    }
+    private static final int COMMENTS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
+            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getCommentBlockSize();
 
     /**
      * stores a comment in database, assigns it to publisher/record/nextComment

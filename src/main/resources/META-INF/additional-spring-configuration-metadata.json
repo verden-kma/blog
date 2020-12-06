@@ -58,6 +58,11 @@
       "name": "digestPageSize",
       "type": "java.lang.String",
       "description": "The number of the most recent records displayed as a digest."
+    },
+    {
+      "name": "searchPageSize",
+      "type": "java.lang.String",
+      "description": "The number of records or publishers returned on client's query."
     }
   ]
 }

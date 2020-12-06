@@ -4,6 +4,7 @@ import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.MinResponseRecord;
+import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.utils.EagerContentPage;
@@ -11,6 +12,7 @@ import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collection;
 import java.util.List;
 
 // works with textual data only
@@ -19,6 +21,13 @@ public interface IRecordService {
             throws ServerCriticalError, WrongFileFormatException;
 
     EagerContentPage<ResponseRecord> getRecordsPage(long publisherId, long userId, Pageable pageable);
+
+    /**
+     * @param recordsChunks lists of RecordEntities posted by the same publisher
+     * @param userId        user who is querying the records and who may have evaluated them
+     * @return list of <code>ResponseRecord</code> for each record
+     */
+    List<ResponseRecord> buildRespRecs(Collection<List<RecordEntity>> recordsChunks, long userId);
 
     List<String> getUserRecordsImgPaths(long userId, Pageable pageable); // used as get_last_records_imgs
 
