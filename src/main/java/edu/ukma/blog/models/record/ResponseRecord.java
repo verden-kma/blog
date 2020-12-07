@@ -2,9 +2,6 @@ package edu.ukma.blog.models.record;
 
 import lombok.Data;
 
-import javax.annotation.Nullable;
-
-//todo: maybe it is a better idea to return a location of the image associated with a record and not perform additional query?
 @Data
 public class ResponseRecord {
     private int id;
@@ -17,10 +14,8 @@ public class ResponseRecord {
 
     private boolean isEdited;
 
-    private String imgLocation; // todo: add img path to older code
-
-    @Nullable // like - true, dislike - false, ignore - null
-    private Boolean reaction; // used for current user
+    // like - true, dislike - false, ignore - null
+    private Boolean reaction;
 
     private int likes;
 

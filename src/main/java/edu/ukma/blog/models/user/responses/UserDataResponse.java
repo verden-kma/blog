@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserPageResponse {
+public class UserDataResponse {
     private String username;
 
     private String status; // short description about user's occupation

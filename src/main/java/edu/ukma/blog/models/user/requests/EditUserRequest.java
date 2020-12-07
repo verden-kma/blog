@@ -6,7 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class EditUserRequestModel {
+public class EditUserRequest {
     @Pattern(regexp = PatternConstants.PASSWORD_PATTERN)
     private String password;
 

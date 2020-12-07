@@ -4,7 +4,7 @@ import edu.ukma.blog.PropertyAccessor;
 import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.record.ResponseRecord;
-import edu.ukma.blog.models.user.responses.PublisherPreview;
+import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.services.ISearchService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
@@ -48,10 +48,10 @@ public class SearchCtrl {
 //            new HashMap<String, String>() {{put("most recent", RecordEntity_.TIMESTAMP);}});
 
     @GetMapping("/publishers")
-    public LazyContentPage<PublisherPreview> findPublishers(@RequestParam @NotEmpty String name,
-                                                            @RequestParam @Min(0) int page,
-                                                            Principal principal) {
-        long userId = userService.getUserId(principal.getName());
+    public LazyContentPage<UserDataPreviewResponse> findPublishers(@RequestParam @NotEmpty String name,
+                                                                   @RequestParam @Min(0) int page,
+                                                                   Principal principal) {
+        long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE);
         return searchService.findPopularPublishers(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
     }
@@ -61,7 +61,7 @@ public class SearchCtrl {
     public LazyContentPage<ResponseRecord> findRecords(@RequestParam @NotEmpty String title,
                                                        @RequestParam @Min(0) int page,
                                                        Principal principal) {
-        long userId = userService.getUserId(principal.getName());
+        long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP));
         return searchService.findRecordsWithTitleLike(title, pageable, userId);
     }

@@ -7,7 +7,6 @@ import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.services.ICommentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +26,14 @@ public class CommentService implements ICommentService {
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
-    private ICommentsRepo commentsRepo;
+    private final ICommentsRepo commentsRepo;
 
-    @Autowired
-    private IPublisherStatsRepo publisherStatsRepo;
+    private final IPublisherStatsRepo publisherStatsRepo;
+
+    public CommentService(ICommentsRepo commentsRepo, IPublisherStatsRepo publisherStatsRepo) {
+        this.commentsRepo = commentsRepo;
+        this.publisherStatsRepo = publisherStatsRepo;
+    }
 
     @Override
     public int addComment(RecordId recordId, long commenterId, String text) {
@@ -42,11 +44,6 @@ public class CommentService implements ICommentService {
         commentsRepo.save(comment);
         publisherStatsRepo.incCommentsCount(recordId.getPublisherId());
         return commentId.getCommentOwnId();
-    }
-
-    @Override
-    public List<CommentEntity> getComments(RecordId recordId) {
-        return commentsRepo.findAllById_RecordId(recordId);
     }
 
     @Override

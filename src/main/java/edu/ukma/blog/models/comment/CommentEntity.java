@@ -22,5 +22,5 @@ public class CommentEntity {
     @NotEmpty
     private String text;
 
-    private String timestamp;
+    private String timestamp; // LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC) ?
 }

@@ -2,10 +2,10 @@ package edu.ukma.blog.controllers.actors;
 
 import edu.ukma.blog.PropertyAccessor;
 import edu.ukma.blog.SpringApplicationContext;
-import edu.ukma.blog.models.user.requests.EditUserRequestModel;
+import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
-import edu.ukma.blog.models.user.responses.PublisherPreview;
-import edu.ukma.blog.models.user.responses.UserPageResponse;
+import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
+import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,20 +33,20 @@ public class UserCtrl {
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{publisher}")
-    public UserPageResponse getUserData(@PathVariable String publisher,
+    public UserDataResponse getUserData(@PathVariable String publisher,
                                         Principal principal) {
         return userService.getPublisher(principal.getName(), publisher);
     }
 
     // will it be really used?
     @GetMapping("/{publisher}/short")
-    public PublisherPreview getShortData(@PathVariable String publisher,
-                                         Principal principal) {
+    public UserDataPreviewResponse getShortData(@PathVariable String publisher,
+                                                Principal principal) {
         return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
     @PutMapping
-    public void updateUserData(@Valid @RequestBody EditUserRequestModel update,
+    public void updateUserData(@Valid @RequestBody EditUserRequest update,
                                Principal principal) {
         userService.updateUser(principal.getName(), update);
     }

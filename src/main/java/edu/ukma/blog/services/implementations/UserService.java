@@ -9,14 +9,13 @@ import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
-import edu.ukma.blog.models.user.requests.EditUserRequestModel;
+import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
-import edu.ukma.blog.models.user.responses.PublisherPreview;
-import edu.ukma.blog.models.user.responses.UserPageResponse;
+import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
+import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
-import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
 import edu.ukma.blog.services.IUserService;
@@ -54,7 +53,8 @@ public class UserService implements IUserService {
 
     private final IRecordsRepo recordsRepo;
 
-    public UserService(IUsersRepo usersRepo, BCryptPasswordEncoder passwordEncoder, IFollowersRepo followersRepo, IRecordsRepo recordsRepo) {
+    public UserService(IUsersRepo usersRepo, BCryptPasswordEncoder passwordEncoder,
+                       IFollowersRepo followersRepo, IRecordsRepo recordsRepo) {
         this.usersRepo = usersRepo;
         this.passwordEncoder = passwordEncoder;
         this.followersRepo = followersRepo;
@@ -62,57 +62,56 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserEntity addUser(UserSignupRequest userData) {
+    public void addUser(UserSignupRequest userData) {
         if (usersRepo.existsUserByUsername(userData.getUsername()))
             throw new UsernameDuplicateException(userData.getUsername());
         UserEntity newUser = new UserEntity();
         BeanUtils.copyProperties(userData, newUser);
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
         newUser.setStatistics(new PublisherStats(newUser));
-        return usersRepo.save(newUser);
+        usersRepo.save(newUser);
     }
 
     @Override
-    public long getUserId(String username) {
+    public long getUserIdByUsername(String username) {
         return usersRepo.getByUsername(username)
                 .orElseThrow(() -> new UsernameMissingException(username))
                 .getId();
     }
 
     @Override
-    public UserPageResponse getPublisher(String user, String publisher) {
-        UserPageResponse respUser = new UserPageResponse();
+    public UserDataResponse getPublisher(String user, String publisher) {
+        UserDataResponse respUser = new UserDataResponse();
         UserEntity pUser = usersRepo.findByUsername(user);
-        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserId(user), getUserId(publisher))));
+        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserIdByUsername(user), getUserIdByUsername(publisher))));
         BeanUtils.copyProperties(pUser, respUser);
         BeanUtils.copyProperties(pUser.getStatistics(), respUser);
         return respUser;
     }
 
     @Override
-    public PublisherPreview getPublisherPreview(String publisher, String user, int recPrevNum) {
-        long userId = getUserId(user);
-        long publisherId = getUserId(publisher);
+    // todo: test, pay attention to stats
+    public UserDataPreviewResponse getPublisherPreview(String publisher, String user, int recPrevNum) {
+        long publisherId = getUserIdByUsername(publisher);
+        long userId = getUserIdByUsername(user);
 
-        PublisherPreview preview = new PublisherPreview();
+        UserDataPreviewResponse preview = new UserDataPreviewResponse();
         preview.setPublisherName(publisher);
         preview.setFollowed(followersRepo.existsById(new FollowerId(publisherId, userId)));
         Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
-        preview.setLastRecordsImgPaths(recordsRepo.findById_PublisherId(publisherId, pageable)
+        preview.setLastRecords(recordsRepo.findById_PublisherId(publisherId, pageable)
                 .stream()
-                .map(RecordImgLocationView::getImgLocation)
+                .map(x -> x.getId().getRecordOwnId())
                 .collect(Collectors.toList()));
-        PublisherStats stats = getUserEntity(user).getStatistics();
+//        PublisherStats stats = getUserEntity(user).getStatistics();
+        PublisherStats stats = usersRepo.findById(publisherId).getStatistics();
         BeanUtils.copyProperties(stats, preview);
         return preview;
     }
 
-
-//    recordsRepo.findById_PublisherId(publisherId, pageable).stream().map(RecordImgLocationView::getImgLocation).collect(Collectors.toList());
-
     @Override
     @Transactional
-    public void updateUser(String username, EditUserRequestModel editUser) {
+    public void updateUser(String username, EditUserRequest editUser) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaUpdate<UserEntity> criteriaUpdate = cb.createCriteriaUpdate(UserEntity.class);
         Root<UserEntity> root = criteriaUpdate.from(UserEntity.class);
@@ -148,7 +147,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<String> getUsernames(List<Long> userIds) {
+    public List<String> getUsernamesByIds(List<Long> userIds) {
         return usersRepo.findAllByIdIn(userIds).stream()
                 .map(UserNameView::getUsername).collect(Collectors.toList());
     }

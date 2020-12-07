@@ -29,17 +29,17 @@ public class FollowerCtrl {
     @GetMapping
     public List<String> getFollowers(@PathVariable String publisher,
                                      @RequestParam int block) {
-        long publisherId = userService.getUserId(publisher);
+        long publisherId = userService.getUserIdByUsername(publisher);
         Pageable pageable = PageRequest.of(block, FOLLOWERS_BLOCK_SIZE);
-        return userService.getUsernames(followerService.getFollowersBlock(publisherId, pageable));
+        return userService.getUsernamesByIds(followerService.getFollowersBlock(publisherId, pageable));
     }
 
     // used (in target view, in publisher page view, publisher preview)
     @PutMapping
     public void follow(@PathVariable String publisher,
                        Principal principal) {
-        long publisherId = userService.getUserId(publisher);
-        long subscriberId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long subscriberId = userService.getUserIdByUsername(principal.getName());
         followerService.addFollower(publisherId, subscriberId);
     }
 
@@ -47,8 +47,8 @@ public class FollowerCtrl {
     @DeleteMapping
     public void unfollow(@PathVariable String publisher,
                          Principal principal) {
-        long publisherId = userService.getUserId(publisher);
-        long subscriberId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long subscriberId = userService.getUserIdByUsername(principal.getName());
         followerService.removeFollower(publisherId, subscriberId);
     }
 }

@@ -2,14 +2,14 @@ package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
-import edu.ukma.blog.models.record.evaluation.EvalPage;
-import edu.ukma.blog.models.record.evaluation.Evaluation;
 import edu.ukma.blog.models.record.evaluation.Evaluation_;
+import edu.ukma.blog.models.simple_interaction.Evaluation;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.services.IRecordEvalService;
+import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -83,26 +83,26 @@ public class RecordEvalService implements IRecordEvalService {
     }
 
     @Override
-    public EvalPage getLikers(RecordId recordId, Pageable pageable) {
-        return getEvalKind(recordId, true, pageable);
+    public LazyContentPage<String> getLikers(RecordId recordId, Pageable pageable) {
+        return getEvalPageOfKind(recordId, true, pageable);
     }
 
     @Override
-    public EvalPage getDislikers(RecordId recordId, Pageable pageable) {
-        return getEvalKind(recordId, false, pageable);
+    public LazyContentPage<String> getDislikers(RecordId recordId, Pageable pageable) {
+        return getEvalPageOfKind(recordId, false, pageable);
     }
 
-    private EvalPage getEvalKind(RecordId recordId, boolean isLiker, Pageable pageable) {
+    private LazyContentPage<String> getEvalPageOfKind(RecordId recordId, boolean isLiker, Pageable pageable) {
         Slice<Evaluation> evals = evaluatorsRepo.findAllById_RecordIdAndIsLiker(recordId, isLiker, pageable);
 
         List<String> evaluators = usersRepo.findByIdIn(evals
                 .getContent()
                 .stream()
-                .map(x -> x.getId().getEvaluatorOwnId())
+                .map(x -> x.getId().getEvaluatorUserId())
                 .collect(Collectors.toList()))
                 .stream()
                 .map(UserEntityIdsView::getUsername)
                 .collect(Collectors.toList());
-        return new EvalPage(evaluators, evals.isLast());
+        return new LazyContentPage<>(evaluators, evals.isLast());
     }
 }

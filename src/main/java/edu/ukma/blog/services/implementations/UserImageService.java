@@ -67,7 +67,7 @@ public class UserImageService implements IUserImageService {
     public void setAvatar(MultipartFile multipartImage, String username) {
         try {
             IconHandler.saveIcon(ImageIO.read(multipartImage.getInputStream()),
-                    new File(IMAGE_ROOT, buildPathByUsername(username) + AVATAR_SUFFIX).getPath());
+                    new File(IMAGE_ROOT, buildPathByUsername(username) + AVATAR_SUFFIX).getPath(), AVATAR_SIZE);
         } catch (IOException e) {
             throw new ServerCriticalError(e);
         }
@@ -95,13 +95,13 @@ public class UserImageService implements IUserImageService {
         File locationOnDisk = new File(IMAGE_ROOT, buildPathByUsername(username) + BANNER_SUFFIX);
         try {
             BufferedImage bImg = ImageIO.read(imageFile.getInputStream());
-            if (bImg.getWidth() == topBannerDims.getWidth() && bImg.getHeight() == topBannerDims.getHeight()) {
+            if (bImg.getWidth() == TOP_BANNER_DIMS.getWidth() && bImg.getHeight() == TOP_BANNER_DIMS.getHeight()) {
                 imageFile.transferTo(locationOnDisk);
             } else {
                 int width = bImg.getWidth();
                 int height = bImg.getHeight();
                 double inputRatio = (double) width / height;
-                double targetRatio = (double) topBannerDims.getWidth() / topBannerDims.getHeight();
+                double targetRatio = (double) TOP_BANNER_DIMS.getWidth() / TOP_BANNER_DIMS.getHeight();
                 final int centerX = width / 2;
                 final int centerY = height / 2;
                 if (Math.abs(targetRatio - inputRatio) > 1e-5) {
@@ -111,7 +111,7 @@ public class UserImageService implements IUserImageService {
                     bImg.flush();
                     bImg = cropped;
                 }
-                Scalr.resize(bImg, Scalr.Mode.FIT_EXACT, topBannerDims.getWidth(), topBannerDims.getHeight());
+                Scalr.resize(bImg, Scalr.Mode.FIT_EXACT, TOP_BANNER_DIMS.getWidth(), TOP_BANNER_DIMS.getHeight());
                 ImageIO.write(bImg, TARGET_IMAGE_FORMAT, locationOnDisk);
                 bImg.flush();
                 System.out.println("banner location: " + locationOnDisk.getPath());

@@ -1,4 +1,4 @@
-package edu.ukma.blog.models;
+package edu.ukma.blog.models.simple_interaction;
 
 import edu.ukma.blog.models.compositeIDs.FollowerId;
 import lombok.AllArgsConstructor;

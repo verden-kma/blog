@@ -17,11 +17,6 @@ public interface IPublisherStatsRepo extends JpaRepository<PublisherStats, Long>
 
     @Modifying
     @Transactional
-    @Query("UPDATE PublisherStats ps SET ps.uploads = ps.uploads - 1 WHERE ps.id = :userId")
-    void decUploadsCount(@Param("userId") Long userId);
-
-    @Modifying
-    @Transactional
     @Query("UPDATE PublisherStats ps SET ps.followers = ps.followers + 1 WHERE ps.id = :userId")
     void incFollowersCount(@Param("userId") Long userId);
 
@@ -59,4 +54,11 @@ public interface IPublisherStatsRepo extends JpaRepository<PublisherStats, Long>
     @Transactional
     @Query("UPDATE PublisherStats ps SET ps.comments = ps.comments - 1 WHERE ps.id = :userId")
     void decCommentsCount(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE PublisherStats ps SET ps.uploads = ps.uploads - 1, ps.likes = ps.likes - :numLikes, " +
+            "ps.dislikes = ps.dislikes - :numDislikes, ps.comments = ps.comments - :numComm WHERE ps.id = :userId")
+    void removeRecordStats(@Param("userId") Long userId, @Param("numLikes") int numLikes,
+                           @Param("numDislikes") int numDislikes, @Param("numComm") int numComm);
 }

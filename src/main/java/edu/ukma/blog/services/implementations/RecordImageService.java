@@ -88,7 +88,7 @@ public class RecordImageService implements IRecordImageService {
                 saveCompressed(originalImg, location);
             }
 
-            IconHandler.saveIcon(originalImg, new File(IMAGE_ROOT, location + ICON_SUFFIX).getPath());
+            IconHandler.saveIcon(originalImg, new File(IMAGE_ROOT, location + ICON_SUFFIX).getPath(), RECORD_ICON_SIZE);
 
             originalImg.flush();
             System.out.println("location: " + location);
@@ -119,30 +119,6 @@ public class RecordImageService implements IRecordImageService {
         writer.dispose();
     }
 
-//    /**
-//     * check that a file passed is of an appropriate format or throw exception otherwise
-//     *
-//     * @param origin file to validate
-//     * @return type of a valid file's format
-//     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
-//     */
-//    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
-//        String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
-//        if (fileFormat == null) {
-//            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
-//        }
-//        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
-//        for (String acceptableFormat : ACCEPTABLE_FORMATS) {
-//            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
-//        }
-//        throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
-//    }
-//
-//    enum FormatType {
-//        TARGET,
-//        ACCEPTABLE
-//    }
-
     @Override
     public File getImage(String location) {
         return new File(IMAGE_ROOT, location + TARGET_SUFFIX);
@@ -166,3 +142,27 @@ public class RecordImageService implements IRecordImageService {
         return original.delete() & compressed.delete() & icon.delete();
     }
 }
+
+//    /**
+//     * check that a file passed is of an appropriate format or throw exception otherwise
+//     *
+//     * @param origin file to validate
+//     * @return type of a valid file's format
+//     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
+//     */
+//    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
+//        String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
+//        if (fileFormat == null) {
+//            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
+//        }
+//        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
+//        for (String acceptableFormat : ACCEPTABLE_FORMATS) {
+//            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
+//        }
+//        throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
+//    }
+//
+//    enum FormatType {
+//        TARGET,
+//        ACCEPTABLE
+//    }

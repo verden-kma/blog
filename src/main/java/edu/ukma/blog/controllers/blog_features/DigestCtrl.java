@@ -6,6 +6,7 @@ import edu.ukma.blog.models.record.MinResponseRecord;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.utils.LazyContentPage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +21,7 @@ public class DigestCtrl {
 
     private final IRecordService recordService;
 
+    @Autowired
     public DigestCtrl(IRecordService recordService) {
         this.recordService = recordService;
     }

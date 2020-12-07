@@ -3,7 +3,7 @@ package edu.ukma.blog.repositories;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
-import edu.ukma.blog.repositories.projections.record.RecordImgLocationAndPublisherIdView;
+import edu.ukma.blog.repositories.projections.record.RecordIdView;
 import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
 import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
 import org.springframework.data.domain.Pageable;
@@ -36,17 +36,17 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     List<RecordEntity> findAllById_PublisherId(long publisherId, Pageable pageable);
 
-    List<RecordImgLocationView> findById_PublisherId(long publisherId, Pageable pageable);
+    List<RecordOwnIdView> findById_PublisherId(long publisherId, Pageable pageable);
 
     // TODO: maybe there is a way to make this query more general
-    @Query(value = "SELECT publisher_id, img_location FROM (\n" +
+    @Query(value = "SELECT publisher_id, record_own_id FROM (\n" +
             "    SELECT publisher_id, \n" +
-            "           img_location, \n" +
+            "           record_own_id, \n" +
             "           ROW_NUMBER() OVER (PARTITION BY publisher_id ORDER BY timestamp DESC) AS rec_rank \n" +
             "    FROM record_entity) ranks\n" +
             "WHERE rec_rank <= :depth AND publisher_id IN (:publisherIds);", nativeQuery = true)
-    List<RecordImgLocationAndPublisherIdView> getLastRecordsOfPublishers(@Param("publisherIds") List<Long> publisherIds,
-                                                                         @Param("depth") int depth);
+    List<RecordIdView> getLastRecordsOfPublishers(@Param("publisherIds") List<Long> publisherIds,
+                                                  @Param("depth") int depth);
 
     Slice<MinRecordView> findAllBy(Pageable pageable);
 

@@ -50,9 +50,9 @@ public class CommentCtrl {
     public int addComment(@PathVariable String publisher,
                           @PathVariable int recordId,
                           @RequestBody RequestComment newComment) {
-        long publisherId = userService.getUserId(publisher);
+        long publisherId = userService.getUserIdByUsername(publisher);
         RecordId fullRecordId = new RecordId(publisherId, recordId);
-        long commenterId = userService.getUserId(newComment.getCommenter());
+        long commenterId = userService.getUserIdByUsername(newComment.getCommenter());
         return commentService.addComment(fullRecordId, commenterId, newComment.getText());
     }
 
@@ -60,7 +60,7 @@ public class CommentCtrl {
     public List<ResponseComment> getComments(@PathVariable String publisher,
                                              @PathVariable int recordId,
                                              @RequestParam int block) {
-        long publisherId = userService.getUserId(publisher);
+        long publisherId = userService.getUserIdByUsername(publisher);
         Pageable pageable = PageRequest.of(block, COMMENTS_BLOCK_SIZE, Sort.by(CommentEntity_.TIMESTAMP).descending());
         List<CommentEntity> comments = commentService.getCommentsBlock(new RecordId(publisherId, recordId), pageable);
 
@@ -83,8 +83,8 @@ public class CommentCtrl {
                               @PathVariable int recordId,
                               @PathVariable int commentId,
                               Principal principal) {
-        long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long userId = userService.getUserIdByUsername(principal.getName());
         try {
             commentService.removeComment(new CommentId(new RecordId(publisherId, recordId), commentId), userId);
         } catch (EmptyResultDataAccessException e) {

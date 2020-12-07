@@ -1,4 +1,4 @@
-package edu.ukma.blog.models.record.evaluation;
+package edu.ukma.blog.models.simple_interaction;
 
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import lombok.AllArgsConstructor;
@@ -15,5 +15,5 @@ import javax.persistence.Entity;
 public class Evaluation {
     @EmbeddedId
     private EvaluatorId id;
-    private Boolean isLiker; //  object for 'Example.of' findAll option
+    private Boolean isLiker;
 }

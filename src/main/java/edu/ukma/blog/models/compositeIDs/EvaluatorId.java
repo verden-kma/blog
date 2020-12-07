@@ -13,5 +13,5 @@ import java.io.Serializable;
 @Embeddable
 public class EvaluatorId implements Serializable {
     private RecordId recordId;
-    private long evaluatorOwnId;
+    private long evaluatorUserId;
 }

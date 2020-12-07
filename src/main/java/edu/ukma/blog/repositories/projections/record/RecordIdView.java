@@ -1,7 +1,7 @@
 package edu.ukma.blog.repositories.projections.record;
 
-public interface RecordImgLocationAndPublisherIdView {
+public interface RecordIdView {
     long getPublisher_Id();
 
-    String getImg_Location();
+    int getRecord_Own_Id();
 }

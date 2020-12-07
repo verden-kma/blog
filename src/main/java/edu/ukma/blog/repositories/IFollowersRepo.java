@@ -1,7 +1,7 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.models.Follower;
 import edu.ukma.blog.models.compositeIDs.FollowerId;
+import edu.ukma.blog.models.simple_interaction.Follower;
 import edu.ukma.blog.repositories.projections.user.FollowerPublisherView;
 import edu.ukma.blog.repositories.projections.user.FollowerSubscriberView;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +15,6 @@ import java.util.Set;
 @Repository
 public interface IFollowersRepo extends JpaRepository<Follower, FollowerId> {
     Set<FollowerPublisherView> findById_SubscriberIdAndId_PublisherIdIn(long subscriberId, Collection<Long> publisherId);
-
-    List<FollowerSubscriberView> findAllById_PublisherId(long publisher);
 
     List<FollowerSubscriberView> findAllById_PublisherId(long publisher, Pageable pageable);
 }

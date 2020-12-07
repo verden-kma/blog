@@ -50,8 +50,8 @@ public class RecordCtrl {
     public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
                                                            @RequestParam int page,
                                                            Principal principal) {
-        long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
         return recordService.getRecordsPage(publisherId, userId, pageable);
     }
@@ -63,7 +63,7 @@ public class RecordCtrl {
     public int addRecord(@RequestPart RequestRecord recordData,
                          @RequestPart MultipartFile image,
                          Principal principal) {
-        long publisherId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(principal.getName());
         return recordService.addRecord(publisherId, recordData, image);
     }
 
@@ -71,8 +71,8 @@ public class RecordCtrl {
     public ResponseRecord getRecord(@PathVariable String publisher,
                                     @PathVariable int recordId,
                                     Principal principal) {
-        long publisherId = userService.getUserId(publisher);
-        long userId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long userId = userService.getUserIdByUsername(principal.getName());
         return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
     }
 
@@ -98,7 +98,7 @@ public class RecordCtrl {
     }
 
     private byte[] getSelectedImage(Function<String, File> selector, String publisher, int recordId) {
-        long publisherId = userService.getUserId(publisher);
+        long publisherId = userService.getUserIdByUsername(publisher);
         String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
         File image = selector.apply(location);
         try (InputStream input = new FileInputStream(image)) {
@@ -114,14 +114,14 @@ public class RecordCtrl {
                            Principal principal) {
         if (updatedRecord.getCaption() == null && updatedRecord.getAdText() == null)
             throw new BlankRecordEditException("no update data provided");
-        long publisherId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(principal.getName());
         recordService.editRecord(new RecordId(publisherId, recordId), updatedRecord);
     }
 
     @DeleteMapping(path = "/{recordOwnId}")
     public void removeRecord(@PathVariable int recordOwnId,
                              Principal principal) {
-        long publisherId = userService.getUserId(principal.getName());
+        long publisherId = userService.getUserIdByUsername(principal.getName());
         recordService.removeRecord(new RecordId(publisherId, recordOwnId));
     }
 }

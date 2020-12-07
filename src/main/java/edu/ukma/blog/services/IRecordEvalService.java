@@ -1,7 +1,7 @@
 package edu.ukma.blog.services;
 
 import edu.ukma.blog.models.compositeIDs.RecordId;
-import edu.ukma.blog.models.record.evaluation.EvalPage;
+import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 
 
@@ -12,7 +12,7 @@ public interface IRecordEvalService {
 
     void removeEvaluation(RecordId recordId, long userId, boolean eval);
 
-    EvalPage getLikers(RecordId recordId, Pageable pageable);
+    LazyContentPage<String> getLikers(RecordId recordId, Pageable pageable);
 
-    EvalPage getDislikers(RecordId recordId, Pageable pageable);
+    LazyContentPage<String> getDislikers(RecordId recordId, Pageable pageable);
 }

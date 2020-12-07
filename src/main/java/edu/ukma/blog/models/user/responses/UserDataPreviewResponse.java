@@ -5,13 +5,14 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PublisherPreview {
-    boolean isFollowed;
+public class UserDataPreviewResponse {
     private String publisherName;
 
     private int followers;
 
     private int uploads;
 
-    private List<String> lastRecordsImgPaths;
+    boolean isFollowed;
+
+    private List<Integer> lastRecords;
 }

@@ -10,8 +10,6 @@ import java.util.List;
 public interface ICommentService {
     int addComment(RecordId recordId, long commenterId, String text);
 
-    List<CommentEntity> getComments(RecordId recordId);
-
     List<CommentEntity> getCommentsBlock(RecordId recordId, Pageable pageable);
 
     void removeComment(CommentId commentID, long commentatorId);

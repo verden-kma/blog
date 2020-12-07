@@ -7,7 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class MinResponseRecord {
     private String publisher;
-    private long recordOwnId;
+
+    private int recordOwnId;
+
     private String caption;
-    private String imgLocation;
 }

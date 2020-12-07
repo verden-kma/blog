@@ -1,5 +1,5 @@
 package edu.ukma.blog.repositories.projections.user;
 
-public interface IdView {
+public interface UserIdView {
     long getId();
 }

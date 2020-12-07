@@ -1,12 +1,11 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.models.Follower;
 import edu.ukma.blog.models.Follower_;
 import edu.ukma.blog.models.compositeIDs.FollowerId;
+import edu.ukma.blog.models.simple_interaction.Follower;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.services.IFollowerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +20,18 @@ import java.util.stream.Collectors;
 
 @Service
 public class FollowerService implements IFollowerService {
+
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
-    private IFollowersRepo followersRepo;
+    private final IFollowersRepo followersRepo;
 
-    @Autowired
-    private IPublisherStatsRepo publisherStatsRepo;
+    private final IPublisherStatsRepo publisherStatsRepo;
+
+    public FollowerService(IFollowersRepo followersRepo, IPublisherStatsRepo publisherStatsRepo) {
+        this.followersRepo = followersRepo;
+        this.publisherStatsRepo = publisherStatsRepo;
+    }
 
     @Override
     public void addFollower(long publisherId, long followerId) {
@@ -38,13 +41,6 @@ public class FollowerService implements IFollowerService {
             publisherStatsRepo.incFollowersCount(publisherId);
         }
     }
-
-    @Override
-    public List<Long> getFollowers(long publisherId) {
-        return followersRepo.findAllById_PublisherId(publisherId)
-                .stream().map(x -> x.getId().getSubscriberId()).collect(Collectors.toList());
-    }
-
 
     @Override
     public List<Long> getFollowersBlock(long publisherId, Pageable pageable) {
