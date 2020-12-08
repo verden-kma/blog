@@ -20,7 +20,7 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
 
     Optional<UserIdView> getByUsername(String username);
 
-    StatisticsView findById(long userId);
+    StatisticsView getById(long userId);
 
     List<UserEntityIdsView> findByIdIn(List<Long> ids);
 

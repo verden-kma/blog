@@ -48,7 +48,7 @@ GROUP BY record_own_id , is_liker
     @Query(value = "SELECT \n" +
             "    record_own_id,\n" +
             "    is_liker,\n" +
-            "    COUNT(CONCAT(evaluator_own_id,\n" +
+            "    COUNT(CONCAT(evaluator_user_id,\n" +
             "            '-',\n" +
             "            publisher_id,\n" +
             "            '-',\n" +

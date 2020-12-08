@@ -5,6 +5,7 @@ import edu.ukma.blog.models.compositeIDs.CommentId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +22,7 @@ public interface ICommentsRepo extends JpaRepository<CommentEntity, CommentId> {
 
     List<CommentEntity> findAllById_RecordId(RecordId recordId);
 
-    List<CommentEntity> findAllById_RecordId(RecordId recordId, Pageable pageable);
+    Slice<CommentEntity> findAllById_RecordId(RecordId recordId, Pageable pageable);
 
     @Query(value = "SELECT \n" +
             "    record_own_id,\n" +

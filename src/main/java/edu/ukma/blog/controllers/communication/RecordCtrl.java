@@ -46,16 +46,6 @@ public class RecordCtrl {
         this.recordImageService = recordImageService;
     }
 
-    @GetMapping
-    public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
-                                                           @RequestParam int page,
-                                                           Principal principal) {
-        long publisherId = userService.getUserIdByUsername(publisher);
-        long userId = userService.getUserIdByUsername(principal.getName());
-        Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
-        return recordService.getRecordsPage(publisherId, userId, pageable);
-    }
-
     // todo: handle validation in controller to avoid 500 error while persisting
     @PostMapping(
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
@@ -65,6 +55,16 @@ public class RecordCtrl {
                          Principal principal) {
         long publisherId = userService.getUserIdByUsername(principal.getName());
         return recordService.addRecord(publisherId, recordData, image);
+    }
+
+    @GetMapping
+    public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
+                                                           @RequestParam int page,
+                                                           Principal principal) {
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long userId = userService.getUserIdByUsername(principal.getName());
+        Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
+        return recordService.getRecordsPage(publisherId, userId, pageable);
     }
 
     @GetMapping(path = "/{recordId}")

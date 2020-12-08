@@ -2,6 +2,7 @@ package edu.ukma.blog.controllers.communication;
 
 import edu.ukma.blog.PropertyAccessor;
 import edu.ukma.blog.SpringApplicationContext;
+import edu.ukma.blog.exceptions.user.SelfFollowerException;
 import edu.ukma.blog.services.IFollowerService;
 import edu.ukma.blog.services.IUserService;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +39,7 @@ public class FollowerCtrl {
     @PutMapping
     public void follow(@PathVariable String publisher,
                        Principal principal) {
+        if (publisher.equals(principal.getName())) throw new SelfFollowerException();
         long publisherId = userService.getUserIdByUsername(publisher);
         long subscriberId = userService.getUserIdByUsername(principal.getName());
         followerService.addFollower(publisherId, subscriberId);

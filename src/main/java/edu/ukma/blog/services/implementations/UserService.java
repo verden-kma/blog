@@ -90,7 +90,6 @@ public class UserService implements IUserService {
     }
 
     @Override
-    // todo: test, pay attention to stats
     public UserDataPreviewResponse getPublisherPreview(String publisher, String user, int recPrevNum) {
         long publisherId = getUserIdByUsername(publisher);
         long userId = getUserIdByUsername(user);
@@ -103,8 +102,7 @@ public class UserService implements IUserService {
                 .stream()
                 .map(x -> x.getId().getRecordOwnId())
                 .collect(Collectors.toList()));
-//        PublisherStats stats = getUserEntity(user).getStatistics();
-        PublisherStats stats = usersRepo.findById(publisherId).getStatistics();
+        PublisherStats stats = usersRepo.getById(publisherId).getStatistics();
         BeanUtils.copyProperties(stats, preview);
         return preview;
     }

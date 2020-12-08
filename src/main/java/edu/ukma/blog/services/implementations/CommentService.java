@@ -1,13 +1,19 @@
 package edu.ukma.blog.services.implementations;
 
+import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.comment.CommentEntity;
 import edu.ukma.blog.models.comment.CommentEntity_;
+import edu.ukma.blog.models.comment.ResponseComment;
 import edu.ukma.blog.models.compositeIDs.CommentId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.services.ICommentService;
+import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.utils.LazyContentPage;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +25,7 @@ import javax.persistence.criteria.Root;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService implements ICommentService {
@@ -30,10 +37,14 @@ public class CommentService implements ICommentService {
 
     private final IPublisherStatsRepo publisherStatsRepo;
 
-    public CommentService(ICommentsRepo commentsRepo, IPublisherStatsRepo publisherStatsRepo) {
+    private final IUserService userService;
+
+    public CommentService(ICommentsRepo commentsRepo, IPublisherStatsRepo publisherStatsRepo, IUserService userService) {
         this.commentsRepo = commentsRepo;
         this.publisherStatsRepo = publisherStatsRepo;
+        this.userService = userService;
     }
+
 
     @Override
     public int addComment(RecordId recordId, long commenterId, String text) {
@@ -47,8 +58,22 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentEntity> getCommentsBlock(RecordId recordId, Pageable pageable) {
-        return commentsRepo.findAllById_RecordId(recordId, pageable);
+    public LazyContentPage<ResponseComment> getCommentsBlock(long publisherId, RecordId recordId, Pageable pageable) {
+        Slice<CommentEntity> comments = commentsRepo.findAllById_RecordId(recordId, pageable);
+
+        // different comments are written by different users, users can write multiple comments
+        // all records are posted by 1 publisher
+        List<Long> ids = comments.stream().map(CommentEntity::getCommentatorId).collect(Collectors.toList());
+        final BiMap<Long, String> userIds = userService.getUserIdentifiersBimap(ids);
+
+        List<ResponseComment> resp = comments.stream().map(commentEntity -> {
+            ResponseComment response = new ResponseComment();
+            BeanUtils.copyProperties(commentEntity, response);
+            response.setCommentId(commentEntity.getId().getCommentOwnId());
+            response.setCommentator(userIds.get(commentEntity.getCommentatorId()));
+            return response;
+        }).collect(Collectors.toList());
+        return new LazyContentPage<>(resp, comments.isLast());
     }
 
     /**

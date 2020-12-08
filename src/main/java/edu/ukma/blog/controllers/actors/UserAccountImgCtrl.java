@@ -23,7 +23,7 @@ public class UserAccountImgCtrl {
         this.imageService = imageService;
     }
 
-    @PutMapping("/avatar") // , consumes = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE}
+    @PutMapping(value = "/avatar")
     public void setAvatarImage(@RequestPart MultipartFile image,
                                Principal principal) {
         imageService.setAvatar(image, principal.getName());
@@ -48,15 +48,15 @@ public class UserAccountImgCtrl {
         imageService.removeAvatar(principal.getName());
     }
 
-    @PutMapping("/top-banner")
-    public void setTopBanner(@PathVariable String username,
-                             @RequestPart MultipartFile image) {
-        imageService.setTopBanner(image, username);
+    @PutMapping(value = "/top-banner")
+    public void setTopBanner(@RequestPart MultipartFile image,
+                             Principal principal) {
+        imageService.setTopBanner(image, principal.getName());
     }
 
     @GetMapping(path = "/top-banner", produces = ImageConstants.TARGET_MEDIA_TYPE)
-    public byte[] getTopBanner(Principal principal) {
-        Optional<File> banner = imageService.getTopBanner(principal.getName());
+    public byte[] getTopBanner(@PathVariable String username) {
+        Optional<File> banner = imageService.getTopBanner(username);
         if (banner.isPresent()) {
             try (InputStream stream = new FileInputStream(banner.get())) {
                 return IOUtils.toByteArray(stream);
