@@ -21,12 +21,40 @@ public class BlogApplication {
 		SpringApplication.run(BlogApplication.class, args);
 	}
 
-	@Bean
-	public BCryptPasswordEncoder bCryptPasswordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	public PropertyAccessor getPropertyAccessor() {
-		return new PropertyAccessor();
-	}
+    public PropertyAccessor getPropertyAccessor() {
+        return new PropertyAccessor();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* todo:
+ * 1. Особисто я б не використовував int чи long в якості ключа. Зараз це уже не дуже прийнято так як має певні обмеження.
+ *  рекомендую використовувати Guid (uid), він гарантує вам унікальність ключа, може бути згенерований як в коді, так і в БД.
+ *  З мінусів - менша читабельність і трохи більший розмір ніж інт.
+ * 2. Особисто я б також не використовував композитні ключі, вони можуть викликати проблеми в випадку коли доведеться розширяти
+ *  функціонал. Я б використовував Guid + ForeignKey. При цьому ForeignKey може бути як явною зв'язкою по БД,
+ *  так і логічною на рівні коду. З явною в БД є плюси в тому, що відбувається автоматичний контроль цілісності даних \
+ * (при операціях додавання, оновлення, видалення), тобто ви не зможете створити коментар від користувача, який не існує.
+ * з мінусів - той самий - цілісність даних при розростанні структури може викликати проблеми, так як можливості логіки
+ * моделей в коді куди більші ніж в БД.
+ * 3. Не знаю що відбувається в класі шифрування паролю, але почитайте бестпрактісес по зберіганню паролів
+ * */

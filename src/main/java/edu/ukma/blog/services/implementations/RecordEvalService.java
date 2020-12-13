@@ -2,15 +2,15 @@ package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
-import edu.ukma.blog.models.record.evaluation.Evaluation_;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
+import edu.ukma.blog.models.simple_interaction.Evaluation_;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.services.IRecordEvalService;
 import edu.ukma.blog.utils.LazyContentPage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,14 +31,20 @@ public class RecordEvalService implements IRecordEvalService {
     @PersistenceContext
     private EntityManager em;
 
-    @Autowired
-    private IEvaluatorsRepo evaluatorsRepo;
+    private final IEvaluatorsRepo evaluatorsRepo;
 
-    @Autowired
-    private IUsersRepo usersRepo;
+    private final IUsersRepo usersRepo;
 
-    @Autowired
-    private IPublisherStatsRepo publisherStatsRepo;
+    private final IPublisherStatsRepo publisherStatsRepo;
+
+    private final IRecordNodesRepo recordNodesRepo;
+
+    public RecordEvalService(IEvaluatorsRepo evaluatorsRepo, IUsersRepo usersRepo, IPublisherStatsRepo publisherStatsRepo, IRecordNodesRepo recordNodesRepo) {
+        this.evaluatorsRepo = evaluatorsRepo;
+        this.usersRepo = usersRepo;
+        this.publisherStatsRepo = publisherStatsRepo;
+        this.recordNodesRepo = recordNodesRepo;
+    }
 
     @Override
     public Boolean getReaction(RecordId recordId, long userId) {
@@ -65,6 +71,10 @@ public class RecordEvalService implements IRecordEvalService {
         } else return;
         if (eval) publisherStatsRepo.incLikesCount(recordId.getPublisherId());
         else publisherStatsRepo.incDislikesCount(recordId.getPublisherId());
+
+        recordNodesRepo.unset(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
+        if (eval) recordNodesRepo.setLike(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
+        else recordNodesRepo.setDislike(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
     }
 
     @Override
@@ -80,6 +90,8 @@ public class RecordEvalService implements IRecordEvalService {
         if (hasDeleted)
             if (eval) publisherStatsRepo.decLikesCount(recordId.getPublisherId());
             else publisherStatsRepo.decDislikesCount(recordId.getPublisherId());
+
+        recordNodesRepo.unset(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
     }
 
     @Override

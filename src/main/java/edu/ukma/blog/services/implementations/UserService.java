@@ -6,6 +6,7 @@ import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
 import edu.ukma.blog.models.compositeIDs.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
+import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
@@ -16,6 +17,7 @@ import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
 import edu.ukma.blog.services.IUserService;
@@ -53,12 +55,15 @@ public class UserService implements IUserService {
 
     private final IRecordsRepo recordsRepo;
 
+    private final IUserNodesRepo userNodesRepo;
+
     public UserService(IUsersRepo usersRepo, BCryptPasswordEncoder passwordEncoder,
-                       IFollowersRepo followersRepo, IRecordsRepo recordsRepo) {
+                       IFollowersRepo followersRepo, IRecordsRepo recordsRepo, IUserNodesRepo userNodesRepo) {
         this.usersRepo = usersRepo;
         this.passwordEncoder = passwordEncoder;
         this.followersRepo = followersRepo;
         this.recordsRepo = recordsRepo;
+        this.userNodesRepo = userNodesRepo;
     }
 
     @Override
@@ -70,6 +75,8 @@ public class UserService implements IUserService {
         newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
         newUser.setStatistics(new PublisherStats(newUser));
         usersRepo.save(newUser);
+
+        userNodesRepo.save(new UserGraphEntity(newUser.getId()));
     }
 
     @Override
@@ -131,6 +138,7 @@ public class UserService implements IUserService {
 
     @Override
     public boolean banUser(String username) {
+        usersRepo.getByUsername(username).ifPresent(idView -> userNodesRepo.deleteById(idView.getId()));
         return usersRepo.deleteByUsername(username);
     }
 

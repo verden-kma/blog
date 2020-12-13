@@ -11,10 +11,12 @@ import edu.ukma.blog.models.compositeIDs.EvaluatorId;
 import edu.ukma.blog.models.compositeIDs.RecordId;
 import edu.ukma.blog.models.record.*;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
+import edu.ukma.blog.models.simple_interaction.graph_models.RecordGraphEntity;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
+import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
 import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
@@ -58,13 +60,16 @@ public class RecordService implements IRecordService {
 
     private final IUserService userService;
 
-    public RecordService(IRecordsRepo recordsRepo, ICommentsRepo commentsRepo, IRecordImageService imageService, IEvaluatorsRepo evaluatorsRepo, IPublisherStatsRepo publisherStatsRepo, IUserService userService) {
+    private final IRecordNodesRepo recordNodesRepo;
+
+    public RecordService(IRecordsRepo recordsRepo, ICommentsRepo commentsRepo, IRecordImageService imageService, IEvaluatorsRepo evaluatorsRepo, IPublisherStatsRepo publisherStatsRepo, IUserService userService, IRecordNodesRepo recordNodesRepo) {
         this.recordsRepo = recordsRepo;
         this.commentsRepo = commentsRepo;
         this.imageService = imageService;
         this.evaluatorsRepo = evaluatorsRepo;
         this.publisherStatsRepo = publisherStatsRepo;
         this.userService = userService;
+        this.recordNodesRepo = recordNodesRepo;
     }
 
     @Override
@@ -80,6 +85,9 @@ public class RecordService implements IRecordService {
         String imgLocation = imageService.saveImage(image);
         recordEntity.setImgLocation(imgLocation);
         recordsRepo.save(recordEntity);
+
+        RecordGraphEntity rge = new RecordGraphEntity(recordEntity.getId());
+        recordNodesRepo.save(rge);
 
         publisherStatsRepo.incUploadsCount(publisherId);
         return recordId;
@@ -170,7 +178,6 @@ public class RecordService implements IRecordService {
         return new LazyContentPage<>(minRespRecs, minRecs.isLast());
     }
 
-
     @Override
     public ResponseRecord getRecordCore(RecordId recordId, long userId) {
         RecordEntity record = recordsRepo.findById(recordId)
@@ -229,6 +236,8 @@ public class RecordService implements IRecordService {
             evaluatorsRepo.deleteById_RecordId(id);
             commentsRepo.deleteById_RecordId(id);
             recordsRepo.deleteById(id);
+
+            recordNodesRepo.deleteByPublisherIdAndRecordOwnId(id.getPublisherId(), id.getRecordOwnId());
         });
     }
 }

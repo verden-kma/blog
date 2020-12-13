@@ -1,11 +1,13 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.models.Follower_;
 import edu.ukma.blog.models.compositeIDs.FollowerId;
 import edu.ukma.blog.models.simple_interaction.Follower;
+import edu.ukma.blog.models.simple_interaction.Follower_;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
+import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.services.IFollowerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,9 @@ public class FollowerService implements IFollowerService {
 
     private final IPublisherStatsRepo publisherStatsRepo;
 
+    @Autowired
+    private IUserNodesRepo userNodesRepo;
+
     public FollowerService(IFollowersRepo followersRepo, IPublisherStatsRepo publisherStatsRepo) {
         this.followersRepo = followersRepo;
         this.publisherStatsRepo = publisherStatsRepo;
@@ -39,6 +44,8 @@ public class FollowerService implements IFollowerService {
         if (!followersRepo.existsById(fid)) {
             followersRepo.save(new Follower(fid));
             publisherStatsRepo.incFollowersCount(publisherId);
+
+            userNodesRepo.setFollow(followerId, publisherId);
         }
     }
 
@@ -56,6 +63,7 @@ public class FollowerService implements IFollowerService {
         Root<Follower> root = criteriaDelete.from(Follower.class);
         criteriaDelete.where(cb.equal(root.get(Follower_.ID), new FollowerId(publisherId, followerId)));
         boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
+        userNodesRepo.setUnfollow(followerId, publisherId);
 
         if (hasDeleted) publisherStatsRepo.decFollowersCount(publisherId);
     }
