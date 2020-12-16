@@ -6,7 +6,6 @@ import edu.ukma.blog.SpringApplicationContext;
 public class SecurityConstants {
     public static final long EXPIRATION_TIME;
     public static final String TOKEN_PREFIX;
-    public static final String AUTH_HEADER;
     public static final String SIGN_UP_URL;
     public static final String TOKEN_SECRET;
 
@@ -16,7 +15,6 @@ public class SecurityConstants {
 
         EXPIRATION_TIME = getExpirationTime(propertyAccessorBeanName);
         TOKEN_PREFIX = getTokenPrefix(propertyAccessorBeanName);
-        AUTH_HEADER = getAuthHeader(propertyAccessorBeanName);
         SIGN_UP_URL = getSignUpUrl(propertyAccessorBeanName);
         TOKEN_SECRET = getTokenSecret(propertyAccessorBeanName);
     }
@@ -27,10 +25,6 @@ public class SecurityConstants {
 
     private static String getTokenPrefix(String propertyAccessorBeanName) {
         return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getTokenPrefix();
-    }
-
-    private static String getAuthHeader(String propertyAccessorBeanName) {
-        return ((PropertyAccessor) SpringApplicationContext.getBean(propertyAccessorBeanName)).getAuthHeader();
     }
 
     private static String getSignUpUrl(String propertyAccessorBeanName) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ukma.blog.models.user.requests.UserLoginRequest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,14 +22,10 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-//    private static final String USER_SERVICE_BEAN_NAME;
 
     private final AuthenticationManager authMng;
+    private final ObjectMapper jacksonObjectMapper = new ObjectMapper();
 
-//    static {
-//        String implClassName = UserService.class.getSimpleName();
-//        USER_SERVICE_BEAN_NAME = implClassName.substring(0, 1).toLowerCase() + implClassName.substring(1);
-//    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -45,6 +42,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
+
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
@@ -57,10 +55,23 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
 
-//        IUserService userService = (IUserService) SpringApplicationContext.getBean(USER_SERVICE_BEAN_NAME);
-//        UserEntity user = userService.getUserEntity(username);
-        response.addHeader(SecurityConstants.AUTH_HEADER, SecurityConstants.TOKEN_PREFIX + token);
-//        response.addHeader("UserID", user.getPublicId());
+        @Data
+        class AuthResp {
+            final String authType = SecurityConstants.TOKEN_PREFIX;
+            String token;
+
+            public AuthResp(String token) {
+                this.token = token;
+            }
+        }
+
+        try {
+            response.setStatus(HttpServletResponse.SC_OK);
+            jacksonObjectMapper.writeValue(response.getWriter(), new AuthResp(token));
+            response.getWriter().close();
+        } catch (IOException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

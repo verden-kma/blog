@@ -1,6 +1,7 @@
 package edu.ukma.blog.security;
 
 import io.jsonwebtoken.Jwts;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +24,7 @@ public class JWTValidationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
-        String authHeader = request.getHeader(SecurityConstants.AUTH_HEADER);
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             UsernamePasswordAuthenticationToken authToken = getAuthToken(authHeader);
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -32,7 +33,7 @@ public class JWTValidationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthToken(String authHeader) {
-        String token = authHeader.replace(SecurityConstants.TOKEN_PREFIX, "");
+        String token = authHeader.substring(SecurityConstants.TOKEN_PREFIX.length());
         String user = Jwts.parser()
                 .setSigningKey(SecurityConstants.TOKEN_SECRET)
                 .parseClaimsJws(token)
