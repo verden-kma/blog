@@ -1,0 +1,9 @@
+.header-block {
+    display: flex;
+    justify-content: space-evenly;
+    background: #282c34;
+}
+
+.search-block input[type="submit"] {
+
+}

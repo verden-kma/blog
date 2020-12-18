@@ -49,6 +49,9 @@ class Auth extends React.Component {
 
             const {history} = this.props;
             store.set('loggedIn', true)
+            store.set('username', this.state.username)
+            store.set('authType', response.data.authType)
+            store.set('token', response.data.token)
             history.push('/');
         }, (error) => {
             alert("wrong credentials " + (error.response && error.response.status))

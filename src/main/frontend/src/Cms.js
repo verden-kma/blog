@@ -1,7 +1,9 @@
 import React from 'react';
 import store from 'store'
-import {Redirect} from "react-router-dom";
+import {BrowserRouter, Redirect} from "react-router-dom";
 import {isLoggedIn} from "./App";
+import Header from "./header/Header";
+import Footer from "./footer/Footer";
 
 // import Header from "./header/Header.js"
 // import Digest from "./digest/Digest.js"
@@ -25,9 +27,24 @@ class Cms extends React.Component {
         if (!isLoggedIn()) {
             return <Redirect to="/login"/>;
         }
-        return <div>this is cms
-            <br/>
-            <button onClick={() => this.handleLogout(this.state.history)}>log out</button>
+        console.log(store.get('username'))
+        console.log(store.get('authType'))
+        console.log(store.get('token'))
+
+        const userData = {
+            username: store.get('username'),
+            authType: store.get('authType'),
+            token: store.get('token')
+        }
+
+        return <div>
+            <BrowserRouter>
+                <Header key={userData.username} userData={userData}/>
+                {/*<Digest userData={userData} />*/}
+            </BrowserRouter>
+            <Footer/>
+            {/*<br/>*/}
+            {/*<button onClick={() => this.handleLogout(this.state.history)}>log out</button>*/}
         </div>
     }
 }
