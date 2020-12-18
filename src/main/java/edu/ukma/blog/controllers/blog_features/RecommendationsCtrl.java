@@ -62,7 +62,7 @@ public class RecommendationsCtrl {
     @Data
     @AllArgsConstructor
     static class PublicRecordId {
-        private String publisherId;
+        private String publisher;
         private int recordOwnId;
     }
 }

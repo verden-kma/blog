@@ -12,8 +12,8 @@ class Auth extends React.Component {
             username: "",
             password: "",
             repeatPassword: "",
-            status: null,
-            description: null
+            status: "",
+            description: ""
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -105,13 +105,15 @@ class Auth extends React.Component {
                             type="text"
                             name="status"
                             placeholder="your status"
-                            value={this.state.status}/>
+                            value={this.state.status}
+                            onChange={this.handleChange}/>
                         <br/>
                         <input
                             type="text"
                             name="description"
                             placeholder="write about yourself"
-                            value={this.state.description}/>
+                            value={this.state.description}
+                            onChange={this.handleChange}/>
                     </div>
                 }
 
