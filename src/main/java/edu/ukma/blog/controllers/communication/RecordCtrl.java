@@ -17,7 +17,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,9 +46,10 @@ public class RecordCtrl {
     }
 
     // todo: handle validation in controller to avoid 500 error while persisting
-    @PostMapping(
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
-    )
+    @PostMapping
+//            (
+//            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
+//    )
     public int addRecord(@RequestPart RequestRecord recordData,
                          @RequestPart MultipartFile image,
                          Principal principal) {

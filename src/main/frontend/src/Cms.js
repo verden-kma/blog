@@ -5,10 +5,6 @@ import {isLoggedIn} from "./App";
 import Header from "./header/Header";
 import Footer from "./footer/Footer";
 
-// import Header from "./header/Header.js"
-// import Digest from "./digest/Digest.js"
-// import Footer from "./footer/Footer.js"
-
 class Cms extends React.Component {
     constructor(props) {
         super(props);
@@ -40,7 +36,6 @@ class Cms extends React.Component {
         return <div>
             <BrowserRouter>
                 <Header key={userData.username} userData={userData}/>
-                {/*<Digest userData={userData} />*/}
             </BrowserRouter>
             <Footer/>
             {/*<br/>*/}

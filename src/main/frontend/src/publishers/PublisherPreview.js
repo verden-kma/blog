@@ -29,8 +29,6 @@ class PublisherPreview extends React.Component {
     }
 
     render() {
-        console.log("this.state.lastRecImgs")
-        console.log(this.state.lastRecImgs)
         return (
             <div>
                 <h3>{this.state.publisherName}</h3>
@@ -39,8 +37,6 @@ class PublisherPreview extends React.Component {
                 {this.state.isFollowed && <h5>is followed</h5>}
                 <br/>
                 {this.state.lastRecImgs.map((imgSrc, index) => {
-                    console.log("imgSrc")
-                    console.log(imgSrc)
                     return <img key={index} style={{width: 200, height: 120}}
                                 src={"data:image/jpeg;base64," + imgSrc}
                                 alt={index}/>

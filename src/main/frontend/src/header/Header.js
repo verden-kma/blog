@@ -1,12 +1,14 @@
 import React from "react";
 import BlogLogo from "./BlogLogo";
 import Publishers from "./Publishers";
-import Search from "./Search";
 import NewRecord from "./NewRecord";
 import MyProfile from "./MyProfile";
 import {Link, Route, Switch} from "react-router-dom";
 import RecommendedPublishers from "../publishers/RecommendedPublishers";
 import Digest from "../digest/Digest";
+import SetUpRecord from "../records/SetUpRecord";
+import Records from "./Records";
+import RecommendedRecords from "../records/RecommendedRecords";
 
 class Header extends React.Component {
     constructor(props) {
@@ -25,9 +27,10 @@ class Header extends React.Component {
                     {/*<BrowserRouter>*/}
                     <Link to={'/digest'}><BlogLogo/></Link>
                     <Link to={'/publishers'}><Publishers/></Link>
-                    <Search/>
-                    <Link to={'post-record'}><NewRecord/></Link>
-                    <Link to={'profile'}><MyProfile/></Link>
+                    {/*<Search/>*/}
+                    <Link to={'/records'}><Records/></Link>
+                    <Link to={'/post-record'}><NewRecord/></Link>
+                    <Link to={'/profile'}><MyProfile/></Link>
                     {/*<UserAccount/> todo: settings*/}
 
 
@@ -35,18 +38,18 @@ class Header extends React.Component {
                 </header>
                 <Switch>
                     <Route path={'/digest'}>
-                        <div>
-                            <br/>
-                            <Digest userData={this.props.userData}/>
-                        </div>
+                        <Digest userData={this.props.userData}/>
                     </Route>
                     <Route path={'/publishers'}>
                         <RecommendedPublishers authData={this.state}/>
                     </Route>
-                    <Route path={'post-record'}>
-
+                    <Route path={'/records'}>
+                        <RecommendedRecords authData={this.state}/>
                     </Route>
-                    <Route path={'profile'}>
+                    <Route path={'/post-record'}>
+                        <SetUpRecord authData={this.state}/>
+                    </Route>
+                    <Route path={'/profile'}>
 
                     </Route>
                 </Switch>
