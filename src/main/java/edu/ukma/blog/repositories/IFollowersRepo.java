@@ -1,6 +1,6 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.models.compositeIDs.FollowerId;
+import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.simple_interaction.Follower;
 import edu.ukma.blog.repositories.projections.user.FollowerPublisherView;
 import edu.ukma.blog.repositories.projections.user.FollowerSubscriberView;

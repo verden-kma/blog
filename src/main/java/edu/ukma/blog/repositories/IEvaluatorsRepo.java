@@ -1,14 +1,15 @@
 package edu.ukma.blog.repositories;
 
 
-import edu.ukma.blog.models.compositeIDs.EvaluatorId;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.EvaluatorId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
 import edu.ukma.blog.repositories.projections.record.MultiRecordEvalView;
 import edu.ukma.blog.repositories.projections.record.RecordEvaluationView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,7 @@ public interface IEvaluatorsRepo extends JpaRepository<Evaluation, EvaluatorId> 
     List<RecordEvaluationView> findAllById_EvaluatorUserIdAndId_RecordId_PublisherIdAndId_RecordId_RecordOwnIdIn
             (long evaluatorOwnId, long publisherId, Collection<Integer> recordOwnId);
 
+    @Modifying
     void deleteById_RecordId(RecordId recordId);
 
 /*

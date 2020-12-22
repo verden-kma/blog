@@ -5,7 +5,7 @@ import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;

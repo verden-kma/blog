@@ -1,6 +1,6 @@
 package edu.ukma.blog.models.simple_interaction.graph_models;
 
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.neo4j.ogm.annotation.GeneratedValue;

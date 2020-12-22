@@ -38,8 +38,8 @@ class Cms extends React.Component {
                 <Header key={userData.username} userData={userData}/>
             </BrowserRouter>
             <Footer/>
-            {/*<br/>*/}
-            {/*<button onClick={() => this.handleLogout(this.state.history)}>log out</button>*/}
+            <br/>
+            <button onClick={() => this.handleLogout(this.state.history)}>log out</button>
         </div>
     }
 }

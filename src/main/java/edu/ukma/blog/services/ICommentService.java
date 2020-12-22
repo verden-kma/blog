@@ -1,8 +1,8 @@
 package edu.ukma.blog.services;
 
 import edu.ukma.blog.models.comment.ResponseComment;
-import edu.ukma.blog.models.compositeIDs.CommentId;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.CommentId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 

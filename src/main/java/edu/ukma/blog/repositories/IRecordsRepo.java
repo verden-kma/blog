@@ -1,6 +1,6 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordIdView;

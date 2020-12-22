@@ -1,6 +1,6 @@
 package edu.ukma.blog.models.record;
 
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import lombok.Data;
 
 import javax.persistence.EmbeddedId;

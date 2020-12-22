@@ -1,7 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.models.compositeIDs.EvaluatorId;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.EvaluatorId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
 import edu.ukma.blog.models.simple_interaction.Evaluation_;
 import edu.ukma.blog.repositories.IEvaluatorsRepo;

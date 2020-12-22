@@ -22,7 +22,7 @@ class Thumbnail extends React.Component {
                 headers: {
                     'Authorization': `${this.state.authType} ${this.state.token}`
                 }
-            }).then((success) => console.log("liked record"),
+            }).then((success) => alert("liked record"),
             (error) => console.log("failed to like"))
     }
 
@@ -33,7 +33,7 @@ class Thumbnail extends React.Component {
             headers: {
                 'Authorization': `${this.state.authType} ${this.state.token}`
             }
-        }).then((success) => console.log("followed publisher"),
+        }).then((success) => alert("followed publisher"),
             (error) => console.log("failed to follow"))
     }
 

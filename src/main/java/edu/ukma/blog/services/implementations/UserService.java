@@ -4,7 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
-import edu.ukma.blog.models.compositeIDs.FollowerId;
+import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;

@@ -7,8 +7,8 @@ import edu.ukma.blog.exceptions.record.NoSuchRecordException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.ServerLogicsError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
-import edu.ukma.blog.models.compositeIDs.EvaluatorId;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.EvaluatorId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.record.*;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
 import edu.ukma.blog.models.simple_interaction.graph_models.RecordGraphEntity;
@@ -73,6 +73,7 @@ public class RecordService implements IRecordService {
     }
 
     @Override
+    @Transactional
     public int addRecord(long publisherId, RequestRecord record, MultipartFile image)
             throws ServerCriticalError, WrongFileFormatException {
         Optional<RecordOwnIdView> lastRecord = recordsRepo.findTopById_PublisherIdOrderById_RecordOwnIdDesc(publisherId);
@@ -222,8 +223,8 @@ public class RecordService implements IRecordService {
         entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 
-    // todo: test, pay attention to deletion stats impact
     @Override
+    @Transactional
     public void removeRecord(RecordId id) {
         Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
         maybeRecord.ifPresent(record -> {

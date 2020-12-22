@@ -1,13 +1,12 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.models.compositeIDs.FollowerId;
+import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.simple_interaction.Follower;
 import edu.ukma.blog.models.simple_interaction.Follower_;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.services.IFollowerService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +29,16 @@ public class FollowerService implements IFollowerService {
 
     private final IPublisherStatsRepo publisherStatsRepo;
 
-    @Autowired
-    private IUserNodesRepo userNodesRepo;
+    private final IUserNodesRepo userNodesRepo;
 
-    public FollowerService(IFollowersRepo followersRepo, IPublisherStatsRepo publisherStatsRepo) {
+    public FollowerService(IFollowersRepo followersRepo, IPublisherStatsRepo publisherStatsRepo, IUserNodesRepo userNodesRepo) {
         this.followersRepo = followersRepo;
         this.publisherStatsRepo = publisherStatsRepo;
+        this.userNodesRepo = userNodesRepo;
     }
 
     @Override
+    @Transactional
     public void addFollower(long publisherId, long followerId) {
         FollowerId fid = new FollowerId(publisherId, followerId);
         if (!followersRepo.existsById(fid)) {

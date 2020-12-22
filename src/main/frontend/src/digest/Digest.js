@@ -14,6 +14,7 @@ class Digest extends React.Component {
     }
 
     componentDidMount() {
+        console.log("digest mounted")
         axios.get('http://localhost:8080/digest?page=0', {
             headers: {
                 'Authorization': `${this.state.authType} ${this.state.token}`

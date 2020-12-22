@@ -1,4 +1,4 @@
-package edu.ukma.blog.models.compositeIDs;
+package edu.ukma.blog.models.composite_id;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

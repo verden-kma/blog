@@ -2,7 +2,6 @@ package edu.ukma.blog.repositories.graph_repos;
 
 import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.repositories.graph_repos.graph_projections.UserRecomView;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 
@@ -18,6 +17,6 @@ public interface IUserNodesRepo extends Neo4jRepository<UserGraphEntity, Long> {
     @Query("MATCH (target:UserGraphEntity{userId:{0}})-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(similarPubls:UserGraphEntity) WHERE similarPubls <> publs " +
-            "RETURN similarPubls.userId AS recommendation, COUNT(*) AS strength ORDER BY strength")
-    List<UserRecomView> getRecommendations(long customerId, Pageable pageable);
+            "RETURN similarPubls.userId AS recommendation, COUNT(*) AS strength ORDER BY strength LIMIT {1}")
+    List<UserRecomView> getRecommendations(long customerId, int limit);
 }

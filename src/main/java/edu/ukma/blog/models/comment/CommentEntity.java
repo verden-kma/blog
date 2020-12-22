@@ -1,6 +1,6 @@
 package edu.ukma.blog.models.comment;
 
-import edu.ukma.blog.models.compositeIDs.CommentId;
+import edu.ukma.blog.models.composite_id.CommentId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

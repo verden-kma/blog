@@ -1,4 +1,4 @@
-package edu.ukma.blog.models.compositeIDs;
+package edu.ukma.blog.models.composite_id;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class EvaluatorId implements Serializable {
+public class CommentId implements Serializable {
     private RecordId recordId;
-    private long evaluatorUserId;
+
+    private int commentOwnId;
 }

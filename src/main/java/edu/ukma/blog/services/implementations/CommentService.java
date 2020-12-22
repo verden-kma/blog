@@ -4,8 +4,8 @@ import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.comment.CommentEntity;
 import edu.ukma.blog.models.comment.CommentEntity_;
 import edu.ukma.blog.models.comment.ResponseComment;
-import edu.ukma.blog.models.compositeIDs.CommentId;
-import edu.ukma.blog.models.compositeIDs.RecordId;
+import edu.ukma.blog.models.composite_id.CommentId;
+import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.services.ICommentService;
@@ -47,6 +47,7 @@ public class CommentService implements ICommentService {
 
 
     @Override
+    @Transactional
     public int addComment(RecordId recordId, long commenterId, String text) {
         Optional<CommentEntity> lastComment = commentsRepo.findTopById_RecordIdOrderById_CommentOwnIdDesc(recordId);
         CommentId commentId = new CommentId(recordId, lastComment
