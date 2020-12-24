@@ -160,13 +160,8 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = getUserEntity(username);
-        return new User(user.getUsername(), user.getEncryptedPassword(), Collections.emptyList());
-    }
-
-    public UserEntity getUserEntity(String username) {
         UserEntity user = usersRepo.findByUsername(username);
         if (user == null) throw new UsernameNotFoundException(username);
-        return user;
+        return new User(user.getUsername(), user.getEncryptedPassword(), Collections.emptyList());
     }
 }

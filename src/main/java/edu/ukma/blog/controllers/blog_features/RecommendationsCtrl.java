@@ -1,6 +1,8 @@
 package edu.ukma.blog.controllers.blog_features;
 
 import com.google.common.collect.BiMap;
+import edu.ukma.blog.PropertyAccessor;
+import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.services.IRecommendService;
 import edu.ukma.blog.services.IUserService;
@@ -19,8 +21,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/recommendations")
 public class RecommendationsCtrl {
-    private static final int PUBLISHERS_RECOM_LIMIT = 10;
-    private static final int RECORDS_RECOM_LIMIT = 10;
+    private static final int PUBLISHERS_RECOM_LIMIT;
+    private static final int RECORDS_RECOM_LIMIT;
+
+    static {
+        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
+                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
+        PUBLISHERS_RECOM_LIMIT = pa.getRecordRecommendationSize();
+        RECORDS_RECOM_LIMIT = pa.getPublisherRecommendationSize();
+    }
 
     private final IRecommendService recommendService;
 

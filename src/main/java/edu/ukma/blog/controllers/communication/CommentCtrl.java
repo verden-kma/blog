@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
 
 @RestController
@@ -43,9 +46,9 @@ public class CommentCtrl {
      * @return valid id of a new comment in a database
      */
     @PostMapping
-    public int addComment(@PathVariable String publisher,
-                          @PathVariable int recordId,
-                          @RequestBody RequestComment newComment) {
+    public int addComment(@PathVariable @NotEmpty String publisher,
+                          @PathVariable @Min(1) int recordId,
+                          @RequestBody @Valid RequestComment newComment) {
         long publisherId = userService.getUserIdByUsername(publisher);
         RecordId fullRecordId = new RecordId(publisherId, recordId);
         long commenterId = userService.getUserIdByUsername(newComment.getCommenter());
@@ -53,18 +56,18 @@ public class CommentCtrl {
     }
 
     @GetMapping
-    public LazyContentPage<ResponseComment> getComments(@PathVariable String publisher,
-                                                        @PathVariable int recordId,
-                                                        @RequestParam int block) {
+    public LazyContentPage<ResponseComment> getComments(@PathVariable @NotEmpty String publisher,
+                                                        @PathVariable @Min(1) int recordId,
+                                                        @RequestParam @Min(0) int block) {
         long publisherId = userService.getUserIdByUsername(publisher);
         Pageable pageable = PageRequest.of(block, COMMENTS_BLOCK_SIZE, Sort.by(CommentEntity_.TIMESTAMP).descending());
         return commentService.getCommentsBlock(publisherId, new RecordId(publisherId, recordId), pageable);
     }
 
     @DeleteMapping(path = "/{commentId}")
-    public void removeComment(@PathVariable String publisher,
-                              @PathVariable int recordId,
-                              @PathVariable int commentId,
+    public void removeComment(@PathVariable @NotEmpty String publisher,
+                              @PathVariable @Min(1) int recordId,
+                              @PathVariable @Min(1) int commentId,
                               Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());

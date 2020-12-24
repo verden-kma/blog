@@ -9,6 +9,8 @@ import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
 
 @RestController
@@ -34,16 +36,16 @@ public class EvaluationCtrl {
     }
 
     @GetMapping("/likers")
-    public LazyContentPage<String> getLikers(@PathVariable String publisher,
-                                             @PathVariable int recordId,
-                                             @RequestParam int block) {
+    public LazyContentPage<String> getLikers(@PathVariable @NotEmpty String publisher,
+                                             @PathVariable @Min(1) int recordId,
+                                             @RequestParam @Min(0) int block) {
         long publisherId = userService.getUserIdByUsername(publisher);
         return reactionService.getLikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
     @PutMapping("/likers")
-    public void likeRecord(@PathVariable String publisher,
-                           @PathVariable int recordId,
+    public void likeRecord(@PathVariable @NotEmpty String publisher,
+                           @PathVariable @Min(1) int recordId,
                            Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
@@ -51,8 +53,8 @@ public class EvaluationCtrl {
     }
 
     @DeleteMapping("/likers")
-    public void removeLike(@PathVariable String publisher,
-                           @PathVariable int recordId,
+    public void removeLike(@PathVariable @NotEmpty String publisher,
+                           @PathVariable @Min(1) int recordId,
                            Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
@@ -60,16 +62,16 @@ public class EvaluationCtrl {
     }
 
     @GetMapping("/dislikers")
-    public LazyContentPage<String> getDislikers(@PathVariable String publisher,
-                                                @PathVariable int recordId,
-                                                @RequestParam int block) {
+    public LazyContentPage<String> getDislikers(@PathVariable @NotEmpty String publisher,
+                                                @PathVariable @Min(1) int recordId,
+                                                @RequestParam @Min(0) int block) {
         long publisherId = userService.getUserIdByUsername(publisher);
         return reactionService.getDislikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
     @PutMapping("/dislikers")
-    public void dislikeRecord(@PathVariable String publisher,
-                              @PathVariable int recordId,
+    public void dislikeRecord(@PathVariable @NotEmpty String publisher,
+                              @PathVariable @Min(1) int recordId,
                               Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
@@ -77,8 +79,8 @@ public class EvaluationCtrl {
     }
 
     @DeleteMapping("/dislikers")
-    public void removeDislike(@PathVariable String publisher,
-                              @PathVariable int recordId,
+    public void removeDislike(@PathVariable @NotEmpty String publisher,
+                              @PathVariable @Min(1) int recordId,
                               Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());

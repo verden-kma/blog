@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Min;
+
 @RestController
 public class DigestCtrl {
     private static final int DIGEST_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
@@ -27,7 +29,7 @@ public class DigestCtrl {
     }
 
     @GetMapping("/digest")
-    public LazyContentPage<MinResponseRecord> getDigest(@RequestParam int page) {
+    public LazyContentPage<MinResponseRecord> getDigest(@RequestParam @Min(0) int page) {
         Pageable pageable = PageRequest.of(page, DIGEST_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
         return recordService.getMinResponsePage(pageable);
     }

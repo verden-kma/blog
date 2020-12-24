@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
 
 @RestController
@@ -27,20 +28,20 @@ public class UserCtrl {
     }
 
     @PostMapping
-    public void addUser(@RequestBody UserSignupRequest user) {
+    public void addUser(@Valid @RequestBody UserSignupRequest user) {
         userService.addUser(user);
     }
 
     // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{publisher}")
-    public UserDataResponse getUserData(@PathVariable String publisher,
+    public UserDataResponse getUserData(@PathVariable @NotEmpty String publisher,
                                         Principal principal) {
         return userService.getPublisher(principal.getName(), publisher);
     }
 
     // will it be really used?
     @GetMapping("/{publisher}/short")
-    public UserDataPreviewResponse getShortData(@PathVariable String publisher,
+    public UserDataPreviewResponse getShortData(@PathVariable @NotEmpty String publisher,
                                                 Principal principal) {
         return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
     }

@@ -73,6 +73,26 @@
       "name": "passwordPattern.regexp",
       "type": "java.lang.String",
       "description": "Pattern that defines acceptable passwords for user registration."
+    },
+    {
+      "name": "recordRecommendationSize",
+      "type": "java.lang.String",
+      "description": "Number of recommended records offered to a client (customer/user)."
+    },
+    {
+      "name": "publisherRecommendationSize",
+      "type": "java.lang.String",
+      "description": "Number of recommended publishers."
+    },
+    {
+      "name": "recordsDirectoriesDepth",
+      "type": "java.lang.String",
+      "description": "Number of directory levels for storing record images."
+    },
+    {
+      "name": "compressionThreshold",
+      "type": "java.lang.String",
+      "description": "If image that is being stored is bigger that this, then a compressed copy of this image is created."
     }
   ]
 }

@@ -17,9 +17,13 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -45,12 +49,11 @@ public class RecordCtrl {
         this.recordImageService = recordImageService;
     }
 
-    // todo: handle validation in controller to avoid 500 error while persisting
     @PostMapping
-//            (
-//            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
-//    )
-    public int addRecord(@RequestPart RequestRecord recordData,
+            (
+                    consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
+            )
+    public int addRecord(@RequestPart @Valid RequestRecord recordData,
                          @RequestPart MultipartFile image,
                          Principal principal) {
         long publisherId = userService.getUserIdByUsername(principal.getName());
@@ -58,8 +61,8 @@ public class RecordCtrl {
     }
 
     @GetMapping
-    public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable String publisher,
-                                                           @RequestParam int page,
+    public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable @NotEmpty String publisher,
+                                                           @RequestParam @Min(1) int page,
                                                            Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
@@ -68,8 +71,8 @@ public class RecordCtrl {
     }
 
     @GetMapping(path = "/{recordId}")
-    public ResponseRecord getRecord(@PathVariable String publisher,
-                                    @PathVariable int recordId,
+    public ResponseRecord getRecord(@PathVariable @NotEmpty String publisher,
+                                    @PathVariable @Min(1) int recordId,
                                     Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
@@ -78,22 +81,22 @@ public class RecordCtrl {
 
     // used (for target view)
     @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
-    public byte[] getImage(@PathVariable String publisher,
-                           @PathVariable int recordId) {
+    public byte[] getImage(@PathVariable @NotEmpty String publisher,
+                           @PathVariable @Min(1) int recordId) {
         return getSelectedImage(recordImageService::getImage, publisher, recordId);
     }
 
     // used (for general view)
     @GetMapping(path = "/{recordId}/image-min", produces = ImageConstants.TARGET_MEDIA_TYPE)
-    public byte[] getImageMin(@PathVariable String publisher,
-                              @PathVariable int recordId) {
+    public byte[] getImageMin(@PathVariable @NotEmpty String publisher,
+                              @PathVariable @Min(1) int recordId) {
         return getSelectedImage(recordImageService::getImageMin, publisher, recordId);
     }
 
     // used (for digest, user preview)
     @GetMapping(path = "/{recordId}/image-icon", produces = ImageConstants.TARGET_MEDIA_TYPE)
-    public byte[] getImageIcon(@PathVariable String publisher,
-                               @PathVariable int recordId) {
+    public byte[] getImageIcon(@PathVariable @NotEmpty String publisher,
+                               @PathVariable @Min(1) int recordId) {
         return getSelectedImage(recordImageService::getImageIcon, publisher, recordId);
     }
 
@@ -109,8 +112,8 @@ public class RecordCtrl {
     }
 
     @PutMapping(path = "/{recordId}")
-    public void editRecord(@PathVariable int recordId,
-                           @RequestBody RequestRecord updatedRecord,
+    public void editRecord(@PathVariable @Min(1) int recordId,
+                           @RequestBody @Valid RequestRecord updatedRecord,
                            Principal principal) {
         if (updatedRecord.getCaption() == null && updatedRecord.getAdText() == null)
             throw new BlankRecordEditException("no update data provided");
@@ -119,7 +122,7 @@ public class RecordCtrl {
     }
 
     @DeleteMapping(path = "/{recordOwnId}")
-    public void removeRecord(@PathVariable int recordOwnId,
+    public void removeRecord(@PathVariable @Min(1) int recordOwnId,
                              Principal principal) {
         long publisherId = userService.getUserIdByUsername(principal.getName());
         recordService.removeRecord(new RecordId(publisherId, recordOwnId));

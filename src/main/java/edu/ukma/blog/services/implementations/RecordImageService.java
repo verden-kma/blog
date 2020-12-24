@@ -1,5 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
+import edu.ukma.blog.PropertyAccessor;
+import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
@@ -7,7 +9,6 @@ import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,16 +27,15 @@ import java.util.Random;
 
 import static edu.ukma.blog.constants.ImageConstants.*;
 
-
 @Service
 public class RecordImageService implements IRecordImageService {
     // note: maximum number of images that can be stored is ~2^41.
     // It is not enough for 2^63 users, but just fine for debug
     // 3x512 with 8 IMG_ID_LENGTH should be enough
-    private static final String PATH_PREFIX = ImageConstants.PATH_PREFIX + "/records";
-    private static final File IMAGE_ROOT = new File(PATH_PREFIX);
-    private static final String PATH_TEMPLATE = "/%d/%d/";
-    private static final long COMPRESSION_THRESHOLD = 512 * 1024;
+    private static final File IMAGE_ROOT = new File(ImageConstants.PATH_PREFIX + "/records");
+    private static final String PATH_TEMPLATE;
+    private static final int DIR_DEPTH;
+    private static final long COMPRESSION_THRESHOLD;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;
     private static final String COMPRESSED_SUFFIX = "-min." + TARGET_IMAGE_FORMAT;
@@ -43,10 +43,19 @@ public class RecordImageService implements IRecordImageService {
 
     private final Random random = new Random();
 
-    @Autowired
-    private IRecordsRepo recordsRepo;
-
     static {
+        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
+                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
+        COMPRESSION_THRESHOLD = pa.getCompressionThreshold();
+        DIR_DEPTH = pa.getRecordsDirectoriesDepth();
+
+        StringBuilder pathBuilder = new StringBuilder(DIR_DEPTH * 3 + 1);
+        for (int i = 0; i < DIR_DEPTH; i++) {
+            pathBuilder.append("/%d");
+        }
+        pathBuilder.append('/');
+        PATH_TEMPLATE = pathBuilder.toString();
+
         // initialize similar to R-way-tree structure of folders for faster access to files
         // use random to assign images to folders
         if (!IMAGE_ROOT.exists()) {
@@ -55,6 +64,12 @@ public class RecordImageService implements IRecordImageService {
                 for (int j = 0; j < FOLDERS_WIDTH; j++)
                     new File(IMAGE_ROOT, String.format(PATH_TEMPLATE, i, j)).mkdirs();
         }
+    }
+
+    private final IRecordsRepo recordsRepo;
+
+    public RecordImageService(IRecordsRepo recordsRepo) {
+        this.recordsRepo = recordsRepo;
     }
 
     /**
@@ -79,10 +94,9 @@ public class RecordImageService implements IRecordImageService {
 
         try {
             BufferedImage originalImg = ImageIO.read(original.getInputStream());
-            File originalStored = new File(IMAGE_ROOT, location + "." + TARGET_IMAGE_FORMAT);
+            File originalStored = new File(IMAGE_ROOT, location + TARGET_SUFFIX);
             if (original.getContentType().equals(TARGET_MEDIA_TYPE)) original.transferTo(originalStored);
             else ImageIO.write(originalImg, TARGET_IMAGE_FORMAT, originalStored);
-
 
             if (originalStored.length() > COMPRESSION_THRESHOLD) {
                 saveCompressed(originalImg, location);
@@ -100,23 +114,21 @@ public class RecordImageService implements IRecordImageService {
 
     private void saveCompressed(final BufferedImage image, String originLocation) throws IOException {
         File compressedImageFile = new File(IMAGE_ROOT, originLocation + COMPRESSED_SUFFIX);
-        OutputStream os = new FileOutputStream(compressedImageFile);
+        ImageWriter writer = null;
+        try (OutputStream os = new FileOutputStream(compressedImageFile);
+             ImageOutputStream ios = ImageIO.createImageOutputStream(os)) {
 
-        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(TARGET_IMAGE_FORMAT);
-        ImageWriter writer = writers.next();
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(TARGET_IMAGE_FORMAT);
+            writer = writers.next();
+            writer.setOutput(ios);
 
-        ImageOutputStream ios = ImageIO.createImageOutputStream(os);
-        writer.setOutput(ios);
-
-        ImageWriteParam param = writer.getDefaultWriteParam();
-
-        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        param.setCompressionQuality(0.7f);  // Change the quality value you prefer
-        writer.write(null, new IIOImage(image, null, null), param);
-
-        os.close();
-        ios.close();
-        writer.dispose();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(0.7f);  // Change the quality value you prefer
+            writer.write(null, new IIOImage(image, null, null), param);
+        } finally {
+            if (writer != null) writer.dispose();
+        }
     }
 
     @Override
@@ -142,27 +154,3 @@ public class RecordImageService implements IRecordImageService {
         return original.delete() & compressed.delete() & icon.delete();
     }
 }
-
-//    /**
-//     * check that a file passed is of an appropriate format or throw exception otherwise
-//     *
-//     * @param origin file to validate
-//     * @return type of a valid file's format
-//     * @throws WrongFileFormatException if <code>origin</code> file has unacceptable format
-//     */
-//    private static FormatType validateFormat(final MultipartFile origin) throws WrongFileFormatException {
-//        String fileFormat = FilenameUtils.getExtension(origin.getOriginalFilename());
-//        if (fileFormat == null) {
-//            throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, "null");
-//        }
-//        if (fileFormat.equalsIgnoreCase(TARGET_IMAGE_FORMAT)) return FormatType.TARGET;
-//        for (String acceptableFormat : ACCEPTABLE_FORMATS) {
-//            if (fileFormat.equalsIgnoreCase(acceptableFormat)) return FormatType.ACCEPTABLE;
-//        }
-//        throw new WrongFileFormatException(TARGET_IMAGE_FORMAT, ACCEPTABLE_FORMATS, fileFormat);
-//    }
-//
-//    enum FormatType {
-//        TARGET,
-//        ACCEPTABLE
-//    }

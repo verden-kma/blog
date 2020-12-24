@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class FollowerCtrl {
     }
 
     @GetMapping
-    public List<String> getFollowers(@PathVariable String publisher,
+    public List<String> getFollowers(@PathVariable @NotEmpty String publisher,
                                      @RequestParam int block) {
         long publisherId = userService.getUserIdByUsername(publisher);
         Pageable pageable = PageRequest.of(block, FOLLOWERS_BLOCK_SIZE);
@@ -37,7 +38,7 @@ public class FollowerCtrl {
 
     // used (in target view, in publisher page view, publisher preview)
     @PutMapping
-    public void follow(@PathVariable String publisher,
+    public void follow(@PathVariable @NotEmpty String publisher,
                        Principal principal) {
         if (publisher.equals(principal.getName())) throw new SelfFollowerException();
         long publisherId = userService.getUserIdByUsername(publisher);
@@ -47,7 +48,7 @@ public class FollowerCtrl {
 
     // used (same)
     @DeleteMapping
-    public void unfollow(@PathVariable String publisher,
+    public void unfollow(@PathVariable @NotEmpty String publisher,
                          Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long subscriberId = userService.getUserIdByUsername(principal.getName());

@@ -15,7 +15,7 @@ public class ImageConstants {
 
     public static final String TARGET_MEDIA_TYPE = MediaType.IMAGE_JPEG_VALUE;
     public static final Set<String> ACCEPTABLE_MEDIA_TYPES = Collections.unmodifiableSet(new HashSet<>
-            (Arrays.asList(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE)));
+            (Arrays.asList(MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE)));
 
     public static final String TARGET_IMAGE_FORMAT = "jpg";
     public static final String[] ACCEPTABLE_FORMATS = new String[]{"jpg", "jpeg", "png", "gif"};

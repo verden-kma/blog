@@ -23,6 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL)
                 .permitAll()
+
+                .antMatchers("/h2-console/**").permitAll()
+
                 .anyRequest()
                 .authenticated()
                 .and()

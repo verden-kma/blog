@@ -4,6 +4,7 @@ import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.services.IUserImageService;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserAccountImgCtrl {
     private final IUserImageService imageService;
 
+    @Autowired
     public UserAccountImgCtrl(IUserImageService imageService) {
         this.imageService = imageService;
     }

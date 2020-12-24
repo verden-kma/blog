@@ -5,10 +5,11 @@ import lombok.Data;
 
 import javax.validation.constraints.Pattern;
 
+
 @Data
 public class UserSignupRequest {
 
-    @Pattern(regexp = "\\w{3,20}")
+    @Pattern(regexp = PatternConstants.USERNAME_PATTERN)
     private String username;
 
     @Pattern(regexp = PatternConstants.PASSWORD_PATTERN)

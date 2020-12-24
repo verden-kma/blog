@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import static edu.ukma.blog.PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME;
 import static edu.ukma.blog.constants.ImageConstants.*;
 
 @Service
@@ -30,10 +31,8 @@ public class UserImageService implements IUserImageService {
     private static final String BANNER_SUFFIX = "-bnr." + ImageConstants.TARGET_IMAGE_FORMAT;
 
     static {
-        String beanName = PropertyAccessor.class.getSimpleName();
-        String propertyAccessorBeanName = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
         MIN_USERNAME_LEN = ((PropertyAccessor) SpringApplicationContext
-                .getBean(propertyAccessorBeanName))
+                .getBean(PROPERTY_ACCESSOR_BEAN_NAME))
                 .getMinUsernameLen();
 
         StringBuilder pathTemplateBuilder = new StringBuilder(3 * MIN_USERNAME_LEN);
@@ -111,9 +110,11 @@ public class UserImageService implements IUserImageService {
                     bImg.flush();
                     bImg = cropped;
                 }
-                Scalr.resize(bImg, Scalr.Mode.FIT_EXACT, TOP_BANNER_DIMS.getWidth(), TOP_BANNER_DIMS.getHeight());
-                ImageIO.write(bImg, TARGET_IMAGE_FORMAT, locationOnDisk);
+                BufferedImage toFlush = Scalr.resize(bImg, Scalr.Mode.FIT_EXACT,
+                        TOP_BANNER_DIMS.getWidth(), TOP_BANNER_DIMS.getHeight());
+                ImageIO.write(toFlush, TARGET_IMAGE_FORMAT, locationOnDisk);
                 bImg.flush();
+                toFlush.flush();
                 System.out.println("banner location: " + locationOnDisk.getPath());
             }
         } catch (IOException e) {

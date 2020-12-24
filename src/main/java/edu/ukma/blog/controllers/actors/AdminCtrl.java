@@ -1,7 +1,7 @@
 package edu.ukma.blog.controllers.actors;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.web.bind.annotation.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 @RestController
 @RequestMapping("/admins")

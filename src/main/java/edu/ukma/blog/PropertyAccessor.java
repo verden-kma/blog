@@ -8,15 +8,15 @@ import java.util.Objects;
 
 @Component
 public class PropertyAccessor {
-    @Autowired
-    private Environment environment;
-
     public static final String PROPERTY_ACCESSOR_BEAN_NAME;
 
     static {
         String beanName = PropertyAccessor.class.getSimpleName();
         PROPERTY_ACCESSOR_BEAN_NAME = beanName.substring(0, 1).toLowerCase() + beanName.substring(1);
     }
+
+    @Autowired
+    private Environment environment;
 
     public long getExpirationTime() {
         return Long.parseLong(Objects.requireNonNull(environment.getProperty("expirationTime")));
@@ -72,5 +72,21 @@ public class PropertyAccessor {
 
     public int getRecordsPreviewBlock() {
         return Integer.parseInt(Objects.requireNonNull(environment.getProperty("recordsPreviewBlock")));
+    }
+
+    public int getRecordRecommendationSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("recordRecommendationSize")));
+    }
+
+    public int getPublisherRecommendationSize() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("publisherRecommendationSize")));
+    }
+
+    public int getRecordsDirectoriesDepth() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("recordsDirectoriesDepth")));
+    }
+
+    public int getCompressionThreshold() {
+        return Integer.parseInt(Objects.requireNonNull(environment.getProperty("compressionThreshold")));
     }
 }

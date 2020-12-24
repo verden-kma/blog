@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Data
 @Entity
@@ -16,7 +15,6 @@ public class UserEntity {
     private long id;
 
     @NotBlank
-    @Size(min = 3, max = 20)
     @Column(unique = true)
     private String username;
 
