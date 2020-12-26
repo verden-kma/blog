@@ -21,8 +21,8 @@ import java.lang.reflect.Modifier;
 import static edu.ukma.blog.constants.ImageConstants.TARGET_IMAGE_FORMAT;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ExtendWith(SpringExtension.class)
 public class RecordImageServiceTest {
 
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;

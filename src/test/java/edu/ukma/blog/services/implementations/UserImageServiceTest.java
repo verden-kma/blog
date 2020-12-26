@@ -24,8 +24,8 @@ import java.lang.reflect.Modifier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ExtendWith(SpringExtension.class)
 public class UserImageServiceTest {
 
     static final String username = "Japanese_Dancer";

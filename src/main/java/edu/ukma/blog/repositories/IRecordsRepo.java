@@ -51,10 +51,4 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
     Slice<MinRecordView> findAllBy(Pageable pageable);
 
     Slice<RecordEntity> findByCaptionContains(@NotEmpty String caption, Pageable pageable);
-
-//    as an example to remember
-//    @Transactional
-//    @Modifying // try custom object, if fail then primitive types
-//    @Query("UPDATE RecordEntity rec SET rec.caption=:title, rec.isEdited=true WHERE rec.id=:id")
-//    void updateCaption(@Param("id") RecordID id, @Param("title") String title);
 }

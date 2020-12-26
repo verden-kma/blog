@@ -29,24 +29,6 @@ public interface IEvaluatorsRepo extends JpaRepository<Evaluation, EvaluatorId> 
     @Modifying
     void deleteById_RecordId(RecordId recordId);
 
-/*
-SELECT
-    record_own_id,
-    is_liker,
-    COUNT(CONCAT(evaluator_own_id,
-            '-',
-            publisher_id,
-            '-',
-            record_own_id)) AS count
-FROM
-    evaluation
-WHERE
-    record_own_id IN (:idList)
-        AND is_liker IS NOT NULL
-        AND publisher_id = :publisherId
-GROUP BY record_own_id , is_liker
-* */
-
     @Query(value = "SELECT \n" +
             "    record_own_id,\n" +
             "    is_liker,\n" +
@@ -64,4 +46,21 @@ GROUP BY record_own_id , is_liker
             "GROUP BY record_own_id , is_liker", nativeQuery = true)
     List<MultiRecordEvalView> getRecordsEvaluations(@Param(value = "publisherId") long publisherId,
                                                     @Param(value = "recordsOwnIds") List<Integer> recordsOwnIds);
+    /*
+SELECT
+    record_own_id,
+    is_liker,
+    COUNT(CONCAT(evaluator_own_id,
+            '-',
+            publisher_id,
+            '-',
+            record_own_id)) AS count
+FROM
+    evaluation
+WHERE
+    record_own_id IN (:idList)
+        AND is_liker IS NOT NULL
+        AND publisher_id = :publisherId
+GROUP BY record_own_id , is_liker
+* */
 }
