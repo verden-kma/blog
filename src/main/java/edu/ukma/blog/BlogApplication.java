@@ -1,6 +1,5 @@
 package edu.ukma.blog;
 
-import edu.ukma.blog.repositories.IUsersRepo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -16,7 +15,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @Configuration
 @SpringBootApplication
-@EnableJpaRepositories(basePackageClasses = IUsersRepo.class)
+//@EnableJpaRepositories(basePackageClasses = IUsersRepo.class)
+@EnableJpaRepositories(basePackages = "edu.ukma.blog.repositories")
 @EntityScan("edu.ukma.blog.models")
 public class BlogApplication {
 

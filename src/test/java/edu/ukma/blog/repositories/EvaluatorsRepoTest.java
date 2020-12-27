@@ -1,14 +1,43 @@
 package edu.ukma.blog.repositories;
 
 
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import edu.ukma.blog.repositories.projections.record.MultiRecordEvalView;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.util.Pair;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
-@TestPropertySource("classpath:application-test.properties")
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@DataJpaTest
+@ContextConfiguration(classes = JpaConfig.class, loader = AnnotationConfigContextLoader.class)
+@Sql({"/test_data/evaluators-data.sql"})
 public class EvaluatorsRepoTest {
-    // getRecordsEvaluations
+    @Resource
+    private IEvaluatorsRepo evaluatorsRepo;
+
+    @Test
+    void testGetRecordsEvaluations() {
+        List<MultiRecordEvalView> res = evaluatorsRepo.getRecordsEvaluations(10L, Lists.list(1, 2, 3));
+        Map<Pair<Integer, Boolean>, Integer> grouped = res.stream()
+                .collect(Collectors.toMap(entry -> Pair.of(entry.getRecord_Own_Id(),
+                        entry.getIs_Liker()), MultiRecordEvalView::getMono_Eval_Count));
+
+        assertEquals(5, res.size());
+
+        assertEquals(3, grouped.get(Pair.of(1, true)));
+        assertEquals(2, grouped.get(Pair.of(2, true)));
+        assertEquals(1, grouped.get(Pair.of(2, false)));
+        assertEquals(1, grouped.get(Pair.of(3, true)));
+        assertEquals(2, grouped.get(Pair.of(3, false)));
+    }
+
 }

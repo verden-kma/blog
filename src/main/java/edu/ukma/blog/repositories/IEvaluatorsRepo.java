@@ -40,9 +40,9 @@ public interface IEvaluatorsRepo extends JpaRepository<Evaluation, EvaluatorId> 
             "FROM\n" +
             "    evaluation\n" +
             "WHERE\n" +
-            "    record_own_id IN (:recordsOwnIds)\n" +
+            "    publisher_id = :publisherId\n" +
             "        AND is_liker IS NOT NULL\n" +
-            "        AND publisher_id = :publisherId\n" +
+            "        AND record_own_id IN (:recordsOwnIds)\n" +
             "GROUP BY record_own_id , is_liker", nativeQuery = true)
     List<MultiRecordEvalView> getRecordsEvaluations(@Param(value = "publisherId") long publisherId,
                                                     @Param(value = "recordsOwnIds") List<Integer> recordsOwnIds);
