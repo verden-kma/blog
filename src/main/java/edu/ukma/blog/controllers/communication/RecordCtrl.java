@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Function;
 
 @RestController
@@ -83,32 +85,41 @@ public class RecordCtrl {
     @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImage(@PathVariable @NotEmpty String publisher,
                            @PathVariable @Min(1) int recordId) {
-        return getSelectedImage(recordImageService::getImage, publisher, recordId);
+        return getSelectedImage(Collections.singletonList(recordImageService::getImage), publisher, recordId);
+    }
+
+    private byte[] getSelectedImage(Iterable<Function<String, File>> selectors, String publisher, int recordId) {
+        long publisherId = userService.getUserIdByUsername(publisher);
+        String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
+
+        File image = null;
+        for (Function<String, File> selector : selectors) {
+            if (image == null || !image.exists())
+                image = selector.apply(location);
+        }
+
+        try (InputStream input = new FileInputStream(image)) {
+            return IOUtils.toByteArray(input);
+        } catch (NullPointerException e) {
+            throw new ServerCriticalError("No valid file provider passed.");
+        } catch (IOException e) {
+            throw new ServerCriticalError(e);
+        }
     }
 
     // used (for general view)
     @GetMapping(path = "/{recordId}/image-min", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageMin(@PathVariable @NotEmpty String publisher,
                               @PathVariable @Min(1) int recordId) {
-        return getSelectedImage(recordImageService::getImageMin, publisher, recordId);
+        return getSelectedImage(Arrays.asList(recordImageService::getImageMin, recordImageService::getImage),
+                publisher, recordId);
     }
 
     // used (for digest, user preview)
     @GetMapping(path = "/{recordId}/image-icon", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageIcon(@PathVariable @NotEmpty String publisher,
                                @PathVariable @Min(1) int recordId) {
-        return getSelectedImage(recordImageService::getImageIcon, publisher, recordId);
-    }
-
-    private byte[] getSelectedImage(Function<String, File> selector, String publisher, int recordId) {
-        long publisherId = userService.getUserIdByUsername(publisher);
-        String location = recordService.getImgLocation(new RecordId(publisherId, recordId));
-        File image = selector.apply(location);
-        try (InputStream input = new FileInputStream(image)) {
-            return IOUtils.toByteArray(input);
-        } catch (IOException e) {
-            throw new ServerCriticalError(e);
-        }
+        return getSelectedImage(Collections.singletonList(recordImageService::getImageIcon), publisher, recordId);
     }
 
     @PutMapping(path = "/{recordId}")

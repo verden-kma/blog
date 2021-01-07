@@ -1,8 +1,17 @@
 import React from 'react'
 import axios from 'axios'
 
-class Thumbnail extends React.Component {
-    constructor(props) {
+interface IState {
+    authType: string,
+    token: string,
+    publisher: string,
+    recordOwnId: number,
+    caption: string,
+    image: string | null
+}
+
+class Thumbnail extends React.Component<any, IState> {
+    constructor(props: { data: Readonly<IState>; }) {
         super(props);
         this.state = {
             ...props.data,
@@ -55,7 +64,7 @@ class Thumbnail extends React.Component {
         return (
             <div>
                 <img style={{width: 200, height: 120}}
-                     src={"data:image/jpeg;base64, " + this.state.image}
+                     src={'data:image/jpeg;base64, ' + this.state.image}
                      alt={this.state.caption}/>
                 <br/>
                 <h3>{this.state.publisher}</h3>

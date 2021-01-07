@@ -2,13 +2,32 @@ import React from "react";
 import axios from 'axios'
 import Thumbnail from "./Thumbnail";
 
-class Digest extends React.Component {
-    constructor(props) {
+interface IProps {
+    username: string,
+    authType: string,
+    token: string
+}
+
+interface IState {
+    authType: string,
+    token: string
+    username: string,
+    records: Array<IRecord>
+}
+
+interface IRecord {
+    publisher: string,
+    recordOwnId: number,
+    caption: string
+}
+
+class Digest extends React.Component<IProps, IState> {
+    constructor(props: IProps | Readonly<IProps>) {
         super(props);
         this.state = {
-            username: props.userData.username,
-            authType: props.userData.authType,
-            token: props.userData.token,
+            username: props.username, // was props.userData.username
+            authType: props.authType,
+            token: props.token,
             records: []
         }
     }
