@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class ResponseRecord {
+    private String publisher;
+
     private int id;
 
     private String caption;

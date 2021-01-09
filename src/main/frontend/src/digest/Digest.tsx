@@ -1,33 +1,22 @@
 import React from "react";
 import axios from 'axios'
 import Thumbnail from "./Thumbnail";
-
-interface IProps {
-    username: string,
-    authType: string,
-    token: string
-}
+import {IAuthProps} from "../main/CMSMain";
 
 interface IState {
-    authType: string,
-    token: string
-    username: string,
-    records: Array<IRecord>
+    records: Array<IMiniRecord>
 }
 
-interface IRecord {
+interface IMiniRecord {
     publisher: string,
     recordOwnId: number,
     caption: string
 }
 
-class Digest extends React.Component<IProps, IState> {
-    constructor(props: IProps | Readonly<IProps>) {
+class Digest extends React.Component<IAuthProps, IState> {
+    constructor(props: IAuthProps) {
         super(props);
         this.state = {
-            username: props.username, // was props.userData.username
-            authType: props.authType,
-            token: props.token,
             records: []
         }
     }
@@ -36,7 +25,7 @@ class Digest extends React.Component<IProps, IState> {
         console.log("digest mounted")
         axios.get('http://localhost:8080/digest?page=0', {
             headers: {
-                'Authorization': `${this.state.authType} ${this.state.token}`
+                'Authorization': `${this.props.authType} ${this.props.token}`
             }
         }).then((response) => {
             this.setState({records: response.data.pageItems})
@@ -49,15 +38,9 @@ class Digest extends React.Component<IProps, IState> {
         const thumbnails = this.state.records.map(record =>
             <Thumbnail
                 key={record.publisher + record.recordOwnId}
-                data={
-                    {
-                        ...record,
-                        authType: this.state.authType,
-                        token: this.state.token
-                    }
-                }/>
+                auth={this.props}
+                data={record}/>
         )
-
         return (
             <div>
                 {thumbnails}
@@ -66,4 +49,5 @@ class Digest extends React.Component<IProps, IState> {
     }
 }
 
+export type {IMiniRecord};
 export default Digest;

@@ -6,7 +6,14 @@ import store from "store"
 import {BrowserRouter, Route, Switch, withRouter} from "react-router-dom";
 import Publishers from "./Publishers";
 import PostRecord from "./PostRecord";
-import UserPage from "../user_page/UserPage";
+import RecordPreview, {PreviewContextEnum} from "../RecordsPreview";
+import {searchModes} from "./Search";
+
+interface IAuthProps {
+    username: string,
+    authType: string,
+    token: string
+}
 
 class CMSMain extends React.Component<any, any> {
 
@@ -19,28 +26,34 @@ class CMSMain extends React.Component<any, any> {
         return (
             <div>
                 <BrowserRouter>
-                    <Header/>
+                    <Header {...authData}/>
                     <Switch>
-                        <Route path={"/digest"}>
+                        <Route exact path={"/digest"}>
                             <Digest {...authData} />
                         </Route>
-                        <Route path={"/publishers"}>
+                        <Route exact path={"/publishers"}>
                             <Publishers/>
                         </Route>
-                        <Route path={"/post-record"}>
+                        <Route exact path={"/post-record"}>
                             <PostRecord {...authData}/>
                         </Route>
-                        <Route path={"/profile"}>
-                            <UserPage {...authData}/>
+                        <Route exact path={"/profile"}>
+                            <RecordPreview {...{...authData, previewContext: PreviewContextEnum.PUBLISHER_RECORDS}}/>
                         </Route>
+                        <Route exact path={`/search/${searchModes[0]}`}>
+                            <RecordPreview {...{...authData, previewContext: PreviewContextEnum.SEARCH}}/>
+                        </Route>
+                        {/*<Route exact path={`/search?mode=${searchModes[1]}&query=:query`}>*/}
+                        {/*    <PublishersPreview {...authData}/>*/}
+                        {/*</Route>*/}
                     </Switch>
                     <Footer/>
                 </BrowserRouter>
             </div>
         )
-
     }
 
 }
 
+export type {IAuthProps};
 export default withRouter(CMSMain);

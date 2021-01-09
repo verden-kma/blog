@@ -105,11 +105,15 @@ public class RecordService implements IRecordService {
 
     public List<ResponseRecord> buildRespRecs(Collection<List<RecordEntity>> recordsChunks, long userId) {
         int resSize = 0;
-        for (List<RecordEntity> records : recordsChunks) {
+        for (List<RecordEntity> records : recordsChunks)
             resSize += records.size();
-        }
 
         List<ResponseRecord> res = new ArrayList<>(resSize);
+
+        BiMap<Long, String> userIdMap = userService.getUserIdentifiersBimap(recordsChunks
+                .stream()
+                .flatMap(Collection::stream)
+                .map(x -> x.getId().getPublisherId()).collect(Collectors.toList()));
 
         for (List<RecordEntity> records : recordsChunks) {
             if (records.isEmpty()) continue;
@@ -118,6 +122,7 @@ public class RecordService implements IRecordService {
             List<ResponseRecord> respRecs = records.stream().map(x -> {
                 ResponseRecord resp = new ResponseRecord();
                 BeanUtils.copyProperties(x, resp);
+                resp.setPublisher(userIdMap.get(x.getId().getPublisherId()));
                 resp.setId(x.getId().getRecordOwnId());
                 return resp;
             }).collect(Collectors.toList());
@@ -184,6 +189,7 @@ public class RecordService implements IRecordService {
         RecordEntity record = recordsRepo.findById(recordId)
                 .orElseThrow(() -> new NoSuchRecordException(recordId.getRecordOwnId()));
         ResponseRecord res = new ResponseRecord();
+        res.setPublisher(userService.getUsernamesByIds(Collections.singletonList(recordId.getPublisherId())).get(0));
         res.setId(recordId.getRecordOwnId());
         BeanUtils.copyProperties(record, res);
         res.setLikes(evaluatorsRepo.countAllById_RecordIdAndIsLiker(recordId, true));

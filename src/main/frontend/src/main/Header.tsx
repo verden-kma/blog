@@ -1,15 +1,21 @@
 import React from "react";
 import {Link} from "react-router-dom";
+import Search from "./Search";
+import {IAuthProps} from "./CMSMain";
+
 
 interface IState { // todo: query user data
-    username: string,
-    userAva: Blob,
-    userPageBanner: Blob,
+    userAva: string,
+    userPageBanner: string,
     status: string,
     description: string
 }
 
-class Header extends React.Component<any, any> {
+class Header extends React.Component<IAuthProps, IState> {
+    constructor(props: IAuthProps) {
+        super(props);
+
+    }
 
     render() {
         return (<div>
@@ -19,6 +25,10 @@ class Header extends React.Component<any, any> {
                 <li><Link to={"/publishers"}>{Publishers()}</Link></li>
                 <br/>
                 <li><Link to={"/records"}>{Records()}</Link></li>
+                <br/>
+                <li><Search {...this.props} searchCallback={(searchData) => {
+                    console.log(searchData)
+                }}/></li>
                 <br/>
                 <li><Link to={"/post-record"}>{NewRecord()}</Link></li>
                 <br/>

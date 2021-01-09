@@ -1,57 +1,56 @@
 import React from 'react'
 import axios from 'axios'
+import {IAuthProps} from "../main/CMSMain";
+import {IMiniRecord} from "./Digest";
 
-interface IState {
-    authType: string,
-    token: string,
-    publisher: string,
-    recordOwnId: number,
-    caption: string,
-    image: string | null
+interface IProps {
+    auth: IAuthProps,
+    data: IMiniRecord
 }
 
-class Thumbnail extends React.Component<any, IState> {
-    constructor(props: { data: Readonly<IState>; }) {
+interface IState {
+    image?: string
+}
+
+class Thumbnail extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
-        this.state = {
-            ...props.data,
-            image: null
-        }
+        this.state = {}
         this.likeRecord = this.likeRecord.bind(this)
         this.followPublisher = this.followPublisher.bind(this)
     }
 
     likeRecord() {
-        console.log(`http://localhost:8080/users/${this.state.publisher}/records/${this.state.recordOwnId}/likers`)
-        console.log('Authorization ' + `${this.state.authType} ${this.state.token}`)
+        console.log(`http://localhost:8080/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}/likers`)
+        console.log('Authorization ' + `${this.props.auth.authType} ${this.props.auth.token}`)
 
 
-        axios.put(`http://localhost:8080/users/${this.state.publisher}/records/${this.state.recordOwnId}/likers`,
+        axios.put(`http://localhost:8080/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}/likers`,
             {}, {
                 headers: {
-                    'Authorization': `${this.state.authType} ${this.state.token}`
+                    'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
                 }
             }).then((success) => alert("liked record"),
             (error) => console.log("failed to like"))
     }
 
     followPublisher() {
-        console.log(`http://localhost:8080/users/${this.state.publisher}/followers`)
+        console.log(`http://localhost:8080/users/${this.props.data.publisher}/followers`)
 
-        axios.put(`http://localhost:8080/users/${this.state.publisher}/followers`, {}, {
+        axios.put(`http://localhost:8080/users/${this.props.data.publisher}/followers`, {}, {
             headers: {
-                'Authorization': `${this.state.authType} ${this.state.token}`
+                'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
             }
         }).then((success) => alert("followed publisher"),
             (error) => console.log("failed to follow"))
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.state.publisher}/records/${this.state.recordOwnId}/image-min`,
+        axios.get(`http://localhost:8080/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}/image-min`,
             {
                 responseType: 'arraybuffer',
                 headers: {
-                    'Authorization': `${this.state.authType} ${this.state.token}`,
+                    'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`,
                     'Accept': 'image/jpeg'
                 }
             }).then((response) => {
@@ -65,10 +64,10 @@ class Thumbnail extends React.Component<any, IState> {
             <div>
                 <img style={{width: 200, height: 120}}
                      src={'data:image/jpeg;base64, ' + this.state.image}
-                     alt={this.state.caption}/>
+                     alt={this.props.data.caption}/>
                 <br/>
-                <h3>{this.state.publisher}</h3>
-                <h4>{this.state.caption}</h4>
+                <h3>{this.props.data.publisher}</h3>
+                <h4>{this.props.data.caption}</h4>
                 <br/>
                 <button onClick={this.likeRecord}>like</button>
                 <button onClick={this.followPublisher}>follow publisher</button>
