@@ -37,8 +37,8 @@ public class SearchService implements ISearchService {
     }
 
     @Override
-    public LazyContentPage<UserDataPreviewResponse> findPopularPublishers(String prefix, Pageable publisherPageable,
-                                                                          long userId, int numPreviewImgs) {
+    public LazyContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable publisherPageable,
+                                                                             long userId, int numPreviewImgs) {
         Slice<PublisherPreviewBaseView> previewBasesSlice = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, publisherPageable);
         List<PublisherPreviewBaseView> previewBases = previewBasesSlice.getContent();
 
@@ -64,7 +64,7 @@ public class SearchService implements ISearchService {
         List<UserDataPreviewResponse> res = new ArrayList<>(previewBases.size());
         for (PublisherPreviewBaseView pb : previewBases) {
             UserDataPreviewResponse pp = new UserDataPreviewResponse();
-            pp.setPublisherName(pb.getUsername());
+            pp.setPublisher(pb.getUsername());
             pp.setUploads(pb.getStatistics().getUploads());
             pp.setFollowers(pb.getStatistics().getFollowers());
             pp.setFollowed(subscriptions.contains(pb.getId()));

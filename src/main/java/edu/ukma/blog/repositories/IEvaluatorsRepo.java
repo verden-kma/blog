@@ -32,11 +32,7 @@ public interface IEvaluatorsRepo extends JpaRepository<Evaluation, EvaluatorId> 
     @Query(value = "SELECT \n" +
             "    record_own_id,\n" +
             "    is_liker,\n" +
-            "    COUNT(CONCAT(evaluator_user_id,\n" +
-            "            '-',\n" +
-            "            publisher_id,\n" +
-            "            '-',\n" +
-            "            record_own_id)) AS mono_eval_count\n" +
+            "    COUNT(*) AS mono_eval_count\n" +
             "FROM\n" +
             "    evaluation\n" +
             "WHERE\n" +
@@ -46,11 +42,12 @@ public interface IEvaluatorsRepo extends JpaRepository<Evaluation, EvaluatorId> 
             "GROUP BY record_own_id , is_liker", nativeQuery = true)
     List<MultiRecordEvalView> getRecordsEvaluations(@Param(value = "publisherId") long publisherId,
                                                     @Param(value = "recordsOwnIds") List<Integer> recordsOwnIds);
+
     /*
 SELECT
     record_own_id,
     is_liker,
-    COUNT(CONCAT(evaluator_own_id,
+    COUNT(CONCAT(evaluator_user_id,
             '-',
             publisher_id,
             '-',

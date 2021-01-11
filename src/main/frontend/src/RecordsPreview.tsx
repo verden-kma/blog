@@ -21,7 +21,7 @@ interface IRecord {
     publisher: string,
     id: number,
     caption: string,
-    adText?: string,
+    adText: string | null,
     timestamp: string,
     isEdited: boolean,
     reaction: boolean | null,
@@ -30,9 +30,10 @@ interface IRecord {
     numOfComments: number
 }
 
-const PreviewContextEnum = Object.freeze({
+const RecordPreviewContext = Object.freeze({
     PUBLISHER_RECORDS: 1,
-    SEARCH: 2
+    SEARCH: 2,
+    RECOMMENDATION: 3
 });
 
 class RecordPreview extends React.Component<IProps, IState> {
@@ -49,55 +50,58 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
     getUrl(): string {
-        if (this.props.previewContext === PreviewContextEnum.PUBLISHER_RECORDS) {
+        if (this.props.previewContext === RecordPreviewContext.PUBLISHER_RECORDS) {
             return `http://localhost:8080/users/${this.props.username}/records?page=${this.state.currPage}`;
-        } else if (this.props.previewContext === PreviewContextEnum.SEARCH) {
+        }
+        if (this.props.previewContext === RecordPreviewContext.SEARCH) {
             const paramValue = new URLSearchParams(this.props.location.search).get("query");
-            return `http://localhost:8080/users/${this.props.username}/records?title=${paramValue}&page=${this.state.currPage}`
+            return `http://localhost:8080/search/records?title=${paramValue}&page=${this.state.currPage}`
+        }
+        if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
+            // todo: implement
         }
         return "/404"; // mock
     }
 
     componentDidMount() {
         const url = this.getUrl();
-        axios.get(url, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
-        }).then(success => {
-                console.log(success.data)
-                this.setState((oldState: IState) => {
-                    return {
-                        ...oldState,
-                        numPages: success.data.totalPagesNum,
-                        isLast: success.data.isLast,
-                        recordJsons: success.data.pageItems
-                    }
-                });
+        axios.get(url, {headers: {'Authorization': `${this.props.authType} ${this.props.token}`}})
+            .then(success => {
+                    console.log(success.data)
+                    this.setState((oldState: IState) => {
+                        return {
+                            ...oldState,
+                            numPages: success.data.totalPagesNum,
+                            isLast: success.data.isLast,
+                            recordJsons: success.data.pageItems
+                        }
+                    });
 //todo : handle situation: user loads record, deletes it, loads exact same record with different image
-                // (should work as IDs are different)
-                this.state.recordJsons.filter(({id}: IRecord) => this.state.recordImgs[id] === undefined)
-                    .forEach(({id}: IRecord) => {
-                        axios.get(`http://localhost:8080/users/${this.props.username}/records/${id}/image-min`,
-                            {
-                                responseType: 'arraybuffer',
-                                headers: {
-                                    'Authorization': `${this.props.authType} ${this.props.token}`
-                                }
-                            }).then(response => {
-                            this.setState((oldState: IState) => {
-                                return {
-                                    ...oldState,
-                                    recordImgs: {
-                                        ...oldState.recordImgs,
-                                        [id]: Buffer.from(response.data, 'binary').toString('base64')
+                    // (should work as IDs are different)
+                    this.state.recordJsons.filter(({id}: IRecord) => this.state.recordImgs[id] === undefined)
+                        .forEach(({id}: IRecord) => {
+                            axios.get(`http://localhost:8080/users/${this.props.username}/records/${id}/image-min`,
+                                {
+                                    responseType: 'arraybuffer',
+                                    headers: {
+                                        'Authorization': `${this.props.authType} ${this.props.token}`
                                     }
-                                }
-                            });
+                                }).then(response => {
+                                this.setState((oldState: IState) => {
+                                    return {
+                                        ...oldState,
+                                        recordImgs: {
+                                            ...oldState.recordImgs,
+                                            [id]: Buffer.from(response.data, 'binary').toString('base64')
+                                        }
+                                    }
+                                });
+                            })
                         })
-                    })
-            },
-            error => {
-                console.log(error)
-            })
+                },
+                error => {
+                    console.log(error)
+                })
     }
 
     handleEvaluation(id: number, forLike: boolean) {
@@ -176,6 +180,6 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 }
 
-export {PreviewContextEnum};
+export {RecordPreviewContext};
 export type {IRecord};
 export default withRouter(RecordPreview);

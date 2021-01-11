@@ -6,8 +6,8 @@ import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 
 public interface ISearchService {
-    LazyContentPage<UserDataPreviewResponse> findPopularPublishers(String prefix, Pageable publisherPageable,
-                                                                   long userId, int numPreviewImgs);
+    LazyContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable publisherPageable,
+                                                                      long userId, int numPreviewImgs);
 
     LazyContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId);
 }

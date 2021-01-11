@@ -53,7 +53,7 @@ public class SearchCtrl {
                                                                    Principal principal) {
         long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE);
-        return searchService.findPopularPublishers(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
+        return searchService.findPublishersWithPrefix(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
     //feature-idea: add record_statistics entity to avoid querying stats every time

@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class UserDataPreviewResponse {
-    private String publisherName;
+    private String publisher;
 
     private int followers;
 

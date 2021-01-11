@@ -6,8 +6,9 @@ import store from "store"
 import {BrowserRouter, Route, Switch, withRouter} from "react-router-dom";
 import Publishers from "./Publishers";
 import PostRecord from "./PostRecord";
-import RecordPreview, {PreviewContextEnum} from "../RecordsPreview";
+import RecordPreview, {RecordPreviewContext} from "../RecordsPreview";
 import {searchModes} from "./Search";
+import PublishersPreview, {PublisherPreviewContext} from "../PublishersPreview";
 
 interface IAuthProps {
     username: string,
@@ -38,14 +39,14 @@ class CMSMain extends React.Component<any, any> {
                             <PostRecord {...authData}/>
                         </Route>
                         <Route exact path={"/profile"}>
-                            <RecordPreview {...{...authData, previewContext: PreviewContextEnum.PUBLISHER_RECORDS}}/>
+                            <RecordPreview {...{...authData, previewContext: RecordPreviewContext.PUBLISHER_RECORDS}}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[0]}`}>
-                            <RecordPreview {...{...authData, previewContext: PreviewContextEnum.SEARCH}}/>
+                            <RecordPreview {...{...authData, previewContext: RecordPreviewContext.SEARCH}}/>
                         </Route>
-                        {/*<Route exact path={`/search?mode=${searchModes[1]}&query=:query`}>*/}
-                        {/*    <PublishersPreview {...authData}/>*/}
-                        {/*</Route>*/}
+                        <Route exact path={`/search/${searchModes[1]}`}>
+                            <PublishersPreview {...{...authData, previewContext: PublisherPreviewContext.SEARCH}}/>
+                        </Route>
                     </Switch>
                     <Footer/>
                 </BrowserRouter>

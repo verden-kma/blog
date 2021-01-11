@@ -1,6 +1,5 @@
 package edu.ukma.blog.repositories;
 
-
 import edu.ukma.blog.repositories.projections.record.MultiRecordEvalView;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;

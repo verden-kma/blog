@@ -102,7 +102,7 @@ public class UserService implements IUserService {
         long userId = getUserIdByUsername(user);
 
         UserDataPreviewResponse preview = new UserDataPreviewResponse();
-        preview.setPublisherName(publisher);
+        preview.setPublisher(publisher);
         preview.setFollowed(followersRepo.existsById(new FollowerId(publisherId, userId)));
         Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
         preview.setLastRecords(recordsRepo.findById_PublisherId(publisherId, pageable)
