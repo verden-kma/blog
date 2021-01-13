@@ -18,9 +18,6 @@ class RecordCard extends React.Component<ICardProps, any> {
 
 
     render() {
-        console.log("reaction: ")
-        console.log(this.props.reaction)
-
         const activeStyle = {"font-weight": "bold"};
         const ls = (this.props.reaction !== null && this.props.reaction) ? activeStyle : {};
         const dls = (this.props.reaction !== null && !this.props.reaction) ? activeStyle : {};

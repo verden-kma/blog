@@ -5,7 +5,7 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
 
 interface IProps extends IAuthProps, RouteComponentProps<any> {
-    previewContext: number
+    previewContext: PublisherPreviewContext
 }
 
 interface IState {
@@ -23,10 +23,10 @@ interface IPublisher {
     lastRecords: Array<number>
 }
 
-const PublisherPreviewContext = Object.freeze({
-    SEARCH: 1,
-    RECOMMENDATION: 2
-});
+enum PublisherPreviewContext {
+    SEARCH,
+    RECOMMENDATION
+}
 
 class PublishersPreview extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -52,9 +52,32 @@ class PublishersPreview extends React.Component<IProps, IState> {
         return "/404"; // mock
     }
 
-    handleFollow() {
-        alert("to be implemented")
-        // todo: implement
+    handleFollow(publisher: string) {
+        const p = this.state.publisherJsons.find((p: IPublisher) => p.publisher === publisher);
+        if (p === undefined) {
+            console.log("publisher in follow target is undefined")
+            return;
+        }
+
+        axios(
+            {
+                method: p.isFollowed ? "delete" : "put",
+                url: `http://localhost:8080/users/${publisher}/followers`,
+                headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            }
+        ).then(success => {
+            console.log("follow resp");
+            console.log(success);
+            let updPubl: IPublisher = {...p};
+            p.isFollowed ? updPubl.followers-- : updPubl.followers++;
+            updPubl.isFollowed = !p.isFollowed;
+            this.setState(oldState => {
+                return {
+                    ...oldState,
+                    publisherJsons: [...oldState.publisherJsons.filter(p => p.publisher !== publisher), updPubl]
+                }
+            });
+        }, error => console.log(error));
     }
 
     componentDidMount() {
@@ -142,9 +165,6 @@ class PublishersPreview extends React.Component<IProps, IState> {
                            lastRecords={this.state.previewRecordImgs[pd.publisher]}
                            followCallback={this.handleFollow}/>
         )
-        console.log("publisherCards&state")
-        console.log(publisherCards)
-        console.log(this.state)
         return (<div>
             publisherCards...
             <br/>

@@ -4,11 +4,11 @@ import Footer from "./Footer";
 import Digest from "../digest/Digest";
 import store from "store"
 import {BrowserRouter, Route, Switch, withRouter} from "react-router-dom";
-import Publishers from "./Publishers";
 import PostRecord from "./PostRecord";
 import RecordPreview, {RecordPreviewContext} from "../RecordsPreview";
 import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../PublishersPreview";
+import FullRecordView from "../record_page/FullRecordView";
 
 interface IAuthProps {
     username: string,
@@ -33,7 +33,10 @@ class CMSMain extends React.Component<any, any> {
                             <Digest {...authData} />
                         </Route>
                         <Route exact path={"/publishers"}>
-                            <Publishers/>
+                            recommended publishers are to be implemented
+                        </Route>
+                        <Route exact path={"/records"}>
+                            recommended records are to be implemented
                         </Route>
                         <Route exact path={"/post-record"}>
                             <PostRecord {...authData}/>
@@ -46,6 +49,9 @@ class CMSMain extends React.Component<any, any> {
                         </Route>
                         <Route exact path={`/search/${searchModes[1]}`}>
                             <PublishersPreview {...{...authData, previewContext: PublisherPreviewContext.SEARCH}}/>
+                        </Route>
+                        <Route exact path={"/users/:publisher/records/:recordId"}>
+                            <FullRecordView {...{...authData}}/>
                         </Route>
                     </Switch>
                     <Footer/>

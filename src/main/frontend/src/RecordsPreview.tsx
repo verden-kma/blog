@@ -6,7 +6,7 @@ import RecordCard from "./main/RecordCard";
 import ReactPaginate from 'react-paginate';
 
 interface IProps extends RouteComponentProps<any>, IAuthProps {
-    previewContext: number
+    previewContext: RecordPreviewContext
 }
 
 interface IState {
@@ -30,11 +30,12 @@ interface IRecord {
     numOfComments: number
 }
 
-const RecordPreviewContext = Object.freeze({
-    PUBLISHER_RECORDS: 1,
-    SEARCH: 2,
-    RECOMMENDATION: 3
-});
+
+enum RecordPreviewContext {
+    PUBLISHER_RECORDS,
+    SEARCH,
+    RECOMMENDATION
+}
 
 class RecordPreview extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -67,7 +68,6 @@ class RecordPreview extends React.Component<IProps, IState> {
         const url = this.getUrl();
         axios.get(url, {headers: {'Authorization': `${this.props.authType} ${this.props.token}`}})
             .then(success => {
-                    console.log(success.data)
                     this.setState((oldState: IState) => {
                         return {
                             ...oldState,
@@ -110,14 +110,14 @@ class RecordPreview extends React.Component<IProps, IState> {
             console.log("record to like is undefined, id = " + id)
             return;
         }
-        let updRecord = {...record};
+        let updRecord: IRecord = {...record};
         if (record.reaction !== null && ((forLike && record.reaction) || (!forLike && !record.reaction))) { // remove target eval
             axios.delete(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "likers" : "dislikers"}`, {
                 headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
             }).then(success => {
                 forLike ? updRecord.likes-- : updRecord.dislikes--;
                 updRecord.reaction = null;
-                this.setState((oldState) => {
+                this.setState(oldState => {
                     return {
                         ...oldState,
                         recordJsons: [...oldState.recordJsons.filter(rec => rec.id !== record.id), updRecord]
