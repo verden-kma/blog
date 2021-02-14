@@ -1,7 +1,7 @@
 import React from "react";
 import axios from 'axios'
 import Thumbnail from "./Thumbnail";
-import {IAuthProps} from "../main/CMSMain";
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 
 interface IState {
     records: Array<IMiniRecord>
@@ -22,7 +22,6 @@ class Digest extends React.Component<IAuthProps, IState> {
     }
 
     componentDidMount() {
-        console.log("digest mounted")
         axios.get('http://localhost:8080/digest?page=0', {
             headers: {
                 'Authorization': `${this.props.authType} ${this.props.token}`
@@ -37,7 +36,7 @@ class Digest extends React.Component<IAuthProps, IState> {
     render() {
         const thumbnails = this.state.records.map(record =>
             <Thumbnail
-                key={record.publisher + record.recordOwnId}
+                key={record.publisher + "-" + record.recordOwnId}
                 auth={this.props}
                 data={record}/>
         )

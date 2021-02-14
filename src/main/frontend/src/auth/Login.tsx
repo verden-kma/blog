@@ -35,7 +35,10 @@ class Login extends React.Component<any, IState> {
             store.set('username', this.state.username)
             store.set('authType', response.data.authType)
             store.set('token', response.data.token)
-            this.props.history.push('/');
+            store.set('isAuthorized', true);
+
+            let {from} = this.props.location.state || {from: {pathname: "/"}};
+            this.props.history.replace(from);
         }, (error) => {
             alert("wrong credentials " + (error.response && error.response.status))
         })
@@ -61,6 +64,7 @@ class Login extends React.Component<any, IState> {
                            value={this.state.password}
                            placeholder={"password"}
                            onChange={this.handleChange}/>
+                    <br/>
                     <button>Log in</button>
                 </form>
             </div>
@@ -68,4 +72,13 @@ class Login extends React.Component<any, IState> {
     }
 }
 
+const handleLogOut = () => {
+    store.remove('username');
+    store.remove('authType');
+    store.remove('token');
+    store.remove('isAuthorized');
+    console.log("handle logout")
+}
+
+export {handleLogOut};
 export default withRouter(Login);

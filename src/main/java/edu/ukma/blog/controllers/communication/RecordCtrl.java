@@ -6,6 +6,7 @@ import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.models.composite_id.RecordId;
+import edu.ukma.blog.models.record.MinResponseRecord;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.record.RequestRecord;
 import edu.ukma.blog.models.record.ResponseRecord;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 @RestController
@@ -79,6 +81,11 @@ public class RecordCtrl {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
+    }
+
+    @GetMapping(path = "/short")
+    public List<MinResponseRecord> getRecordsMin(@RequestParam String publisher, @RequestParam List<Integer> rids) {
+        return recordService.getSelectedMinResponse(publisher, rids);
     }
 
     // used (for target view)

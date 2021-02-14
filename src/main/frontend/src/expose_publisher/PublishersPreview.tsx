@@ -1,10 +1,12 @@
 import React from "react"
-import {IAuthProps} from "./main/CMSMain";
-import axios from "axios";
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import axios, {AxiosResponse} from "axios";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
+import {IMiniRecord} from "../digest/Digest";
 
-interface IProps extends IAuthProps, RouteComponentProps<any> {
+interface IProps extends RouteComponentProps<any> {
+    auth: IAuthProps,
     previewContext: PublisherPreviewContext
 }
 
@@ -12,7 +14,7 @@ interface IState {
     publisherJsons: Array<IPublisher>,
     publisherAvas: { [publisher: string]: string },
     publisherBanners: { [publisher: string]: string },
-    previewRecordImgs: { [publisher: string]: Array<{ id: number, img: string }> }
+    previewRecordCores: { [publisher: string]: Array<IMiniRecord> }
 }
 
 interface IPublisher {
@@ -35,7 +37,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
             publisherJsons: [],
             publisherAvas: {},
             publisherBanners: {},
-            previewRecordImgs: {}
+            previewRecordCores: {}
         }
         this.getUrl = this.getUrl.bind(this);
         this.handleFollow = this.handleFollow.bind(this);
@@ -63,7 +65,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
             {
                 method: p.isFollowed ? "delete" : "put",
                 url: `http://localhost:8080/users/${publisher}/followers`,
-                headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
             }
         ).then(success => {
             console.log("follow resp");
@@ -83,7 +85,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
     componentDidMount() {
         const url = this.getUrl();
 
-        axios.get(url, {headers: {'Authorization': `${this.props.authType} ${this.props.token}`}})
+        axios.get(url, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
             .then(success => {
                 console.log(success);
                 this.setState((oldState) => {
@@ -93,7 +95,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
                 success.data.pageItems.forEach((pd: IPublisher) => {
                     axios.get(`http://localhost:8080/users/${pd.publisher}/avatar`, {
                         responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
                     }).then(success => {
                         if (success.data.byteLength) {
                             this.setState((oldState) => {
@@ -110,7 +112,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
 
                     axios.get(`http://localhost:8080/users/${pd.publisher}/top-banner`, {
                         responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
                     }).then(success => {
                         if (success.data.byteLength) {
                             this.setState((oldState) => {
@@ -125,49 +127,41 @@ class PublishersPreview extends React.Component<IProps, IState> {
                         }
                     }, error => console.log(error))
 
-                    pd.lastRecords.forEach((recId: number) => {
-                        axios.get(`http://localhost:8080/users/${pd.publisher}/records/${recId}/image-icon`, {
-                            responseType: 'arraybuffer',
-                            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
-                        }).then(success => {
-                            console.log("icon")
-                            console.log(success)
-                            this.setState((oldState) => {
-                                let updImgs = oldState.previewRecordImgs[pd.publisher]
-                                    ? [...oldState.previewRecordImgs[pd.publisher]] : [];
-                                updImgs.push({
-                                    id: recId,
-                                    img: Buffer.from(success.data, 'binary').toString('base64')
-                                });
-
-                                return {
-                                    ...oldState,
-                                    previewRecordImgs: {
-                                        ...oldState.previewRecordImgs,
-                                        [pd.publisher]: updImgs
-                                    }
+                    axios.get(`http://localhost:8080/users/${pd.publisher}/records/short`, {
+                        params: {
+                            publisher: pd.publisher,
+                            rids: pd.lastRecords
+                        },
+                        responseType: 'arraybuffer',
+                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                    }).then((success: AxiosResponse<Array<IMiniRecord>>) => {
+                        this.setState((oldState) => {
+                            return {
+                                ...oldState,
+                                previewRecordCores: {
+                                    ...oldState.previewRecordCores,
+                                    [pd.publisher]: success.data
                                 }
-                            })
-                        }, error => console.log(error));
-                    })
+                            }
+                        })
+                    }, error => console.log(error));
                 })
             }, error => console.log(error));
     }
 
     render() {
         const publisherCards = this.state.publisherJsons.map((pd: IPublisher) =>
-            <PublisherCard publisher={pd.publisher}
+            <PublisherCard auth={this.props.auth}
+                           publisher={pd.publisher}
                            publisherAva={this.state.publisherAvas[pd.publisher]}
                            publisherBanner={this.state.publisherBanners[pd.publisher]}
                            followers={pd.followers}
                            uploads={pd.uploads}
                            isFollowed={pd.isFollowed}
-                           lastRecords={this.state.previewRecordImgs[pd.publisher]}
+                           lastRecords={this.state.previewRecordCores[pd.publisher]}
                            followCallback={this.handleFollow}/>
-        )
+        );
         return (<div>
-            publisherCards...
-            <br/>
             {publisherCards}
         </div>);
     }

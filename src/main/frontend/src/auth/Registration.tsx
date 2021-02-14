@@ -17,7 +17,6 @@ class Registration extends React.Component<any, any> {
         this.switchToLogin = this.switchToLogin.bind(this);
     }
 
-
     handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         if (this.state.password !== this.state.passwordConfirm) {

@@ -1,15 +1,18 @@
 import React from 'react';
-import defaultAvatar from "./assets/defaultAvatar.png"
-import {Link} from "react-router-dom";
+import defaultAvatar from "../assets/defaultAvatar.png"
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IMiniRecord} from "../digest/Digest";
+import Thumbnail from "../digest/Thumbnail";
 
 interface IProps {
+    auth: IAuthProps,
     publisher: string,
     publisherAva?: string,
     publisherBanner?: string,
     followers: number,
     uploads: number,
     isFollowed: boolean,
-    lastRecords?: Array<{ id: number, img: string }>,
+    lastRecords?: Array<IMiniRecord>,
 
     followCallback(publisher: string): void
 }
@@ -18,6 +21,10 @@ class PublisherCard extends React.Component<IProps, any> {
     render() {
         const followButtonStyle: Object = this.props.isFollowed ? {fontStyle: "italic"} : {fontWeight: "bold"}
         const ava = this.props.publisherAva ? "data:image/jpeg;base64, " + this.props.publisherAva : defaultAvatar;
+
+        const recordCards = this.state.lastRecords
+            .map((recData: IMiniRecord) => <Thumbnail auth={this.props.auth} data={recData}/>);
+
         return (
             <div>
                 <img src={ava} alt={`${this.props.publisher}-ava`}/>
@@ -25,20 +32,7 @@ class PublisherCard extends React.Component<IProps, any> {
                 {this.props.publisherBanner && <img src={"data:image/jpeg;base64, " + this.props.publisherBanner}
                                                     alt={`${this.props.publisherBanner}-banner`}/>}
                 {this.props.lastRecords && <div>
-                    {this.props.lastRecords[0] &&
-                    <Link to={`/users/${this.props.publisher}/records/${this.props.lastRecords[0].id}`}>
-                        <img src={"data:image/jpeg;base64, " + this.props.lastRecords[0].img} alt={"failed to load"}/>
-                    </Link>}
-                    {this.props.lastRecords[1] &&
-                    <Link to={`/users/${this.props.publisher}/records/${this.props.lastRecords[1].id}`}>
-                        <img src={"data:image/jpeg;base64, " + this.props.lastRecords[1].img} alt={"failed to load"}/>
-                    </Link>
-                    }
-                    {this.props.lastRecords[2] &&
-                    <Link to={`/users/${this.props.publisher}/records/${this.props.lastRecords[2].id}`}>
-                        <img src={"data:image/jpeg;base64, " + this.props.lastRecords[2].img} alt={"failed to load"}/>
-                    </Link>
-                    }
+                    {recordCards}
                 </div>}
                 <div>
                     <h5>Uploads: {this.props.uploads}</h5>

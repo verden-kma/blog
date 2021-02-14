@@ -1,8 +1,8 @@
 import React from "react"
-import {IAuthProps} from "./main/CMSMain";
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import axios from "axios";
-import RecordCard from "./main/RecordCard";
+import RecordCard from "../cms_backbone/RecordCard";
 import ReactPaginate from 'react-paginate';
 
 interface IProps extends RouteComponentProps<any>, IAuthProps {

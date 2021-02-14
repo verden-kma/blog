@@ -1,8 +1,13 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, withRouter} from "react-router-dom";
 import Search from "./Search";
-import {IAuthProps} from "./CMSMain";
+import {IAuthProps} from "./CMSNavbarRouting";
+import {handleLogOut} from "../auth/Login";
+import {RouteComponentProps} from "react-router";
 
+interface IProps extends IAuthProps, RouteComponentProps<any> {
+    loginCallback(): void
+}
 
 interface IState { // todo: query user data
     userAva: string,
@@ -11,10 +16,9 @@ interface IState { // todo: query user data
     description: string
 }
 
-class Header extends React.Component<IAuthProps, IState> {
-    constructor(props: IAuthProps) {
+class Header extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
-
     }
 
     render() {
@@ -33,6 +37,14 @@ class Header extends React.Component<IAuthProps, IState> {
                 <li><Link to={"/post-record"}>{NewRecord()}</Link></li>
                 <br/>
                 <li><Link to={"/profile"}>{Profile()}</Link></li>
+                <br/>
+                <li>
+                    <button onClick={() => {
+                        handleLogOut();
+                        this.props.loginCallback()
+                    }}>log out
+                    </button>
+                </li>
             </ul>
         </div>)
     }
@@ -68,4 +80,4 @@ function Profile() {
     </div>)
 }
 
-export default Header;
+export default withRouter(Header);

@@ -247,4 +247,12 @@ public class RecordService implements IRecordService {
             recordNodesRepo.deleteByPublisherIdAndRecordOwnId(id.getPublisherId(), id.getRecordOwnId());
         });
     }
+
+    @Override
+    public List<MinResponseRecord> getSelectedMinResponse(String publisher, List<Integer> rids) {
+        long pid = userService.getUserIdByUsername(publisher);
+        return recordsRepo.findByIdPublisherIdAndIdRecordOwnIdIn(pid, rids).stream()
+                .map(view -> new MinResponseRecord(publisher, view.getId().getRecordOwnId(), view.getCaption()))
+                .collect(Collectors.toList());
+    }
 }

@@ -38,4 +38,6 @@ public interface IRecordService {
     void editRecord(RecordId id, RequestRecord editRequest);
 
     void removeRecord(RecordId id);
+
+    List<MinResponseRecord> getSelectedMinResponse(String publisher, List<Integer> rids);
 }

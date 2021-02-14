@@ -1,5 +1,6 @@
 import React from "react";
-import {IRecord} from "../RecordsPreview";
+import {IRecord} from "../expose_record/RecordsPreview";
+import {monthNames} from "./CMSNavbarRouting";
 
 interface ICardProps extends IRecord {
     image: string,
@@ -7,15 +8,10 @@ interface ICardProps extends IRecord {
     handleEvaluation(id: number, forLike: boolean): void
 }
 
-const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-];
-
 class RecordCard extends React.Component<ICardProps, any> {
     constructor(props: ICardProps) {
         super(props);
     }
-
 
     render() {
         const activeStyle = {"font-weight": "bold"};
@@ -40,7 +36,6 @@ class RecordCard extends React.Component<ICardProps, any> {
             <h6>Comments: {this.props.numOfComments}</h6>
         </div>)
     }
-
 
 }
 

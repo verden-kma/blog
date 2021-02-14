@@ -3,12 +3,12 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Digest from "../digest/Digest";
 import store from "store"
-import {BrowserRouter, Route, Switch, withRouter} from "react-router-dom";
+import {BrowserRouter, Redirect, Route, Switch, withRouter} from "react-router-dom";
 import PostRecord from "./PostRecord";
-import RecordPreview, {RecordPreviewContext} from "../RecordsPreview";
+import RecordPreview, {RecordPreviewContext} from "../expose_record/RecordsPreview";
 import {searchModes} from "./Search";
-import PublishersPreview, {PublisherPreviewContext} from "../PublishersPreview";
-import FullRecordView from "../record_page/FullRecordView";
+import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
+import FullRecordView from "../expose_record/record_page/FullRecordView";
 
 interface IAuthProps {
     username: string,
@@ -16,9 +16,17 @@ interface IAuthProps {
     token: string
 }
 
-class CMSMain extends React.Component<any, any> {
+const JUST_NOW: string = "just now";
+
+class CMSNavbarRouting extends React.Component<any, any> {
+    constructor(props: any) {
+        super(props);
+    }
 
     render() {
+        if (!store.get("isAuthorized")) {
+            return <Redirect to={"/login"}/>
+        }
         const authData = {
             username: store.get("username"),
             authType: store.get("authType"),
@@ -27,7 +35,7 @@ class CMSMain extends React.Component<any, any> {
         return (
             <div>
                 <BrowserRouter>
-                    <Header {...authData}/>
+                    <Header {...authData} loginCallback={() => this.forceUpdate()}/>
                     <Switch>
                         <Route exact path={"/digest"}>
                             <Digest {...authData} />
@@ -48,7 +56,7 @@ class CMSMain extends React.Component<any, any> {
                             <RecordPreview {...{...authData, previewContext: RecordPreviewContext.SEARCH}}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[1]}`}>
-                            <PublishersPreview {...{...authData, previewContext: PublisherPreviewContext.SEARCH}}/>
+                            <PublishersPreview {...{auth: authData, previewContext: PublisherPreviewContext.SEARCH}}/>
                         </Route>
                         <Route exact path={"/users/:publisher/records/:recordId"}>
                             <FullRecordView {...{...authData}}/>
@@ -62,5 +70,12 @@ class CMSMain extends React.Component<any, any> {
 
 }
 
+
+const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+];
+
+export {JUST_NOW};
 export type {IAuthProps};
-export default withRouter(CMSMain);
+export {monthNames};
+export default withRouter(CMSNavbarRouting);

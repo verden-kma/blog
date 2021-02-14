@@ -51,4 +51,6 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
     Slice<MinRecordView> findAllBy(Pageable pageable);
 
     Slice<RecordEntity> findByCaptionContains(@NotEmpty String caption, Pageable pageable);
+
+    List<MinRecordView> findByIdPublisherIdAndIdRecordOwnIdIn(long pid, List<Integer> rids);
 }
