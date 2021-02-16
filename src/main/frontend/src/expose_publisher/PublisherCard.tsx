@@ -37,10 +37,10 @@ class PublisherCard extends React.Component<IProps, any> {
                     <h5>Uploads: {this.props.uploads}</h5>
                     <h5>Followers: {this.props.followers}</h5>
                 </div>
-                <button style={followButtonStyle}
-                        onClick={this.props.followCallback.bind(this, this.props.publisher)}>
+                {this.props.auth.username !== this.props.publisher && <button style={followButtonStyle}
+                                                                              onClick={this.props.followCallback.bind(this, this.props.publisher)}>
                     {this.props.isFollowed ? "Unfollow" : "Follow"}
-                </button>
+                </button>}
             </div>
         );
     }

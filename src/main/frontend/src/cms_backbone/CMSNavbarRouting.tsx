@@ -16,8 +16,6 @@ interface IAuthProps {
     token: string
 }
 
-const JUST_NOW: string = "just now";
-
 class CMSNavbarRouting extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
@@ -78,7 +76,6 @@ const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
 
-export {JUST_NOW};
 export type {IAuthProps};
 export {monthNames};
 export default withRouter(CMSNavbarRouting);

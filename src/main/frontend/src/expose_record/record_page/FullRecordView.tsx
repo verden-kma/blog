@@ -1,5 +1,5 @@
 import React from 'react';
-import {IAuthProps, JUST_NOW, monthNames} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import {IRecord} from "../RecordsPreview";
@@ -65,7 +65,8 @@ class FullRecordView extends React.Component<IProps, IState> {
 
     }
 
-    sendComment() {
+    sendComment(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
         const {publisher, recordId} = this.props.match.params;
         axios.post(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
             commenter: this.props.auth.username,
@@ -73,16 +74,16 @@ class FullRecordView extends React.Component<IProps, IState> {
         }, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
             .then(success => {
                 this.setState((oldState: IState) => {
-                    let topComments: Array<IComment> | undefined = oldState.comments.get(0);
-                    if (topComments === undefined) topComments = [];
+                    let topComments: Array<IComment> = oldState.comments.get(0) || [];
                     let updTopComments: Array<IComment> = [...topComments];
                     let newComment = {
                         commentId: success.data,
                         commentator: this.props.auth.username,
                         text: oldState.newCommentText,
-                        timestamp: JUST_NOW
+                        timestamp: new Date().toUTCString()
                     };
-                    // if (has ava) {
+                    // todo:
+                    // if (commenter has ava) {
                     //     set ava
                     // }
                     updTopComments.unshift(newComment) // add ava
@@ -90,10 +91,12 @@ class FullRecordView extends React.Component<IProps, IState> {
                     updMap.set(0, updTopComments);
                     return {
                         ...oldState,
+                        newCommentText: "",
                         comments: updMap
                     }
-                })
+                });
             }, error => console.log(error));
+
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -132,22 +135,17 @@ class FullRecordView extends React.Component<IProps, IState> {
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
-                const initialComments: Array<IComment> = success.data.pageItems.map((comment: IComment) => {
+                let initialComments: Array<IComment> = success.data.pageItems;
+
+                success.data.pageItems.forEach((comment: IComment, index: number) => {
                     axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
                         responseType: 'arraybuffer',
                         headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
                     }).then(success => {
-                        // todo: avatar might be absent and it is not an error
-                        return {
-                            ...comment,
-                            commentatorAva: Buffer.from(success.data, 'binary').toString('base64')
-                        }
+                        if (success.data !== null)
+                            initialComments[index].commenterAva = Buffer.from(success.data, 'binary').toString('base64');
                     }, error => {
-                        {
-                            return <Comment key={comment.commentId} {...{
-                                ...comment
-                            }} />
-                        }
+                        console.log(error);
                     });
                 });
 
@@ -170,7 +168,9 @@ class FullRecordView extends React.Component<IProps, IState> {
         const dls = (this.state.recordJson.reaction !== null && !this.state.recordJson.reaction) ? activeStyle : {};
 
         let comments: Array<Comment> = []
-        for (let i = 0; i < this.state.currCommentPage; i++) {
+        console.log("this.state");
+        console.log(this.state);
+        for (let i = 0; i <= this.state.currCommentPage; i++) {
             if (this.state.comments.get(i) === undefined) {
                 console.log("failed to load comments block");
                 continue;
@@ -194,7 +194,6 @@ class FullRecordView extends React.Component<IProps, IState> {
                 <p>{this.state.recordJson.adText}</p>
                 <hr/>
                 <div>
-                    {/*// maybe buggy bind*/}
                     <button style={ls}
                             onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
                     </button>

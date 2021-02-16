@@ -10,7 +10,7 @@ function Comment(props: IComment) {
         <img src={ava} alt={`${props.commentator}-ava`}/>
         <span>{props.commentator}</span>
         <span>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</span>
-        <p>props.text</p>
+        <p>{props.text}</p>
     </div>)
 }
 
