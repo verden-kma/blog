@@ -84,7 +84,7 @@ public class RecordCtrl {
     }
 
     @GetMapping(path = "/short")
-    public List<MinResponseRecord> getRecordsMin(@RequestParam String publisher, @RequestParam List<Integer> rids) {
+    public List<MinResponseRecord> getRecordsMin(@PathVariable String publisher, @RequestParam List<Integer> rids) {
         return recordService.getSelectedMinResponse(publisher, rids);
     }
 

@@ -50,16 +50,19 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <PostRecord {...authData}/>
                         </Route>
                         <Route exact path={"/profile"}>
-                            <RecordPreview {...{...authData, previewContext: RecordPreviewContext.PUBLISHER_RECORDS}}/>
+                            <RecordPreview {...{
+                                auth: authData,
+                                previewContext: RecordPreviewContext.PUBLISHER_RECORDS
+                            }}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[0]}`}>
-                            <RecordPreview {...{...authData, previewContext: RecordPreviewContext.SEARCH}}/>
+                            <RecordPreview {...{auth: authData, previewContext: RecordPreviewContext.SEARCH}}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[1]}`}>
                             <PublishersPreview {...{auth: authData, previewContext: PublisherPreviewContext.SEARCH}}/>
                         </Route>
                         <Route exact path={"/users/:publisher/records/:recordId"}>
-                            <FullRecordView {...{...authData}}/>
+                            <FullRecordView {...{auth: authData}}/>
                         </Route>
                     </Switch>
                     <Footer/>

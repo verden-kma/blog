@@ -126,13 +126,10 @@ class PublishersPreview extends React.Component<IProps, IState> {
                             });
                         }
                     }, error => console.log(error))
-
                     axios.get(`http://localhost:8080/users/${pd.publisher}/records/short`, {
                         params: {
-                            publisher: pd.publisher,
-                            rids: pd.lastRecords
+                            rids: pd.lastRecords.join(",")
                         },
-                        responseType: 'arraybuffer',
                         headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
                     }).then((success: AxiosResponse<Array<IMiniRecord>>) => {
                         this.setState((oldState) => {

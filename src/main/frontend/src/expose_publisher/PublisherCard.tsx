@@ -21,8 +21,7 @@ class PublisherCard extends React.Component<IProps, any> {
     render() {
         const followButtonStyle: Object = this.props.isFollowed ? {fontStyle: "italic"} : {fontWeight: "bold"}
         const ava = this.props.publisherAva ? "data:image/jpeg;base64, " + this.props.publisherAva : defaultAvatar;
-
-        const recordCards = this.state.lastRecords
+        const recordCards = this.props.lastRecords === undefined ? [] : this.props.lastRecords
             .map((recData: IMiniRecord) => <Thumbnail auth={this.props.auth} data={recData}/>);
 
         return (

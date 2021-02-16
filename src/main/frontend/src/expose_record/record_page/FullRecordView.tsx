@@ -4,8 +4,10 @@ import {RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import {IRecord} from "../RecordsPreview";
 import Comment from "./Comment";
+import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 
-interface IProps extends IAuthProps, RouteComponentProps<any> {
+interface IProps extends RouteComponentProps<any> {
+    auth: IAuthProps
 }
 
 interface IState {
@@ -33,7 +35,7 @@ class FullRecordView extends React.Component<IProps, IState> {
             image: undefined,
             comments: new Map(),
             currCommentPage: 0,
-            hasMorePages: true,
+            hasMorePages: false,
             newCommentText: ""
         }
         this.handleEvaluation = this.handleEvaluation.bind(this);
@@ -42,8 +44,21 @@ class FullRecordView extends React.Component<IProps, IState> {
         this.sendComment = this.sendComment.bind(this);
     }
 
-    handleEvaluation() {
+    handleEvaluation(forLike: boolean) {
+        if (this.state.recordJson === undefined) {
+            console.log("record json data has not yet been loaded");
+            return;
+        }
+        const handleStateUpdate = (updRec: IRecord) => {
+            this.setState((oldState) => {
+                return {
+                    ...oldState,
+                    recordJson: updRec
+                }
+            })
+        };
 
+        genericHandleEvaluation(this.state.recordJson, forLike, this.props.auth, handleStateUpdate)
     }
 
     loadMoreComments() {
@@ -53,9 +68,9 @@ class FullRecordView extends React.Component<IProps, IState> {
     sendComment() {
         const {publisher, recordId} = this.props.match.params;
         axios.post(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
-            commenter: this.props.username,
+            commenter: this.props.auth.username,
             text: this.state.newCommentText
-        }, {headers: {'Authorization': `${this.props.authType} ${this.props.token}`}})
+        }, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
             .then(success => {
                 this.setState((oldState: IState) => {
                     let topComments: Array<IComment> | undefined = oldState.comments.get(0);
@@ -63,7 +78,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                     let updTopComments: Array<IComment> = [...topComments];
                     let newComment = {
                         commentId: success.data,
-                        commentator: this.props.username,
+                        commentator: this.props.auth.username,
                         text: oldState.newCommentText,
                         timestamp: JUST_NOW
                     };
@@ -91,7 +106,7 @@ class FullRecordView extends React.Component<IProps, IState> {
     componentDidMount() {
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}`, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -103,7 +118,7 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/image`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -114,13 +129,13 @@ class FullRecordView extends React.Component<IProps, IState> {
         }, error => console.log(error));
 
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/comments?block=0`, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 const initialComments: Array<IComment> = success.data.pageItems.map((comment: IComment) => {
                     axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
                         responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
                     }).then(success => {
                         // todo: avatar might be absent and it is not an error
                         return {
@@ -181,10 +196,10 @@ class FullRecordView extends React.Component<IProps, IState> {
                 <div>
                     {/*// maybe buggy bind*/}
                     <button style={ls}
-                            onClick={this.handleEvaluation.bind(this, this.state.recordJson.id, true)}>Like {this.state.recordJson.likes}
+                            onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
                     </button>
                     <button style={dls}
-                            onClick={this.handleEvaluation.bind(this, this.state.recordJson.id, false)}>Dislike {this.state.recordJson.dislikes}
+                            onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
                     </button>
                 </div>
                 <h6>Comments: {this.state.recordJson.numOfComments}</h6>

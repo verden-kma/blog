@@ -4,8 +4,10 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import axios from "axios";
 import RecordCard from "../cms_backbone/RecordCard";
 import ReactPaginate from 'react-paginate';
+import genericHandleEvaluation from "../utils/GenericHandleEvaluation";
 
-interface IProps extends RouteComponentProps<any>, IAuthProps {
+interface IProps extends RouteComponentProps<any> {
+    auth: IAuthProps,
     previewContext: RecordPreviewContext
 }
 
@@ -52,7 +54,7 @@ class RecordPreview extends React.Component<IProps, IState> {
 
     getUrl(): string {
         if (this.props.previewContext === RecordPreviewContext.PUBLISHER_RECORDS) {
-            return `http://localhost:8080/users/${this.props.username}/records?page=${this.state.currPage}`;
+            return `http://localhost:8080/users/${this.props.auth.username}/records?page=${this.state.currPage}`;
         }
         if (this.props.previewContext === RecordPreviewContext.SEARCH) {
             const paramValue = new URLSearchParams(this.props.location.search).get("query");
@@ -66,7 +68,7 @@ class RecordPreview extends React.Component<IProps, IState> {
 
     componentDidMount() {
         const url = this.getUrl();
-        axios.get(url, {headers: {'Authorization': `${this.props.authType} ${this.props.token}`}})
+        axios.get(url, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
             .then(success => {
                     this.setState((oldState: IState) => {
                         return {
@@ -80,11 +82,11 @@ class RecordPreview extends React.Component<IProps, IState> {
                     // (should work as IDs are different)
                     this.state.recordJsons.filter(({id}: IRecord) => this.state.recordImgs[id] === undefined)
                         .forEach(({id}: IRecord) => {
-                            axios.get(`http://localhost:8080/users/${this.props.username}/records/${id}/image-min`,
+                            axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${id}/image-min`,
                                 {
                                     responseType: 'arraybuffer',
                                     headers: {
-                                        'Authorization': `${this.props.authType} ${this.props.token}`
+                                        'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
                                     }
                                 }).then(response => {
                                 this.setState((oldState: IState) => {
@@ -105,52 +107,71 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
     handleEvaluation(id: number, forLike: boolean) {
+
         const record = this.state.recordJsons.find((rec: IRecord) => rec.id === id);
         if (record === undefined) {
             console.log("record to like is undefined, id = " + id)
             return;
         }
-        let updRecord: IRecord = {...record};
-        if (record.reaction !== null && ((forLike && record.reaction) || (!forLike && !record.reaction))) { // remove target eval
-            axios.delete(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "likers" : "dislikers"}`, {
-                headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
-            }).then(success => {
-                forLike ? updRecord.likes-- : updRecord.dislikes--;
-                updRecord.reaction = null;
-                this.setState(oldState => {
-                    return {
-                        ...oldState,
-                        recordJsons: [...oldState.recordJsons.filter(rec => rec.id !== record.id), updRecord]
-                    }
-                })
-                console.log(success);
-            }, error => {
-                console.log(error);
-            })
-            return;
-        }
-        if (record.reaction !== null && ((forLike && !record.reaction) || (!forLike && record.reaction))) { // remove opposite eval
-            axios.delete(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "dislikers" : "likers"}`, {
-                headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
-            }).then(success => {
-                forLike ? updRecord.dislikes-- : updRecord.likes--;
-                console.log(success);
-            }, error => console.log(error))
-        }
 
-        axios.put(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "likers" : "dislikers"}`, {}, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
-        }).then(success => {
-            forLike ? updRecord.likes++ : updRecord.dislikes++;
-            updRecord.reaction = forLike;
-            this.setState((oldState) => {
+        const handleStateUpdate = (updRecord: IRecord) => {
+            this.setState(oldState => {
                 return {
                     ...oldState,
                     recordJsons: [...oldState.recordJsons.filter(rec => rec.id !== record.id), updRecord]
                 }
             })
-            console.log(success)
-        }, error => console.log(error))
+        }
+
+
+        genericHandleEvaluation(record, forLike, this.props.auth, handleStateUpdate);
+
+        // const record = this.state.recordJsons.find((rec: IRecord) => rec.id === id);
+        // if (record === undefined) {
+        //     console.log("record to like is undefined, id = " + id)
+        //     return;
+        // }
+        // let updRecord: IRecord = {...record};
+        // if (record.reaction !== null && ((forLike && record.reaction) || (!forLike && !record.reaction))) { // remove target eval
+        //     axios.delete(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "likers" : "dislikers"}`, {
+        //         headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+        //     }).then(success => {
+        //         forLike ? updRecord.likes-- : updRecord.dislikes--;
+        //         updRecord.reaction = null;
+        //         this.setState(oldState => {
+        //             return {
+        //                 ...oldState,
+        //                 recordJsons: [...oldState.recordJsons.filter(rec => rec.id !== record.id), updRecord]
+        //             }
+        //         })
+        //         console.log(success);
+        //     }, error => {
+        //         console.log(error);
+        //     })
+        //     return;
+        // }
+        // if (record.reaction !== null && ((forLike && !record.reaction) || (!forLike && record.reaction))) { // remove opposite eval
+        //     axios.delete(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "dislikers" : "likers"}`, {
+        //         headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+        //     }).then(success => {
+        //         forLike ? updRecord.dislikes-- : updRecord.likes--;
+        //         console.log(success);
+        //     }, error => console.log(error))
+        // }
+        //
+        // axios.put(`http://localhost:8080/users/${record.publisher}/records/${record.id}/${forLike ? "likers" : "dislikers"}`, {}, {
+        //     headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+        // }).then(success => {
+        //     forLike ? updRecord.likes++ : updRecord.dislikes++;
+        //     updRecord.reaction = forLike;
+        //     this.setState((oldState) => {
+        //         return {
+        //             ...oldState,
+        //             recordJsons: [...oldState.recordJsons.filter(rec => rec.id !== record.id), updRecord]
+        //         }
+        //     })
+        //     console.log(success)
+        // }, error => console.log(error))
     }
 
     render() {
