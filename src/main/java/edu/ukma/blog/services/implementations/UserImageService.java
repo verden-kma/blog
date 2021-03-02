@@ -1,14 +1,15 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.services.IUserImageService;
 import edu.ukma.blog.utils.IconHandler;
 import edu.ukma.blog.utils.VarLenRWayTree;
+import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,36 +19,36 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-import static edu.ukma.blog.PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME;
 import static edu.ukma.blog.constants.ImageConstants.*;
 
 @Service
-public class UserImageService implements IUserImageService {
+@RequiredArgsConstructor
+public class UserImageService implements IUserImageService, InitializingBean {
     private static final String PATH_PREFIX = ImageConstants.PATH_PREFIX + "/account";
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
-    private static final int MIN_USERNAME_LEN;
-    private static final String PATH_TEMPLATE;
+    @Value("${minUsernameLen}")
+    private final int MIN_USERNAME_LEN;
+    @Value("#{T(edu.ukma.blog.services.implementations.UserImageService).buildPath(${minUsernameLen})}")
+    private final String PATH_TEMPLATE;
     private static final String AVATAR_SUFFIX = "-ava." + ImageConstants.TARGET_IMAGE_FORMAT;
     private static final String BANNER_SUFFIX = "-bnr." + ImageConstants.TARGET_IMAGE_FORMAT;
 
-    static {
-        MIN_USERNAME_LEN = ((PropertyAccessor) SpringApplicationContext
-                .getBean(PROPERTY_ACCESSOR_BEAN_NAME))
-                .getMinUsernameLen();
-
+    public static String buildPath(final int MIN_USERNAME_LEN) {
         StringBuilder pathTemplateBuilder = new StringBuilder(3 * MIN_USERNAME_LEN);
         for (int i = 0; i < MIN_USERNAME_LEN; i++)
             pathTemplateBuilder.append("/%c");
-        PATH_TEMPLATE = pathTemplateBuilder.append('/').toString();
-        pathTemplateBuilder.setLength(0);
+        return pathTemplateBuilder.append('/').toString();
+    }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
         if (!IMAGE_ROOT.exists()) {
             IMAGE_ROOT.mkdir();
             VarLenRWayTree.build(MIN_USERNAME_LEN, PATH_TEMPLATE, IMAGE_ROOT);
         }
     }
 
-    private static String buildPathByUsername(String username) {
+    private String buildPathByUsername(String username) {
         Character[] pathArgs = new Character[MIN_USERNAME_LEN];
         for (int i = 0; i < MIN_USERNAME_LEN; i++)
             pathArgs[i] = username.charAt(i);
@@ -127,4 +128,6 @@ public class UserImageService implements IUserImageService {
         File maybeImage = new File(IMAGE_ROOT, buildPathByUsername(username) + BANNER_SUFFIX);
         maybeImage.delete();
     }
+
+
 }

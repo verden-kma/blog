@@ -29,10 +29,6 @@ public class BlogApplication {
         return new BCryptPasswordEncoder();
     }
 
-    public PropertyAccessor getPropertyAccessor() {
-        return new PropertyAccessor();
-    }
-
     @Bean // dev-time configs
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

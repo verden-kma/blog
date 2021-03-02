@@ -26,47 +26,47 @@
     },
     {
       "name": "minUsernameLen",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Users with username shorter than this are not allowed."
     },
     {
       "name": "maxUsernameLen",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Users with username longer than this are not allowed."
     },
     {
       "name": "recordsPerPage",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Defines parameter for user content pagination."
     },
     {
       "name": "evaluatorsPerBlock",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Defines number of evaluators loaded in one block (when user wants to know who liked a specified record.."
     },
     {
       "name": "commentsPerBlock",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "How name comments are displayed in a block."
     },
     {
       "name": "followersPerBlock",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "How many followers are loaded at a time."
     },
     {
       "name": "digestPageSize",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "The number of the most recent records displayed as a digest."
     },
     {
       "name": "searchPageSize",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "The number of records or publishers returned on client's query."
     },
     {
       "name": "recordsPreviewBlock",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Number of record images returned when publisher preview data gets queried."
     },
     {
@@ -76,22 +76,22 @@
     },
     {
       "name": "recordRecommendationSize",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Number of recommended records offered to a client (customer/user)."
     },
     {
       "name": "publisherRecommendationSize",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Number of recommended publishers."
     },
     {
       "name": "recordsDirectoriesDepth",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "Number of directory levels for storing record images."
     },
     {
       "name": "compressionThreshold",
-      "type": "java.lang.String",
+      "type": "java.lang.Integer",
       "description": "If image that is being stored is bigger that this, then a compressed copy of this image is created."
     }
   ]

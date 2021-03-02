@@ -1,10 +1,10 @@
 package edu.ukma.blog.controllers.communication;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.exceptions.user.SelfFollowerException;
 import edu.ukma.blog.services.IFollowerService;
 import edu.ukma.blog.services.IUserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +15,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{publisher}/followers")
+@RequiredArgsConstructor
 public class FollowerCtrl {
-    private static final int FOLLOWERS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getFollowersBlockSize();
+    @Value("${followersPerBlock}")
+    private final int FOLLOWERS_BLOCK_SIZE;
+//            = ((PropertyAccessor) SpringApplicationContext
+//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getFollowersBlockSize();
 
     private final IFollowerService followerService;
 
     private final IUserService userService;
-
-    public FollowerCtrl(IFollowerService followerService, IUserService userService) {
-        this.followerService = followerService;
-        this.userService = userService;
-    }
 
     @GetMapping
     public List<String> getFollowers(@PathVariable @NotEmpty String publisher,

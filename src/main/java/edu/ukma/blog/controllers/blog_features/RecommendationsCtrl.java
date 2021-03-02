@@ -1,8 +1,6 @@
 package edu.ukma.blog.controllers.blog_features;
 
 import com.google.common.collect.BiMap;
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.services.IRecommendService;
@@ -10,6 +8,8 @@ import edu.ukma.blog.services.IUserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,27 +21,20 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/recommendations")
+@RequiredArgsConstructor
 public class RecommendationsCtrl {
-    private static final int PUBLISHERS_RECOM_LIMIT;
-    private static final int RECORDS_RECOM_LIMIT;
-    private static final int RECORDS_PREVIEW_BLOCK;
+    @Value("${recordRecommendationSize}")
+    private final int PUBLISHERS_RECOM_LIMIT;
 
-    static {
-        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
-                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
-        PUBLISHERS_RECOM_LIMIT = pa.getRecordRecommendationSize();
-        RECORDS_RECOM_LIMIT = pa.getPublisherRecommendationSize();
-        RECORDS_PREVIEW_BLOCK = pa.getRecordsPreviewBlock();
-    }
+    @Value("${publisherRecommendationSize}")
+    private final int RECORDS_RECOM_LIMIT;
+
+    @Value("${recordsPreviewBlock}")
+    private final int RECORDS_PREVIEW_BLOCK;
 
     private final IRecommendService recommendService;
 
     private final IUserService userService;
-
-    public RecommendationsCtrl(IRecommendService recommendService, IUserService userService) {
-        this.recommendService = recommendService;
-        this.userService = userService;
-    }
 
     @GetMapping("/subscriptions")
     public List<UserDataPreviewResponse> bySubscriptions(Principal principal) {

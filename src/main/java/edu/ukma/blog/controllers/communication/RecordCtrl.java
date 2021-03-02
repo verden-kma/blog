@@ -1,7 +1,5 @@
 package edu.ukma.blog.controllers.communication;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.record.BlankRecordEditException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
@@ -14,7 +12,9 @@ import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.EagerContentPage;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,21 +37,18 @@ import java.util.function.Function;
 
 @RestController
 @RequestMapping("/users/{publisher}/records")
+@RequiredArgsConstructor
 public class RecordCtrl {
-    private static final int RECORD_PAGE_SIZE = ((PropertyAccessor) SpringApplicationContext
-            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getPageSize();
+    @Value("${recordsPerPage}")
+    private final int RECORD_PAGE_SIZE;
+//            ((PropertyAccessor) SpringApplicationContext
+//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getPageSize();
 
     private final IRecordService recordService;
 
     private final IUserService userService;
 
     private final IRecordImageService recordImageService;
-
-    public RecordCtrl(IRecordService recordService, IUserService userService, IRecordImageService recordImageService) {
-        this.recordService = recordService;
-        this.userService = userService;
-        this.recordImageService = recordImageService;
-    }
 
     @PostMapping
             (
@@ -104,11 +101,10 @@ public class RecordCtrl {
             if (image == null || !image.exists())
                 image = selector.apply(location);
         }
+        if (image == null) throw new ServerCriticalError("No valid file provider passed.");
 
         try (InputStream input = new FileInputStream(image)) {
             return IOUtils.toByteArray(input);
-        } catch (NullPointerException e) {
-            throw new ServerCriticalError("No valid file provider passed.");
         } catch (IOException e) {
             throw new ServerCriticalError(e);
         }

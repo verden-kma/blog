@@ -1,7 +1,5 @@
 package edu.ukma.blog.services.implementations;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
@@ -9,6 +7,9 @@ import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.services.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,34 +29,37 @@ import java.util.Random;
 import static edu.ukma.blog.constants.ImageConstants.*;
 
 @Service
-public class RecordImageService implements IRecordImageService {
+@RequiredArgsConstructor
+public class RecordImageService implements IRecordImageService, InitializingBean {
     // note: maximum number of images that can be stored is ~2^41.
     // It is not enough for 2^63 users, but just fine for debug
     // 3x512 with 8 IMG_ID_LENGTH should be enough
     private static final File IMAGE_ROOT = new File(ImageConstants.PATH_PREFIX + "/records");
-    private static final String PATH_TEMPLATE;
-    private static final int DIR_DEPTH;
-    private static final long COMPRESSION_THRESHOLD;
+    @Value("#{T(edu.ukma.blog.services.implementations.RecordImageService).buildPath(${recordsDirectoriesDepth})}")
+    private final String PATH_TEMPLATE;
+    @Value("${recordsDirectoriesDepth}")
+    private final int DIR_DEPTH;
+    @Value("${compressionThreshold}")
+    private final long COMPRESSION_THRESHOLD;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;
     private static final String COMPRESSED_SUFFIX = "-min." + TARGET_IMAGE_FORMAT;
     private static final String ICON_SUFFIX = "-icon." + TARGET_IMAGE_FORMAT;
 
     private final Random random = new Random();
+    private final IRecordsRepo recordsRepo;
 
-    static {
-        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
-                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
-        COMPRESSION_THRESHOLD = pa.getCompressionThreshold();
-        DIR_DEPTH = pa.getRecordsDirectoriesDepth();
-
+    public static String buildPath(final int DIR_DEPTH) {
         StringBuilder pathBuilder = new StringBuilder(DIR_DEPTH * 3 + 1);
         for (int i = 0; i < DIR_DEPTH; i++) {
             pathBuilder.append("/%d");
         }
         pathBuilder.append('/');
-        PATH_TEMPLATE = pathBuilder.toString();
+        return pathBuilder.toString();
+    }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
         // initialize similar to R-way-tree structure of folders for faster access to files
         // use random to assign images to folders
         if (!IMAGE_ROOT.exists()) {
@@ -64,12 +68,6 @@ public class RecordImageService implements IRecordImageService {
                 for (int j = 0; j < FOLDERS_WIDTH; j++)
                     new File(IMAGE_ROOT, String.format(PATH_TEMPLATE, i, j)).mkdirs();
         }
-    }
-
-    private final IRecordsRepo recordsRepo;
-
-    public RecordImageService(IRecordsRepo recordsRepo) {
-        this.recordsRepo = recordsRepo;
     }
 
     /**

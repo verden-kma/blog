@@ -1,13 +1,13 @@
 package edu.ukma.blog.controllers.blog_features;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.services.ISearchService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,26 +22,17 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/search")
+@RequiredArgsConstructor
 public class SearchCtrl {
-    private static final int SEARCH_PAGE_SIZE;
+    @Value("${searchPageSize}")
+    private final int SEARCH_PAGE_SIZE;
 
-    private static final int RECORDS_PREVIEW_BLOCK_SIZE;
-
-    static {
-        final PropertyAccessor pa = ((PropertyAccessor) SpringApplicationContext
-                .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME));
-        SEARCH_PAGE_SIZE = pa.getSearchPageSize();
-        RECORDS_PREVIEW_BLOCK_SIZE = pa.getRecordsPreviewBlock();
-    }
+    @Value("${recordsPreviewBlock}")
+    private final int RECORDS_PREVIEW_BLOCK_SIZE;
 
     private final ISearchService searchService;
 
     private final IUserService userService;
-
-    public SearchCtrl(ISearchService searchService, IUserService userService) {
-        this.searchService = searchService;
-        this.userService = userService;
-    }
 
     // feature-idea: add prioritizing options
 //    private static final Map<String, String> PRIORITIZING_METHOD = Collections.unmodifiableMap(

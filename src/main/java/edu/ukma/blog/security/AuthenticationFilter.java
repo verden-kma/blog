@@ -22,10 +22,12 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+    private final long EXPIRATION_TIME;
+    private final String TOKEN_SECRET;
+    private final String TOKEN_PREFIX;
 
     private final AuthenticationManager authMng;
     private final ObjectMapper jacksonObjectMapper = new ObjectMapper();
-
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -51,13 +53,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String username = ((User) auth.getPrincipal()).getUsername();
         String token = Jwts.builder()
                 .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, TOKEN_SECRET)
                 .compact();
 
         @Data
         class AuthResp {
-            final String authType = SecurityConstants.TOKEN_PREFIX;
+            final String authType = TOKEN_PREFIX;
             String token;
 
             public AuthResp(String token) {

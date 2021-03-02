@@ -1,7 +1,5 @@
 package edu.ukma.blog.controllers.communication;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.exceptions.comment.NoSuchCommentException;
 import edu.ukma.blog.models.comment.CommentEntity_;
 import edu.ukma.blog.models.comment.RequestComment;
@@ -11,6 +9,8 @@ import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.services.ICommentService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,18 +24,16 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/users/{publisher}/records/{recordId}/comments")
+@RequiredArgsConstructor
 public class CommentCtrl {
-    private static final int COMMENTS_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getCommentBlockSize();
+    @Value("${commentsPerBlock}")
+    private final int COMMENTS_BLOCK_SIZE;
+//            = ((PropertyAccessor) SpringApplicationContext
+//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getCommentBlockSize();
 
     private final ICommentService commentService;
 
     private final IUserService userService;
-
-    public CommentCtrl(ICommentService commentService, IUserService userService) {
-        this.commentService = commentService;
-        this.userService = userService;
-    }
 
     /**
      * stores a comment in database, assigns it to publisher/record/nextComment

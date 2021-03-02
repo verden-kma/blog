@@ -10,10 +10,11 @@ public class VarLenRWayTree {
     /**
      * creates R-way-like structure of directories, with first layer consisting of <code>alphas</code> and
      * the following - <code>radix</code>
-     * @param depth - number of layers in the tree
+     *
+     * @param depth    - number of layers in the tree
      * @param basePath - root directory
      */
-    public static void build(int depth, String pathTemplate, final File basePath) {
+    public static void build(int depth, String pathTemplate, final File basePath) throws SecurityException {
         final Character[] pathArgs = new Character[depth]; // hint to compiler to optimise 'length - 1'
         Arrays.fill(pathArgs, RADIX.charAt(0));
         final int[] pathArgsIndices = new int[depth];

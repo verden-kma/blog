@@ -1,11 +1,11 @@
 package edu.ukma.blog.controllers.communication;
 
-import edu.ukma.blog.PropertyAccessor;
-import edu.ukma.blog.SpringApplicationContext;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.services.IRecordEvalService;
 import edu.ukma.blog.services.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +15,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/users/{publisher}/records/{recordId}")
+@RequiredArgsConstructor
 public class EvaluationCtrl {
     /*
      * user can load page on 2 devices (tabs) [null]
@@ -23,17 +24,14 @@ public class EvaluationCtrl {
      * therefore there are separate put and delete endpoints
      * */
 
-    private static final int EVAL_BLOCK_SIZE = ((PropertyAccessor) SpringApplicationContext
-            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getEvalBlockSize();
+    @Value("${evaluatorsPerBlock}")
+    private final int EVAL_BLOCK_SIZE;
+//            = ((PropertyAccessor) SpringApplicationContext
+//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getEvalBlockSize();
 
     private final IRecordEvalService reactionService;
 
     private final IUserService userService;
-
-    public EvaluationCtrl(IRecordEvalService reactionService, IUserService userService) {
-        this.reactionService = reactionService;
-        this.userService = userService;
-    }
 
     @GetMapping("/likers")
     public LazyContentPage<String> getLikers(@PathVariable @NotEmpty String publisher,

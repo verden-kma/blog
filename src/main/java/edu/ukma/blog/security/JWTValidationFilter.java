@@ -16,8 +16,14 @@ import java.util.Collections;
 
 
 public class JWTValidationFilter extends BasicAuthenticationFilter {
-    public JWTValidationFilter(AuthenticationManager authenticationManager) {
+    private final String TOKEN_PREFIX;
+    private final String TOKEN_SECRET;
+
+    public JWTValidationFilter(final String TOKEN_PREFIX, final String TOKEN_SECRET,
+                               AuthenticationManager authenticationManager) {
         super(authenticationManager);
+        this.TOKEN_PREFIX = TOKEN_PREFIX;
+        this.TOKEN_SECRET = TOKEN_SECRET;
     }
 
     @Override
@@ -25,7 +31,7 @@ public class JWTValidationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader != null && authHeader.startsWith(SecurityConstants.TOKEN_PREFIX)) {
+        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
             UsernamePasswordAuthenticationToken authToken = getAuthToken(authHeader);
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
@@ -33,9 +39,9 @@ public class JWTValidationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthToken(String authHeader) {
-        String token = authHeader.substring(SecurityConstants.TOKEN_PREFIX.length());
+        String token = authHeader.substring(TOKEN_PREFIX.length());
         String user = Jwts.parser()
-                .setSigningKey(SecurityConstants.TOKEN_SECRET)
+                .setSigningKey(TOKEN_SECRET)
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
