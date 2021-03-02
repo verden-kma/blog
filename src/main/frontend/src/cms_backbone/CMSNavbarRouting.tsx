@@ -9,6 +9,7 @@ import RecordPreview, {RecordPreviewContext} from "../expose_record/RecordsPrevi
 import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
+import axios from "axios";
 
 interface IAuthProps {
     username: string,
@@ -19,6 +20,15 @@ interface IAuthProps {
 class CMSNavbarRouting extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
+    }
+
+    componentDidMount() {
+        axios.get(`http://localhost:8080/users/${store.get("username")}/avatar`, {
+            responseType: 'arraybuffer',
+            headers: {'Authorization': `${store.get("authType")} ${store.get("token")}`}
+        }).then(success => {
+            store.set("userAva", Buffer.from(success.data, 'binary').toString('base64'));
+        }, error => console.log(error));
     }
 
     render() {

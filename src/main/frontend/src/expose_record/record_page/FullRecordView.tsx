@@ -2,6 +2,7 @@ import React from 'react';
 import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
+import store from "store"
 import {IRecord} from "../RecordsPreview";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
@@ -76,17 +77,14 @@ class FullRecordView extends React.Component<IProps, IState> {
                 this.setState((oldState: IState) => {
                     let topComments: Array<IComment> = oldState.comments.get(0) || [];
                     let updTopComments: Array<IComment> = [...topComments];
-                    let newComment = {
+                    let newComment: IComment = {
                         commentId: success.data,
                         commentator: this.props.auth.username,
                         text: oldState.newCommentText,
-                        timestamp: new Date().toUTCString()
+                        timestamp: new Date().toUTCString(),
+                        commenterAva: store.get("userAva")
                     };
-                    // todo:
-                    // if (commenter has ava) {
-                    //     set ava
-                    // }
-                    updTopComments.unshift(newComment) // add ava
+                    updTopComments.unshift(newComment);
                     let updMap: Map<number, Array<IComment>> = new Map(oldState.comments);
                     updMap.set(0, updTopComments);
                     return {
@@ -107,6 +105,8 @@ class FullRecordView extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
+        console.log("full record did mount")
+
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}`, {
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
@@ -135,28 +135,36 @@ class FullRecordView extends React.Component<IProps, IState> {
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
-                let initialComments: Array<IComment> = success.data.pageItems;
-
-                success.data.pageItems.forEach((comment: IComment, index: number) => {
-                    axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
-                        responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-                    }).then(success => {
-                        if (success.data !== null)
-                            initialComments[index].commenterAva = Buffer.from(success.data, 'binary').toString('base64');
-                    }, error => {
-                        console.log(error);
-                    });
-                });
-
                 let comments: Map<number, Array<IComment>> = new Map();
-                comments.set(0, initialComments);
+                comments.set(0, success.data.pageItems || []);
                 return {
                     ...oldState,
                     hasMorePages: success.data.isLast,
                     comments: comments
                 }
-            })
+            }, () => {
+                success.data.pageItems.forEach((comment: IComment, index: number) => {
+                    axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
+                        responseType: 'arraybuffer',
+                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                    }).then(success => {
+                        if (success.data !== null) {
+                            this.setState(oldState => {
+                                let comments: Map<number, Array<IComment>> = new Map(oldState.comments);
+                                // @ts-ignore
+                                comments.get(0)[index].commenterAva =
+                                    Buffer.from(success.data, 'binary').toString('base64');
+                                return {
+                                    ...oldState,
+                                    comments: comments
+                                }
+                            })
+                        }
+                    }, error => {
+                        console.log(error);
+                    });
+                });
+            });
         }, error => console.log(error));
     }
 
@@ -168,8 +176,6 @@ class FullRecordView extends React.Component<IProps, IState> {
         const dls = (this.state.recordJson.reaction !== null && !this.state.recordJson.reaction) ? activeStyle : {};
 
         let comments: Array<Comment> = []
-        console.log("this.state");
-        console.log(this.state);
         for (let i = 0; i <= this.state.currCommentPage; i++) {
             if (this.state.comments.get(i) === undefined) {
                 console.log("failed to load comments block");
