@@ -89,8 +89,8 @@ public class UserService implements IUserService {
     @Override
     public UserDataResponse getPublisher(String user, String publisher) {
         UserDataResponse respUser = new UserDataResponse();
-        UserEntity pUser = usersRepo.findByUsername(user);
-        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserIdByUsername(user), getUserIdByUsername(publisher))));
+        UserEntity pUser = usersRepo.findByUsername(publisher);
+        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserIdByUsername(publisher), getUserIdByUsername(user))));
         BeanUtils.copyProperties(pUser, respUser);
         BeanUtils.copyProperties(pUser.getStatistics(), respUser);
         return respUser;

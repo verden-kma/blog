@@ -85,7 +85,7 @@ public class RecordEvalService implements IRecordEvalService {
         Root<Evaluation> root = criteriaDelete.from(Evaluation.class);
         criteriaDelete.where(cb.equal(root.get(Evaluation_.ID), new EvaluatorId(recordId, userId)));
         criteriaDelete.where(cb.equal(root.get(Evaluation_.IS_LIKER), eval));
-        boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1; // if there is a bug and > 1 deleted
+        boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
 
         if (hasDeleted)
             if (eval) publisherStatsRepo.decLikesCount(recordId.getPublisherId());

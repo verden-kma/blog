@@ -1,8 +1,7 @@
 package edu.ukma.blog.models.user.responses;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class UserDataResponse {
@@ -22,7 +21,6 @@ public class UserDataResponse {
 
     private int comments;
 
+    @JsonProperty("isFollowed")
     private boolean isFollowed;
-
-    private List<String> subscriptions;
 }

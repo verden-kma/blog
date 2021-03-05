@@ -34,7 +34,6 @@ public class UserCtrl {
         return userService.getPublisher(principal.getName(), publisher);
     }
 
-    // will it be really used?
     @GetMapping("/{publisher}/short")
     public UserDataPreviewResponse getShortData(@PathVariable @NotEmpty String publisher,
                                                 Principal principal) {

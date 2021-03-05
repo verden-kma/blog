@@ -6,6 +6,7 @@ import store from "store"
 import {IRecord} from "../RecordsPreview";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
+import UserStats from "../../expose_publisher/UserStats";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps
@@ -63,7 +64,7 @@ class FullRecordView extends React.Component<IProps, IState> {
     }
 
     loadMoreComments() {
-
+        alert("not implemented")
     }
 
     sendComment(event: React.FormEvent<HTMLFormElement>) {
@@ -193,19 +194,22 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         return (
             <div>
-                <img width={700} height={300} src={'data:image/jpeg;base64, ' + this.state.image}
-                     alt={this.state.recordJson.caption + "-image"}/>
-                <h3>{this.state.recordJson.caption}</h3>
-                <h5>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</h5>
-                <p>{this.state.recordJson.adText}</p>
-                <hr/>
+                <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
                 <div>
-                    <button style={ls}
-                            onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
-                    </button>
-                    <button style={dls}
-                            onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
-                    </button>
+                    <img width={700} height={300} src={'data:image/jpeg;base64, ' + this.state.image}
+                         alt={this.state.recordJson.caption + "-image"}/>
+                    <h3>{this.state.recordJson.caption}</h3>
+                    <h5>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</h5>
+                    <p>{this.state.recordJson.adText}</p>
+                    <hr/>
+                    <div>
+                        <button style={ls}
+                                onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
+                        </button>
+                        <button style={dls}
+                                onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
+                        </button>
+                    </div>
                 </div>
                 <h6>Comments: {this.state.recordJson.numOfComments}</h6>
                 <br/>

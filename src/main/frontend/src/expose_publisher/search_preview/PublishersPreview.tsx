@@ -1,9 +1,10 @@
 import React from "react"
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import axios, {AxiosResponse} from "axios";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
-import {IMiniRecord} from "../digest/Digest";
+import {IMiniRecord} from "../../digest/Digest";
+import handleFollow, {IPublisherFollow} from "../../utils/HandleFollow";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps,
@@ -61,25 +62,47 @@ class PublishersPreview extends React.Component<IProps, IState> {
             return;
         }
 
-        axios(
-            {
-                method: p.isFollowed ? "delete" : "put",
-                url: `http://localhost:8080/users/${publisher}/followers`,
-                headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-            }
-        ).then(success => {
-            console.log("follow resp");
-            console.log(success);
-            let updPubl: IPublisher = {...p};
-            p.isFollowed ? updPubl.followers-- : updPubl.followers++;
-            updPubl.isFollowed = !p.isFollowed;
-            this.setState(oldState => {
+        const pFlwData: IPublisherFollow = {
+            publisherName: p.publisher,
+            isFollowed: p.isFollowed,
+            followers: p.followers
+        }
+
+        const updFlwState = (updPublFlw: IPublisherFollow) => {
+            this.setState((oldState: IState) => {
+                const publisherIndex: number = oldState.publisherJsons.findIndex(publ => publ.publisher === updPublFlw.publisherName);
+                if (publisherIndex == -1) return oldState;
+                let updPublishers = [...oldState.publisherJsons];
+                let updTarget = {...updPublishers[publisherIndex]};
+                updTarget.isFollowed = updPublFlw.isFollowed;
+                updTarget.followers = updPublFlw.followers;
+                updPublishers[publisherIndex] = updTarget;
                 return {
                     ...oldState,
-                    publisherJsons: [...oldState.publisherJsons.filter(p => p.publisher !== publisher), updPubl]
+                    publisherJsons: updPublishers
                 }
             });
-        }, error => console.log(error));
+        }
+
+        handleFollow(pFlwData, this.props.auth, updFlwState);
+
+        // axios(
+        //     {
+        //         method: p.isFollowed ? "delete" : "put",
+        //         url: `http://localhost:8080/users/${publisher}/followers`,
+        //         headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+        //     }
+        // ).then(success => {
+        //     let updPubl: IPublisher = {...p};
+        //     p.isFollowed ? updPubl.followers-- : updPubl.followers++;
+        //     updPubl.isFollowed = !p.isFollowed;
+        //     this.setState(oldState => {
+        //         return {
+        //             ...oldState,
+        //             publisherJsons: [...oldState.publisherJsons.filter(p => p.publisher !== publisher), updPubl]
+        //         }
+        //     });
+        // }, error => console.log(error));
     }
 
     componentDidMount() {

@@ -41,8 +41,6 @@ import java.util.function.Function;
 public class RecordCtrl {
     @Value("${recordsPerPage}")
     private final int RECORD_PAGE_SIZE;
-//            ((PropertyAccessor) SpringApplicationContext
-//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getPageSize();
 
     private final IRecordService recordService;
 
@@ -63,7 +61,7 @@ public class RecordCtrl {
 
     @GetMapping
     public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable @NotEmpty String publisher,
-                                                           @RequestParam @Min(1) int page,
+                                                           @RequestParam int page,
                                                            Principal principal) {
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());

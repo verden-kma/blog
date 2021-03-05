@@ -26,8 +26,6 @@ public class EvaluationCtrl {
 
     @Value("${evaluatorsPerBlock}")
     private final int EVAL_BLOCK_SIZE;
-//            = ((PropertyAccessor) SpringApplicationContext
-//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getEvalBlockSize();
 
     private final IRecordEvalService reactionService;
 

@@ -7,9 +7,10 @@ import {BrowserRouter, Redirect, Route, Switch, withRouter} from "react-router-d
 import PostRecord from "./PostRecord";
 import RecordPreview, {RecordPreviewContext} from "../expose_record/RecordsPreview";
 import {searchModes} from "./Search";
-import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
+import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/search_preview/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
 import axios from "axios";
+import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
 
 interface IAuthProps {
     username: string,
@@ -58,10 +59,11 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <PostRecord {...authData}/>
                         </Route>
                         <Route exact path={"/profile"}>
-                            <RecordPreview {...{
-                                auth: authData,
-                                previewContext: RecordPreviewContext.PUBLISHER_RECORDS
-                            }}/>
+                            <PublisherMainPage auth={authData} targetUsername={authData.username}/>
+                            {/*<RecordPreview {...{*/}
+                            {/*    auth: authData,*/}
+                            {/*    previewContext: RecordPreviewContext.PUBLISHER_RECORDS*/}
+                            {/*}}/>*/}
                         </Route>
                         <Route exact path={`/search/${searchModes[0]}`}>
                             <RecordPreview {...{auth: authData, previewContext: RecordPreviewContext.SEARCH}}/>
