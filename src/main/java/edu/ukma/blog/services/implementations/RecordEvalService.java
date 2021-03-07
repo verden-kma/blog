@@ -14,18 +14,17 @@ import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.Root;
-import javax.transaction.Transactional;
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// 'synchronized' feels wrong, but @Lock does not work and there is no much time left
 @Service
 public class RecordEvalService implements IRecordEvalService {
     @PersistenceContext
@@ -53,9 +52,14 @@ public class RecordEvalService implements IRecordEvalService {
     }
 
     @Override
-    @Transactional
-    public void putEvaluation(RecordId recordId, long userId, boolean eval) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+//    @Lock(LockModeType.WRITE)
+    public synchronized void putEvaluation(RecordId recordId, long userId, boolean eval) {
         Boolean react = getReaction(recordId, userId);
+
+        System.out.println("react " + System.currentTimeMillis());
+        System.out.println(react);
+
         if (react == null) {
             evaluatorsRepo.save(new Evaluation(new EvaluatorId(recordId, userId), eval));
         } else if (react != eval) {
@@ -65,6 +69,8 @@ public class RecordEvalService implements IRecordEvalService {
             criteriaUpdate.set(root.get(Evaluation_.IS_LIKER), eval)
                     .where(cb.equal(root.get(Evaluation_.ID), new EvaluatorId(recordId, userId)));
             em.createQuery(criteriaUpdate).executeUpdate();
+
+            System.out.println("executed put " + System.currentTimeMillis());
 
             if (react) publisherStatsRepo.decLikesCount(recordId.getPublisherId());
             else publisherStatsRepo.decDislikesCount(recordId.getPublisherId());
@@ -78,20 +84,28 @@ public class RecordEvalService implements IRecordEvalService {
     }
 
     @Override
-    @Transactional
-    public void removeEvaluation(RecordId recordId, long userId, boolean eval) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+//    @Lock(LockModeType.WRITE)
+    public synchronized void removeEvaluation(RecordId recordId, long userId, boolean eval) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Evaluation> criteriaDelete = cb.createCriteriaDelete(Evaluation.class);
         Root<Evaluation> root = criteriaDelete.from(Evaluation.class);
-        criteriaDelete.where(cb.equal(root.get(Evaluation_.ID), new EvaluatorId(recordId, userId)));
-        criteriaDelete.where(cb.equal(root.get(Evaluation_.IS_LIKER), eval));
-        boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
+        Predicate condition = cb.and(cb.equal(root.get(Evaluation_.ID), new EvaluatorId(recordId, userId)),
+                cb.equal(root.get(Evaluation_.IS_LIKER), eval));
+        criteriaDelete.where(condition);
 
-        if (hasDeleted)
+
+        int debug = em.createQuery(criteriaDelete).executeUpdate();
+
+        System.out.println("executed delete " + System.currentTimeMillis());
+
+        boolean hasDeleted = debug == 1;
+
+        if (hasDeleted) {
             if (eval) publisherStatsRepo.decLikesCount(recordId.getPublisherId());
             else publisherStatsRepo.decDislikesCount(recordId.getPublisherId());
-
-        recordNodesRepo.unset(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
+            recordNodesRepo.unset(userId, recordId.getPublisherId(), recordId.getRecordOwnId());
+        }
     }
 
     @Override
