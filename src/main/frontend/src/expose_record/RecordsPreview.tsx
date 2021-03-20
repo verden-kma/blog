@@ -151,17 +151,14 @@ class RecordPreview extends React.Component<IProps, IState> {
             }}/>
         )
 
-        const pagination: any = this.props.previewContext === RecordPreviewContext.RECOMMENDATION
-        || this.props.previewContext === RecordPreviewContext.SEARCH ?
-            <button onClick={this.loadCurrentPage}>Load more</button>
-            : (this.state.numPages && <ReactPaginate pageCount={this.state.numPages}
-                                                     pageRangeDisplayed={3}
-                                                     marginPagesDisplayed={2}
-                                                     onPageChange={this.handlePageChange}
-                // not implemented
-                                                     containerClassName={"pagination"}
-                                                     activeClassName={"active"}
-                                                     breakClassName={"break-me"}/>)
+        const pagination = (this.state.numPages && <ReactPaginate pageCount={this.state.numPages}
+                                                                  pageRangeDisplayed={3}
+                                                                  marginPagesDisplayed={2}
+                                                                  onPageChange={this.handlePageChange}
+            // not implemented
+                                                                  containerClassName={"pagination"}
+                                                                  activeClassName={"active"}
+                                                                  breakClassName={"break-me"}/>)
 
         return (<div>
             {records}

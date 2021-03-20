@@ -42,6 +42,7 @@ class CMSNavbarRouting extends React.Component<any, any> {
             authType: store.get("authType"),
             token: store.get("token")
         }
+        // // {() => this.forceUpdate()}
         return (
             <div>
                 <BrowserRouter>
