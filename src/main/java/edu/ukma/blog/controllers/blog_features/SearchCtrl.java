@@ -5,7 +5,7 @@ import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.services.ISearchService;
 import edu.ukma.blog.services.IUserService;
-import edu.ukma.blog.utils.LazyContentPage;
+import edu.ukma.blog.utils.EagerContentPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -39,9 +39,9 @@ public class SearchCtrl {
 //            new HashMap<String, String>() {{put("most recent", RecordEntity_.TIMESTAMP);}});
 
     @GetMapping("/publishers")
-    public LazyContentPage<UserDataPreviewResponse> findPublishers(@RequestParam @NotEmpty String name,
-                                                                   @RequestParam @Min(0) int page,
-                                                                   Principal principal) {
+    public EagerContentPage<UserDataPreviewResponse> findPublishers(@RequestParam @NotEmpty String name,
+                                                                    @RequestParam @Min(0) int page,
+                                                                    Principal principal) {
         long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE);
         return searchService.findPublishersWithPrefix(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
@@ -49,9 +49,9 @@ public class SearchCtrl {
 
     //feature-idea: add record_statistics entity to avoid querying stats every time
     @GetMapping("/records")
-    public LazyContentPage<ResponseRecord> findRecords(@RequestParam @NotEmpty String title,
-                                                       @RequestParam @Min(0) int page,
-                                                       Principal principal) {
+    public EagerContentPage<ResponseRecord> findRecords(@RequestParam @NotEmpty String title,
+                                                        @RequestParam @Min(0) int page,
+                                                        Principal principal) {
         long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, SEARCH_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP));
         return searchService.findRecordsWithTitleLike(title, pageable, userId);

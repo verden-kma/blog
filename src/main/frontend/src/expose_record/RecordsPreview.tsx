@@ -16,9 +16,8 @@ interface IProps extends RouteComponentProps<any> {
 interface IState {
     recordJsons: Array<IRecord>,
     recordImgs: Map<number, string>,
-    currPage: number,
+    currPage?: number,
     numPages?: number,
-    isLast?: boolean
 }
 
 interface IRecord {
@@ -57,83 +56,62 @@ class RecordPreview extends React.Component<IProps, IState> {
         this.state = {
             recordJsons: [],
             recordImgs: new Map(),
-            currPage: 0,
-            isLast: false
+            currPage: 0
         }
         this.getUrl = this.getUrl.bind(this);
-        this.handleNextPage = this.handleNextPage.bind(this);
+        this.loadCurrentPage = this.loadCurrentPage.bind(this);
         this.handleEvaluation = this.handleEvaluation.bind(this);
         this.loadImages = this.loadImages.bind(this);
     }
 
     getUrl(): string {
         if (this.props.previewContext === RecordPreviewContext.PUBLISHER_RECORDS) {
-            return `http://localhost:8080/users/${this.props.targetUsername}/records?page=${this.state.currPage}`;
+            return `http://localhost:8080/users/${this.props.targetUsername}/records`;
         }
         if (this.props.previewContext === RecordPreviewContext.SEARCH) {
             const paramValue = new URLSearchParams(this.props.location.search).get("query");
-            return `http://localhost:8080/search/records?title=${paramValue}&page=${this.state.currPage}`
+            return `http://localhost:8080/search/records?title=${paramValue}`
         }
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
-            // todo: implement
+            return "http://localhost:8080/recommendations/evaluations"
         }
         throw "Unknown RecordPreviewContext";
     }
 
     componentDidMount() {
-        if (this.props.previewContext === RecordPreviewContext.PUBLISHER_RECORDS) {
-            axios.get(`http://localhost:8080/users/${this.props.targetUsername}/records`, {
-                params: {page: 0},
+        if (this.props.previewContext == RecordPreviewContext.RECOMMENDATION) {
+            axios.get(this.getUrl(), {
                 headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-            }).then((success: AxiosResponse<IEagerRecordsPage>) => {
-                const {pageItems, totalPagesNum} = success.data;
-                this.setState({recordJsons: pageItems, numPages: totalPagesNum, currPage: totalPagesNum > 0 ? 1 : 0},
+            }).then((success: AxiosResponse<ILazyRecordsPage>) => {
+                this.setState({recordJsons: success.data.pageItems},
                     () => this.loadImages())
             }, error => console.log(error))
-        } else this.handleNextPage();
+        } else this.loadCurrentPage();
     }
 
-    handleNextPage() {
-        if (this.state.isLast) return;
-        const url = this.getUrl();
-        axios.get(url, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
-            .then((success: AxiosResponse<ILazyRecordsPage>) => {
-                    this.setState((oldState: IState) => {
-                        let updRecs: Array<IRecord>;
-                        if (this.props.previewContext === RecordPreviewContext.SEARCH
-                            || this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
-                            let recsSet = new Set(oldState.recordJsons);
-                            success.data.pageItems.forEach(r => recsSet.add(r));
-                            updRecs = Array.from(recsSet);
-                        } else updRecs = success.data.pageItems;
-                        return {
-                            ...oldState,
-                            isLast: success.data.isLast,
-                            recordJsons: updRecs
-                        }
-                    }, () => this.loadImages());
-//todo : handle situation: user loads record, deletes it, loads exact same record with different image
-                    // (should work as IDs are different)
-                },
-                error => {
-                    console.log(error);
-                })
+    loadCurrentPage() {
+        axios.get(this.getUrl(), {
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`},
+            params: {page: this.state.currPage}
+        }).then((success: AxiosResponse<IEagerRecordsPage>) => {
+            const {pageItems, totalPagesNum} = success.data;
+            this.setState({recordJsons: pageItems, numPages: totalPagesNum},
+                () => this.loadImages())
+        }, error => console.log(error))
     }
 
     loadImages() {
-        // filter is user in case some loading failed, an attempt will be repeated
-        this.state.recordJsons.filter(({id}: IRecord) => this.state.recordImgs.get(id) === undefined)
-            .forEach(({id}: IRecord) => {
-                axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${id}/image-min`,
-                    {
-                        responseType: 'arraybuffer',
-                        headers: {
-                            'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
-                        }
-                    }).then(response => {
-                    this.setState((oldState: IState) => {
-                        let updImgs: Map<number, string> = new Map(oldState.recordImgs);
-                        updImgs.set(id, Buffer.from(response.data, 'binary').toString('base64'));
+        this.state.recordJsons.forEach(({id}: IRecord) => {
+            axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${id}/image-min`,
+                {
+                    responseType: 'arraybuffer',
+                    headers: {
+                        'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
+                    }
+                }).then(response => {
+                this.setState((oldState: IState) => {
+                    let updImgs: Map<number, string> = new Map(oldState.recordImgs);
+                    updImgs.set(id, Buffer.from(response.data, 'binary').toString('base64'));
                         return {
                             ...oldState,
                             recordImgs: updImgs
@@ -144,8 +122,6 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
     handleEvaluation(id: number, forLike: boolean) {
-        console.log("id= " + id)
-
         const record = this.state.recordJsons.find((rec: IRecord) => rec.id === id);
         if (record === undefined) {
             console.log("record to like is undefined, id = " + id)
@@ -177,7 +153,7 @@ class RecordPreview extends React.Component<IProps, IState> {
 
         const pagination: any = this.props.previewContext === RecordPreviewContext.RECOMMENDATION
         || this.props.previewContext === RecordPreviewContext.SEARCH ?
-            <button onClick={this.handleNextPage}>Load more</button>
+            <button onClick={this.loadCurrentPage}>Load more</button>
             : (this.state.numPages && <ReactPaginate pageCount={this.state.numPages}
                                                      pageRangeDisplayed={3}
                                                      marginPagesDisplayed={2}

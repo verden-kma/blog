@@ -72,7 +72,7 @@ public class UsersRepoTest {
         usersRepo.saveAll(Lists.list(u1, u2, u3, u4, u5));
 
         List<PublisherPreviewBaseView> res = usersRepo.findPopularPublishersWithUsernamePrefix("tu",
-                PageRequest.of(0, 2)).toList();
+                PageRequest.of(0, 2));
 
         assertEquals(2, res.size());
 

@@ -3,7 +3,6 @@ package edu.ukma.blog.repositories;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.repositories.projections.user.*;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -32,6 +31,7 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
             "UserEntity user INNER JOIN user.statistics stats " +
             "WHERE user.username LIKE CONCAT(:usernamePrefix, '%') " +
             "ORDER BY stats.followers DESC")
-    Slice<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(String usernamePrefix, Pageable pageable);
+    List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(String usernamePrefix, Pageable pageable);
 
+    int countAllByUsernameStartingWithIgnoreCase(String usernamePrefix);
 }

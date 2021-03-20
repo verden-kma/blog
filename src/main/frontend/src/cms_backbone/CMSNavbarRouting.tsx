@@ -5,9 +5,10 @@ import Digest from "../digest/Digest";
 import store from "store"
 import {BrowserRouter, Redirect, Route, Switch, withRouter} from "react-router-dom";
 import PostRecord from "./PostRecord";
-import RecordPreview, {RecordPreviewContext} from "../expose_record/RecordsPreview";
+import RecordPreview from "../expose_record/RecordsPreview";
+import RecordsPreview, {RecordPreviewContext} from "../expose_record/RecordsPreview";
 import {searchModes} from "./Search";
-import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/search_preview/PublishersPreview";
+import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
 import axios from "axios";
 import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
@@ -50,20 +51,19 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <Digest {...authData} />
                         </Route>
                         <Route exact path={"/publishers"}>
-                            recommended publishers are to be implemented
+                            <PublishersPreview {...{
+                                auth: authData,
+                                previewContext: PublisherPreviewContext.RECOMMENDATION
+                            }} />
                         </Route>
                         <Route exact path={"/records"}>
-                            recommended records are to be implemented
+                            <RecordsPreview {...{auth: authData, previewContext: RecordPreviewContext.RECOMMENDATION}}/>
                         </Route>
                         <Route exact path={"/post-record"}>
                             <PostRecord {...authData}/>
                         </Route>
-                        <Route exact path={"/profile"}>
-                            <PublisherMainPage auth={authData} targetUsername={authData.username}/>
-                            {/*<RecordPreview {...{*/}
-                            {/*    auth: authData,*/}
-                            {/*    previewContext: RecordPreviewContext.PUBLISHER_RECORDS*/}
-                            {/*}}/>*/}
+                        <Route exact path={"/profile/:targetUsername"}>
+                            <PublisherMainPage auth={authData}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[0]}`}>
                             <RecordPreview {...{auth: authData, previewContext: RecordPreviewContext.SEARCH}}/>

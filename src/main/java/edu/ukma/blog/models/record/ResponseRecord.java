@@ -1,6 +1,9 @@
 package edu.ukma.blog.models.record;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class ResponseRecord {
@@ -12,7 +15,8 @@ public class ResponseRecord {
 
     private String adText;
 
-    private String timestamp;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
 
     private boolean isEdited;
 

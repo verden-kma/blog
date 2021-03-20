@@ -1,8 +1,9 @@
 import React from 'react';
-import defaultAvatar from "../../assets/defaultAvatar.png"
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
-import {IMiniRecord} from "../../digest/Digest";
-import Thumbnail from "../../digest/Thumbnail";
+import defaultAvatar from "../assets/defaultAvatar.png"
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IMiniRecord} from "../digest/Digest";
+import Thumbnail from "../digest/Thumbnail";
+import {Link} from "react-router-dom";
 
 interface IProps {
     auth: IAuthProps,
@@ -27,7 +28,7 @@ class PublisherCard extends React.Component<IProps, any> {
         return (
             <div>
                 <img src={ava} alt={`${this.props.publisher}-ava`}/>
-                <h3>{this.props.publisher}</h3>
+                <Link to={`/profile/${this.props.publisher}`}><h3>{this.props.publisher}</h3></Link>
                 {this.props.publisherBanner && <img src={"data:image/jpeg;base64, " + this.props.publisherBanner}
                                                     alt={`${this.props.publisherBanner}-banner`}/>}
                 {this.props.lastRecords && <div>

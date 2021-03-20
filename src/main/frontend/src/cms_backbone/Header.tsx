@@ -36,7 +36,7 @@ class Header extends React.Component<IProps, IState> {
                 <br/>
                 <li><Link to={"/post-record"}>{NewRecord()}</Link></li>
                 <br/>
-                <li><Link to={"/profile"}>{Profile()}</Link></li>
+                <li><Link to={`/profile/${this.props.username}`}>{Profile()}</Link></li>
                 <br/>
                 <li>
                     <button onClick={() => {

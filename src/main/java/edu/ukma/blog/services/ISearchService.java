@@ -2,12 +2,12 @@ package edu.ukma.blog.services;
 
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
-import edu.ukma.blog.utils.LazyContentPage;
+import edu.ukma.blog.utils.EagerContentPage;
 import org.springframework.data.domain.Pageable;
 
 public interface ISearchService {
-    LazyContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable publisherPageable,
-                                                                      long userId, int numPreviewImgs);
+    EagerContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable publisherPageable,
+                                                                       long userId, int numPreviewImgs);
 
-    LazyContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId);
+    EagerContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId);
 }

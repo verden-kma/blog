@@ -39,6 +39,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +48,7 @@ import java.util.stream.Collectors;
 public class RecordService implements IRecordService {
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     private final IRecordsRepo recordsRepo;
 
@@ -82,7 +84,7 @@ public class RecordService implements IRecordService {
         RecordEntity recordEntity = new RecordEntity();
         recordEntity.setId(new RecordId(publisherId, recordId));
         BeanUtils.copyProperties(record, recordEntity);
-        recordEntity.setTimestamp(Instant.now().toString());
+        recordEntity.setTimestamp(LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC));
         String imgLocation = imageService.saveImage(image);
         recordEntity.setImgLocation(imgLocation);
         recordsRepo.save(recordEntity);

@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class LazyContentPage<T> {
     private List<T> pageItems;
-    private boolean isLast;
+    private Boolean isLast; // note: Jackson maps boolean fields removing 'is'
 }

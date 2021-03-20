@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -21,7 +22,7 @@ public class RecordEntity {
 
     private String adText;
 
-    private String timestamp; // LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC) ?
+    private LocalDateTime timestamp;
 
     private boolean isEdited;
 }

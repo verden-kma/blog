@@ -10,9 +10,8 @@ import edu.ukma.blog.repositories.projections.record.RecordIdView;
 import edu.ukma.blog.repositories.projections.user.PublisherPreviewBaseView;
 import edu.ukma.blog.services.IRecordService;
 import edu.ukma.blog.services.ISearchService;
-import edu.ukma.blog.utils.LazyContentPage;
+import edu.ukma.blog.utils.EagerContentPage;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,10 +36,10 @@ public class SearchService implements ISearchService {
     }
 
     @Override
-    public LazyContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable publisherPageable,
-                                                                             long userId, int numPreviewImgs) {
-        Slice<PublisherPreviewBaseView> previewBasesSlice = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, publisherPageable);
-        List<PublisherPreviewBaseView> previewBases = previewBasesSlice.getContent();
+    public EagerContentPage<UserDataPreviewResponse> findPublishersWithPrefix(String prefix, Pageable pageable,
+                                                                              long userId, int numPreviewImgs) {
+        List<PublisherPreviewBaseView> previewBases = usersRepo.findPopularPublishersWithUsernamePrefix(prefix, pageable);
+        int numPages = (int) Math.ceil((double) usersRepo.countAllByUsernameStartingWithIgnoreCase(prefix) / pageable.getPageSize());
 
         List<Long> publisherIds = previewBases.stream().map(PublisherPreviewBaseView::getId).collect(Collectors.toList());
         List<RecordIdView> publishersRecentRecordsViews =
@@ -53,8 +52,6 @@ public class SearchService implements ISearchService {
                 imgs.add(prv.getRecord_Own_Id());
                 return imgs;
             });
-
-        assert (previewBases.size() == publisherRecentRecs.size());
 
         Set<Long> subscriptions = followersRepo.findById_SubscriberIdAndId_PublisherIdIn(userId, publisherIds)
                 .stream()
@@ -71,14 +68,15 @@ public class SearchService implements ISearchService {
             pp.setLastRecords(publisherRecentRecs.get(pb.getId()));
             res.add(pp);
         }
-        return new LazyContentPage<>(res, previewBasesSlice.isLast());
+        return new EagerContentPage<>(res, numPages);
     }
 
     @Override
-    public LazyContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId) {
-        Slice<RecordEntity> recEnts = recordsRepo.findByCaptionContains(titleSubstr, pageable);
+    public EagerContentPage<ResponseRecord> findRecordsWithTitleLike(String titleSubstr, Pageable pageable, long userId) {
+        List<RecordEntity> recEnts = recordsRepo.findByCaptionContains(titleSubstr, pageable);
+        int numPages = (int) Math.ceil((double) recordsRepo.countAllByCaptionContains(titleSubstr) / pageable.getPageSize());
         Map<Long, List<RecordEntity>> samePublisherRecords = recEnts.stream()
                 .collect(Collectors.groupingBy(x -> x.getId().getPublisherId()));
-        return new LazyContentPage<>(recordService.buildRespRecs(samePublisherRecords.values(), userId), recEnts.isLast());
+        return new EagerContentPage<>(recordService.buildRespRecs(samePublisherRecords.values(), userId), numPages);
     }
 }

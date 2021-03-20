@@ -69,5 +69,4 @@ class Search extends React.Component<IProps, ISearchData> {
 }
 
 export {searchModes};
-export type {ISearchData}; // delete?
 export default withRouter(Search);

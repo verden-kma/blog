@@ -3,13 +3,15 @@ import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import RecordPreview, {RecordPreviewContext} from "../../expose_record/RecordsPreview";
 import axios from "axios";
 import UserStats from "../UserStats";
+import {withRouter} from "react-router";
+import {RouteComponentProps} from "react-router-dom";
 
-interface IPublisherProps {
-    auth: IAuthProps,
-    targetUsername: string
+interface IPublisherProps extends RouteComponentProps<any> {
+    auth: IAuthProps
 }
 
 interface IPublisherState {
+    targetUsername: string,
     userAva?: string,
     topBanner?: string,
 }
@@ -19,11 +21,13 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
         super(props);
         let emptyImgs = new Map();
         emptyImgs.set(0, []);
-        this.state = {}
+        this.state = {
+            targetUsername: this.props.match.params.targetUsername
+        }
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.props.targetUsername}/avatar`, {
+        axios.get(`http://localhost:8080/users/${this.state.targetUsername}/avatar`, {
             responseType: 'arraybuffer',
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
@@ -31,7 +35,7 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
                 this.setState({userAva: Buffer.from(success.data, 'binary').toString('base64')})
             }
         }, error => console.log(error));
-        axios.get(`http://localhost:8080/users/${this.props.targetUsername}/top-banner`, {
+        axios.get(`http://localhost:8080/users/${this.state.targetUsername}/top-banner`, {
             responseType: 'arraybuffer',
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then(success => {
@@ -46,11 +50,11 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
 
         return (<div>
             {this.state.topBanner && <img src={'data:image/jpeg;base64, ' + this.state.topBanner} alt={'top banner'}/>}
-            <UserStats auth={this.props.auth} targetUsername={this.props.targetUsername}/>
+            <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>
             <RecordPreview auth={this.props.auth} previewContext={RecordPreviewContext.PUBLISHER_RECORDS}
-                           targetUsername={this.props.targetUsername}/>
+                           targetUsername={this.state.targetUsername}/>
         </div>)
     }
 }
 
-export default PublisherMainPage;
+export default withRouter(PublisherMainPage);

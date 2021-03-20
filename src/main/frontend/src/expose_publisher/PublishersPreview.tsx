@@ -1,10 +1,10 @@
 import React from "react"
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 import axios, {AxiosResponse} from "axios";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
-import {IMiniRecord} from "../../digest/Digest";
-import handleFollow, {IPublisherFollow} from "../../utils/HandleFollow";
+import {IMiniRecord} from "../digest/Digest";
+import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps,
@@ -16,6 +16,8 @@ interface IState {
     publisherAvas: { [publisher: string]: string },
     publisherBanners: { [publisher: string]: string },
     previewRecordCores: { [publisher: string]: Array<IMiniRecord> }
+    currPage?: number,
+    totalPageNum?: number
 }
 
 interface IPublisher {
@@ -34,25 +36,33 @@ enum PublisherPreviewContext {
 class PublishersPreview extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
-        this.state = {
+
+        let compState: IState = {
             publisherJsons: [],
             publisherAvas: {},
             publisherBanners: {},
-            previewRecordCores: {}
+            previewRecordCores: {},
+        };
+
+        if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
+            compState.currPage = 0;
         }
+
+        this.state = compState;
         this.getUrl = this.getUrl.bind(this);
         this.handleFollow = this.handleFollow.bind(this);
+        this.loadCurrentPage = this.loadCurrentPage.bind(this);
     }
 
     getUrl(): string {
         if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
             const publisherPrefix = new URLSearchParams(this.props.location.search).get("query");
-            return `http://localhost:8080/search/publishers?name=${publisherPrefix}&page=0`;
+            return `http://localhost:8080/search/publishers?name=${publisherPrefix}`;
         }
         if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION) {
-            // todo: implement
+            return "http://localhost:8080/recommendations/subscriptions";
         }
-        return "/404"; // mock
+        throw "Unknown PublisherPreviewContext";
     }
 
     handleFollow(publisher: string) {
@@ -85,70 +95,54 @@ class PublishersPreview extends React.Component<IProps, IState> {
         }
 
         handleFollow(pFlwData, this.props.auth, updFlwState);
-
-        // axios(
-        //     {
-        //         method: p.isFollowed ? "delete" : "put",
-        //         url: `http://localhost:8080/users/${publisher}/followers`,
-        //         headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-        //     }
-        // ).then(success => {
-        //     let updPubl: IPublisher = {...p};
-        //     p.isFollowed ? updPubl.followers-- : updPubl.followers++;
-        //     updPubl.isFollowed = !p.isFollowed;
-        //     this.setState(oldState => {
-        //         return {
-        //             ...oldState,
-        //             publisherJsons: [...oldState.publisherJsons.filter(p => p.publisher !== publisher), updPubl]
-        //         }
-        //     });
-        // }, error => console.log(error));
     }
 
     componentDidMount() {
-        const url = this.getUrl();
+        this.loadCurrentPage();
+    }
 
-        axios.get(url, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
-            .then(success => {
-                console.log(success);
-                this.setState((oldState) => {
-                    return {...oldState, publisherJsons: success.data.pageItems}
-                });
-
-                success.data.pageItems.forEach((pd: IPublisher) => {
-                    axios.get(`http://localhost:8080/users/${pd.publisher}/avatar`, {
-                        responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-                    }).then(success => {
-                        if (success.data.byteLength) {
-                            this.setState((oldState) => {
-                                return {
-                                    ...oldState,
-                                    publisherAvas: {
-                                        ...oldState.publisherAvas,
-                                        [pd.publisher]: Buffer.from(success.data, 'binary').toString('base64')
-                                    }
+    loadCurrentPage() {
+        axios.get(this.getUrl(), {
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`},
+            params: {page: this.state.currPage}
+        }).then(success => {
+            this.setState({publisherJsons: success.data.pageItems, totalPageNum: success.data.totalPagesNum})
+            success.data.pageItems.forEach((pd: IPublisher) => {
+                axios.get(`http://localhost:8080/users/${pd.publisher}/avatar`, {
+                    responseType: 'arraybuffer',
+                    headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                }).then(success => {
+                    if (success.data.byteLength) {
+                        this.setState((oldState) => {
+                            return {
+                                ...oldState,
+                                publisherAvas: {
+                                    ...oldState.publisherAvas,
+                                    [pd.publisher]: Buffer.from(success.data, 'binary').toString('base64')
                                 }
-                            })
-                        }
-                    }, error => console.log(error));
+                            }
+                        })
+                    }
+                }, error => console.log(error));
 
-                    axios.get(`http://localhost:8080/users/${pd.publisher}/top-banner`, {
-                        responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-                    }).then(success => {
-                        if (success.data.byteLength) {
-                            this.setState((oldState) => {
-                                return {
-                                    ...oldState,
-                                    publisherBanners: {
-                                        ...oldState.publisherBanners,
-                                        [pd.publisher]: Buffer.from(success.data, 'binary').toString('base64')
-                                    }
+                axios.get(`http://localhost:8080/users/${pd.publisher}/top-banner`, {
+                    responseType: 'arraybuffer',
+                    headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                }).then(success => {
+                    if (success.data.byteLength) {
+                        this.setState((oldState) => {
+                            return {
+                                ...oldState,
+                                publisherBanners: {
+                                    ...oldState.publisherBanners,
+                                    [pd.publisher]: Buffer.from(success.data, 'binary').toString('base64')
                                 }
-                            });
-                        }
-                    }, error => console.log(error))
+                            }
+                        });
+                    }
+                }, error => console.log(error))
+
+                if (pd.lastRecords)
                     axios.get(`http://localhost:8080/users/${pd.publisher}/records/short`, {
                         params: {
                             rids: pd.lastRecords.join(",")
@@ -165,8 +159,8 @@ class PublishersPreview extends React.Component<IProps, IState> {
                             }
                         })
                     }, error => console.log(error));
-                })
-            }, error => console.log(error));
+            })
+        }, error => console.log(error));
     }
 
     render() {
@@ -182,8 +176,10 @@ class PublishersPreview extends React.Component<IProps, IState> {
                            followCallback={this.handleFollow}/>
         );
         return (<div>
-            {publisherCards}
-        </div>);
+                <div>{publisherCards}</div>
+                // pagination will be here
+            </div>
+        );
     }
 }
 

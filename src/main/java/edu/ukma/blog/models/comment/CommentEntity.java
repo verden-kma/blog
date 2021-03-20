@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -22,5 +23,5 @@ public class CommentEntity {
     @NotEmpty
     private String text;
 
-    private String timestamp; // LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC) ?
+    private LocalDateTime timestamp;
 }

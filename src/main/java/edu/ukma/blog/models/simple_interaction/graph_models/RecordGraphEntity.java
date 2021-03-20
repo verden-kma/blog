@@ -13,6 +13,7 @@ import org.neo4j.ogm.typeconversion.UuidStringConverter;
 import java.util.UUID;
 
 @NodeEntity
+// @RelationshipEntity
 @NoArgsConstructor
 @Data
 public class RecordGraphEntity {

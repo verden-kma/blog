@@ -23,6 +23,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Root;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,7 +54,7 @@ public class CommentService implements ICommentService {
         Optional<CommentEntity> lastComment = commentsRepo.findTopById_RecordIdOrderById_CommentOwnIdDesc(recordId);
         CommentId commentId = new CommentId(recordId, lastComment
                 .map(commentEntity -> commentEntity.getId().getCommentOwnId() + 1).orElse(1));
-        CommentEntity comment = new CommentEntity(commentId, commenterId, text, Instant.now().toString());
+        CommentEntity comment = new CommentEntity(commentId, commenterId, text, LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC));
         commentsRepo.save(comment);
         publisherStatsRepo.incCommentsCount(recordId.getPublisherId());
         return commentId.getCommentOwnId();
