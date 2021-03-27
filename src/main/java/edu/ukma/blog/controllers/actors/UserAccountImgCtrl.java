@@ -3,8 +3,8 @@ package edu.ukma.blog.controllers.actors;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.services.IUserImageService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,14 +16,10 @@ import java.security.Principal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users/{username}")
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserAccountImgCtrl {
     private final IUserImageService imageService;
-
-    @Autowired
-    public UserAccountImgCtrl(IUserImageService imageService) {
-        this.imageService = imageService;
-    }
 
     @PutMapping(value = "/avatar")
     public void setAvatarImage(@RequestPart MultipartFile image,
@@ -31,7 +27,7 @@ public class UserAccountImgCtrl {
         imageService.setAvatar(image, principal.getName());
     }
 
-    @GetMapping(value = "/avatar", produces = ImageConstants.TARGET_MEDIA_TYPE)
+    @GetMapping(value = "/{username}/avatar", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getAvatarImage(@PathVariable String username) { // if image is present then length of content is > 0
         Optional<File> icon = imageService.getAvatar(username);
         if (icon.isPresent()) {
@@ -56,7 +52,7 @@ public class UserAccountImgCtrl {
         imageService.setTopBanner(image, principal.getName());
     }
 
-    @GetMapping(path = "/top-banner", produces = ImageConstants.TARGET_MEDIA_TYPE)
+    @GetMapping(path = "/{username}/top-banner", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getTopBanner(@PathVariable String username) {
         Optional<File> banner = imageService.getTopBanner(username);
         if (banner.isPresent()) {

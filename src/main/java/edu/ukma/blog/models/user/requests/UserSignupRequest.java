@@ -9,11 +9,14 @@ import javax.validation.constraints.Pattern;
 @Data
 public class UserSignupRequest {
 
+//    @Email
+//    private String email;
+
     @Pattern(regexp = PatternConstants.USERNAME_PATTERN)
     private String username;
 
     @Pattern(regexp = PatternConstants.PASSWORD_PATTERN)
-    private String password;
+    private CharSequence password;
 
     private String status; // short description about user occupation
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import store from "store"
 import axios, {AxiosResponse} from "axios";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 import defaultAva from "../assets/defaultAvatar.png";
@@ -12,7 +11,7 @@ interface IProps {
 
 interface IState {
     userData?: IUserData,
-    userAva: string,
+    userAva?: string,
     subsAvas: Map<string, string>
 }
 
@@ -32,7 +31,6 @@ class UserStats extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            userAva: store.get("userAva"),
             subsAvas: new Map<string, string>()
         }
         this.handleFollowAction = this.handleFollowAction.bind(this);
@@ -66,15 +64,26 @@ class UserStats extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
+        axios.get(`http://localhost:8080/users/${this.props.targetUsername}/avatar`, {
+            responseType: 'arraybuffer',
+            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+        }).then(success => {
+            if (success.data) {
+                this.setState(oldState => ({
+                    ...oldState,
+                    userAva: Buffer.from(success.data, 'binary').toString('base64')
+                }))
+            }
+        }, error => console.log(error));
         axios.get(`http://localhost:8080/users/${this.props.targetUsername}`, {
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
         }).then((success: AxiosResponse<IUserData>) => {
-            this.setState({userData: success.data})
+            this.setState(oldState => ({...oldState, userData: success.data}))
         }, error => console.log(error));
     }
 
     render() {
-        if (!this.state.userData) return (<div></div>);
+        if (!this.state.userData) return (<div/>);
         const userAva = this.state.userAva ? 'data:image/jpeg;base64, ' + this.state.userAva : defaultAva;
         const followBtnStyle: Object =
             this.state.userData.isFollowed

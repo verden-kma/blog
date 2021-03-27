@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 public class EditUserRequest {
     @Nullable
     @Pattern(regexp = PatternConstants.PASSWORD_PATTERN)
-    private String password;
+    private CharSequence password;
 
     @Nullable
     private String status;

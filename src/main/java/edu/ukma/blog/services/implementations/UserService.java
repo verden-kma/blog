@@ -133,6 +133,7 @@ public class UserService implements IUserService {
             criteriaUpdate.set(root.get(UserEntity_.description), editUser.getDescription())
                     .where(cb.equal(root.get(UserEntity_.username), username));
         }
+
         entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 

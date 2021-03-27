@@ -12,7 +12,6 @@ interface IPublisherProps extends RouteComponentProps<any> {
 
 interface IPublisherState {
     targetUsername: string,
-    userAva?: string,
     topBanner?: string,
 }
 
@@ -27,14 +26,6 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.state.targetUsername}/avatar`, {
-            responseType: 'arraybuffer',
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
-        }).then(success => {
-            if (success.data) {
-                this.setState({userAva: Buffer.from(success.data, 'binary').toString('base64')})
-            }
-        }, error => console.log(error));
         axios.get(`http://localhost:8080/users/${this.state.targetUsername}/top-banner`, {
             responseType: 'arraybuffer',
             headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
@@ -47,7 +38,6 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
 
 
     render() {
-
         return (<div>
             {this.state.topBanner && <img src={'data:image/jpeg;base64, ' + this.state.topBanner} alt={'top banner'}/>}
             <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>

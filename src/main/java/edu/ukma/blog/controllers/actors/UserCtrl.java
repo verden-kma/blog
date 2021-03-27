@@ -43,7 +43,8 @@ public class UserCtrl {
     @PutMapping
     public void updateUserData(@Valid @RequestBody EditUserRequest update,
                                Principal principal) {
-        userService.updateUser(principal.getName(), update);
+        if (update.getStatus() != null || update.getDescription() != null || update.getPassword() != null)
+            userService.updateUser(principal.getName(), update);
     }
 
     // possible feature: add admins who can actually ban users, for now it is just self deletion

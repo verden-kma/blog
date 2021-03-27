@@ -10,8 +10,8 @@ import RecordsPreview, {RecordPreviewContext} from "../expose_record/RecordsPrev
 import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
-import axios from "axios";
 import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
+import UserEditPage from "../expose_publisher/UserEditPage";
 
 interface IAuthProps {
     username: string,
@@ -24,29 +24,20 @@ class CMSNavbarRouting extends React.Component<any, any> {
         super(props);
     }
 
-    componentDidMount() {
-        axios.get(`http://localhost:8080/users/${store.get("username")}/avatar`, {
-            responseType: 'arraybuffer',
-            headers: {'Authorization': `${store.get("authType")} ${store.get("token")}`}
-        }).then(success => {
-            store.set("userAva", Buffer.from(success.data, 'binary').toString('base64'));
-        }, error => console.log(error));
-    }
-
     render() {
         if (!store.get("isAuthorized")) {
             return <Redirect to={"/login"}/>
         }
-        const authData = {
+        const authData: IAuthProps = {
             username: store.get("username"),
             authType: store.get("authType"),
             token: store.get("token")
         }
-        // // {() => this.forceUpdate()}
+
         return (
             <div>
                 <BrowserRouter>
-                    <Header {...authData} loginCallback={() => this.forceUpdate()}/>
+                    <Header username={authData.username} loginCallback={() => this.forceUpdate()}/>
                     <Switch>
                         <Route exact path={"/digest"}>
                             <Digest {...authData} />
@@ -74,6 +65,9 @@ class CMSNavbarRouting extends React.Component<any, any> {
                         </Route>
                         <Route exact path={"/users/:publisher/records/:recordId"}>
                             <FullRecordView {...{auth: authData}}/>
+                        </Route>
+                        <Route exact path={"/edit-user-details"}>
+                            <UserEditPage {...authData}/>
                         </Route>
                     </Switch>
                     <Footer/>
