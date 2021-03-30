@@ -1,6 +1,7 @@
 package edu.ukma.blog.services;
 
 import com.google.common.collect.BiMap;
+import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
@@ -23,6 +24,8 @@ public interface IUserService extends UserDetailsService {
     UserDataPreviewResponse getPublisherPreview(String publisher, String user, int recPrevNum);
 
     void updateUser(String username, EditUserRequest update);
+
+    void updateUserPassword(String username, EditUserPasswordRequest editRequest);
 
     boolean banUser(String username);
 }

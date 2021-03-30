@@ -11,7 +11,8 @@ import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
 import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
-import UserEditPage from "../expose_publisher/UserEditPage";
+import EditUserProfile from "../expose_publisher/user_profile_details/EditUserProfile";
+import ChangePassword from "../expose_publisher/user_profile_details/ChangePassword";
 
 interface IAuthProps {
     username: string,
@@ -37,7 +38,7 @@ class CMSNavbarRouting extends React.Component<any, any> {
         return (
             <div>
                 <BrowserRouter>
-                    <Header username={authData.username} loginCallback={() => this.forceUpdate()}/>
+                    <Header username={authData.username}/>
                     <Switch>
                         <Route exact path={"/digest"}>
                             <Digest {...authData} />
@@ -67,7 +68,10 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <FullRecordView {...{auth: authData}}/>
                         </Route>
                         <Route exact path={"/edit-user-details"}>
-                            <UserEditPage {...authData}/>
+                            <EditUserProfile {...authData}/>
+                        </Route>
+                        <Route exact path={"/change-password"}>
+                            <ChangePassword  {...authData}/>
                         </Route>
                     </Switch>
                     <Footer/>

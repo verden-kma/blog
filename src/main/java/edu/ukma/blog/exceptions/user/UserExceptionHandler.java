@@ -28,4 +28,9 @@ public class UserExceptionHandler {
     public ResponseEntity<Object> handleNoSuchUserException(SelfFollowerException e, WebRequest r) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleWrongPasswordException(WrongPasswordProvidedException e) {
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
 }

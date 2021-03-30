@@ -4,12 +4,14 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
+import edu.ukma.blog.exceptions.user.WrongPasswordProvidedException;
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
+import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
@@ -121,10 +123,6 @@ public class UserService implements IUserService {
         CriteriaUpdate<UserEntity> criteriaUpdate = cb.createCriteriaUpdate(UserEntity.class);
         Root<UserEntity> root = criteriaUpdate.from(UserEntity.class);
 
-        if (editUser.getPassword() != null) {
-            criteriaUpdate.set(root.get(UserEntity_.encryptedPassword), passwordEncoder.encode(editUser.getPassword()))
-                    .where(cb.equal(root.get(UserEntity_.username), username));
-        }
         if (editUser.getStatus() != null) {
             criteriaUpdate.set(root.get(UserEntity_.status), editUser.getStatus())
                     .where(cb.equal(root.get(UserEntity_.username), username));
@@ -134,6 +132,22 @@ public class UserService implements IUserService {
                     .where(cb.equal(root.get(UserEntity_.username), username));
         }
 
+        entityManager.createQuery(criteriaUpdate).executeUpdate();
+    }
+
+    @Override
+    @Transactional
+    public void updateUserPassword(String username, EditUserPasswordRequest editRequest) {
+        String validPass = usersRepo.getEnpassByUsername(username).getEncryptedPassword();
+        if (!passwordEncoder.matches(editRequest.getCurrentPassword(), validPass))
+            throw new WrongPasswordProvidedException("provided password is invalid");
+
+        String offeredNewEnPass = passwordEncoder.encode(editRequest.getNewPassword());
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<UserEntity> criteriaUpdate = cb.createCriteriaUpdate(UserEntity.class);
+        Root<UserEntity> root = criteriaUpdate.from(UserEntity.class);
+        criteriaUpdate.set(root.get(UserEntity_.encryptedPassword), offeredNewEnPass)
+                .where(cb.equal(root.get(UserEntity_.username), username));
         entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 

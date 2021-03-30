@@ -1,5 +1,6 @@
 package edu.ukma.blog.controllers.actors;
 
+import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
@@ -40,11 +41,16 @@ public class UserCtrl {
         return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
-    @PutMapping
+    @PatchMapping("/details")
     public void updateUserData(@Valid @RequestBody EditUserRequest update,
                                Principal principal) {
-        if (update.getStatus() != null || update.getDescription() != null || update.getPassword() != null)
+        if (update.getStatus() != null || update.getDescription() != null)
             userService.updateUser(principal.getName(), update);
+    }
+
+    @PatchMapping(path = "/password")
+    public void updateUserPassword(@Valid @RequestBody EditUserPasswordRequest request, Principal principal) {
+        userService.updateUserPassword(principal.getName(), request);
     }
 
     // possible feature: add admins who can actually ban users, for now it is just self deletion

@@ -31,7 +31,7 @@ class Login extends React.Component<any, IState> {
             username: this.state.username,
             password: this.state.password
         }).then((response) => {
-            alert("logged in");
+            console.log("logged in");
             store.set('username', this.state.username)
             store.set('authType', response.data.authType)
             store.set('token', response.data.token)
@@ -72,13 +72,5 @@ class Login extends React.Component<any, IState> {
     }
 }
 
-const handleLogOut = () => {
-    store.remove('username');
-    store.remove('authType');
-    store.remove('token');
-    store.remove('isAuthorized');
-    console.log("handle logout")
-}
 
-export {handleLogOut};
 export default withRouter(Login);

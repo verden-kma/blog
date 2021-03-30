@@ -1,5 +1,5 @@
 import React from 'react';
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import {Button, Form, FormCheck, FormControl, FormFile, FormGroup, FormLabel} from "react-bootstrap";
 import axios from "axios";
 import {Redirect} from "react-router";
@@ -20,7 +20,7 @@ interface IState {
     hasEdited: boolean
 }
 
-class UserEditPage extends React.Component<IAuthProps, IState> {
+class EditUserProfile extends React.Component<IAuthProps, IState> {
     constructor(props: IAuthProps) {
         super(props);
         this.state = {
@@ -92,7 +92,7 @@ class UserEditPage extends React.Component<IAuthProps, IState> {
         }
         if (Object.keys(textUpdate).length > 0) {
             const textPromise: Promise<any> =
-                axios.put(`http://localhost:8080/users`, textUpdate, {
+                axios.patch(`http://localhost:8080/users/details`, textUpdate, {
                     headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
                 }).then(() => {
                 }, error => console.log(error));
@@ -182,4 +182,4 @@ class UserEditPage extends React.Component<IAuthProps, IState> {
     }
 }
 
-export default UserEditPage;
+export default EditUserProfile;
