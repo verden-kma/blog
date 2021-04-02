@@ -1,6 +1,6 @@
 import React from "react";
 import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
-import RecordPreview, {RecordPreviewContext} from "../../expose_record/RecordsPreview";
+import RecordPreview, {RecordPreviewContext} from "../../expose_record/RecordsPreviewPage";
 import axios from "axios";
 import UserStats from "../UserStats";
 import {withRouter} from "react-router";

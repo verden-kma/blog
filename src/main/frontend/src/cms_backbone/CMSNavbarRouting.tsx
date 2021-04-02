@@ -5,8 +5,7 @@ import Digest from "../digest/Digest";
 import store from "store"
 import {BrowserRouter, Redirect, Route, Switch, withRouter} from "react-router-dom";
 import PostRecord from "./PostRecord";
-import RecordPreview from "../expose_record/RecordsPreview";
-import RecordsPreview, {RecordPreviewContext} from "../expose_record/RecordsPreview";
+import RecordsPreviewPage, {RecordPreviewContext} from "../expose_record/RecordsPreviewPage";
 import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/PublishersPreview";
 import FullRecordView from "../expose_record/record_page/FullRecordView";
@@ -44,13 +43,16 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <Digest {...authData} />
                         </Route>
                         <Route exact path={"/publishers"}>
-                            <PublishersPreview {...{
+                            <PublishersPreview key={"publisher"} {...{
                                 auth: authData,
                                 previewContext: PublisherPreviewContext.RECOMMENDATION
                             }} />
                         </Route>
                         <Route exact path={"/records"}>
-                            <RecordsPreview {...{auth: authData, previewContext: RecordPreviewContext.RECOMMENDATION}}/>
+                            <RecordsPreviewPage key={"records"}{...{
+                                auth: authData,
+                                previewContext: RecordPreviewContext.RECOMMENDATION
+                            }}/>
                         </Route>
                         <Route exact path={"/post-record"}>
                             <PostRecord {...authData}/>
@@ -59,10 +61,16 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <PublisherMainPage auth={authData}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[0]}`}>
-                            <RecordPreview {...{auth: authData, previewContext: RecordPreviewContext.SEARCH}}/>
+                            <RecordsPreviewPage key={"search=records"} {...{
+                                auth: authData,
+                                previewContext: RecordPreviewContext.SEARCH
+                            }}/>
                         </Route>
                         <Route exact path={`/search/${searchModes[1]}`}>
-                            <PublishersPreview {...{auth: authData, previewContext: PublisherPreviewContext.SEARCH}}/>
+                            <PublishersPreview key={"search-publisher"} {...{
+                                auth: authData,
+                                previewContext: PublisherPreviewContext.SEARCH
+                            }}/>
                         </Route>
                         <Route exact path={"/users/:publisher/records/:recordId"}>
                             <FullRecordView {...{auth: authData}}/>
@@ -79,7 +87,6 @@ class CMSNavbarRouting extends React.Component<any, any> {
             </div>
         )
     }
-
 }
 
 

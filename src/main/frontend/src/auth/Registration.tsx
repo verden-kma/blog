@@ -1,20 +1,39 @@
 import React from "react";
 import axios from "axios";
 import {withRouter} from "react-router-dom"
+import {Button, Form, FormControl, FormGroup, FormLabel, Modal, Spinner} from "react-bootstrap";
 
-class Registration extends React.Component<any, any> {
+interface IState {
+    email: string,
+    username: string,
+    password: string,
+    passwordConfirm: string,
+    status?: string,
+    description?: string,
+    hasSentRequest: boolean,
+    hasRequestedSignup: boolean,
+    requestIsDeclined: boolean,
+    cause?: string
+}
+
+class Registration extends React.Component<any, IState> {
     constructor(props: any) {
         super(props);
         this.state = {
+            email: "",
             username: "",
             password: "",
             passwordConfirm: "",
             status: "",
-            description: ""
+            description: "",
+            hasSentRequest: false,
+            hasRequestedSignup: false,
+            requestIsDeclined: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.switchToLogin = this.switchToLogin.bind(this);
+        this.handleFailedRequest = this.handleFailedRequest.bind(this);
     }
 
     handleSubmit(event: React.FormEvent) {
@@ -23,21 +42,28 @@ class Registration extends React.Component<any, any> {
             alert("error: passwords do not match!");
             return;
         }
+        this.setState({hasSentRequest: true});
         axios.post("http://localhost:8080/users", {
+            email: this.state.email,
             username: this.state.username,
             password: this.state.password,
             status: this.state.status,
             description: this.state.description
-        }).then((response) => {
-            alert("registration is successful")
+        }).then(() => {
+            this.setState({hasSentRequest: false, hasRequestedSignup: true});
         }, (error) => {
-            alert("failed to register " + (error.response && error.response.status))
+            this.setState({hasSentRequest: false, requestIsDeclined: true, cause: error.response.data});
+            console.log("failed to register, status: " + error.response.status);
         })
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         const {name, value} = event.target;
-        this.setState({[name]: value});
+        this.setState(oldState => ({...oldState, [name]: value}));
+    }
+
+    handleFailedRequest() {
+        this.setState({requestIsDeclined: false, cause: undefined})
     }
 
     switchToLogin() {
@@ -47,33 +73,63 @@ class Registration extends React.Component<any, any> {
     render() {
         return (
             <div>
+                <Modal size={"sm"} show={this.state.hasRequestedSignup} onHide={this.switchToLogin}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Congratulations! Your personal data has been accepted.</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body><p>In order to get full access to your Sprout account confirm
+                        your email by following the link in the letter we have sent you.</p>
+                    </Modal.Body>
+
+                </Modal>
+                <Modal size={"sm"} show={this.state.requestIsDeclined} onHide={this.handleFailedRequest}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Your registration request has been rejected.</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>{this.state.cause}</Modal.Body>
+                </Modal>
                 <button onClick={this.switchToLogin}>Already have an account</button>
-                <form onSubmit={this.handleSubmit}>
-                    <input type={"text"}
-                           name={"username"}
-                           placeholder={"username"}
-                           onChange={this.handleChange}
-                           required/>
-                    <br/>
-                    <input type={"text"}
-                           name={"status"}
-                           placeholder={"status"}
-                           onChange={this.handleChange}/>
-                    <br/>
-                    <input type={"password"}
-                           name={"password"}
-                           placeholder={"password"}
-                           onChange={this.handleChange}
-                           required/>
-                    <br/>
-                    <input type={"password"}
-                           name={"passwordConfirm"}
-                           placeholder={"repeat password"}
-                           onChange={this.handleChange}
-                           required/>
-                    <br/>
-                    <button>Register</button>
-                </form>
+                <Form onSubmit={this.handleSubmit}>
+                    <FormGroup>
+                        <FormLabel>Email:</FormLabel>
+                        <FormControl type={"email"} name={"email"} onChange={this.handleChange} required/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Username:</FormLabel>
+                        <FormControl type={"text"}
+                                     name={"username"}
+                                     onChange={this.handleChange}
+                                     required/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Password:</FormLabel>
+                        <FormControl type={"password"}
+                                     name={"password"}
+                                     onChange={this.handleChange}
+                                     required/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Confirm the password:</FormLabel>
+                        <FormControl type={"password"}
+                                     name={"passwordConfirm"}
+                                     onChange={this.handleChange}
+                                     required/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Your status:</FormLabel>
+                        <FormControl type={"text"}
+                                     name={"status"}
+                                     onChange={this.handleChange}/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Description (tell about yourself):</FormLabel>
+                        <FormControl type={"text"} name={"description"} onChange={this.handleChange}/>
+                    </FormGroup>
+                    <Button type={"submit"}>
+                        {this.state.hasSentRequest &&
+                        <Spinner as={"span"} animation={"border"} size={"sm"} role={"status"} aria-hidden={"true"}/>}
+                        Register</Button>
+                </Form>
             </div>
         );
     }

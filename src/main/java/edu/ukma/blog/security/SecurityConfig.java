@@ -17,6 +17,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${signUpUrl}")
     private final String SIGN_UP_URL;
 
+    @Value("${confirmSignUpUrl}")
+    private final String CONFIRM_SIGNUP_TEMPLATE;
+
     @Value("${expirationTime}")
     private final long EXPIRATION_TIME;
 
@@ -32,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL)
+                .antMatchers(HttpMethod.POST, SIGN_UP_URL, CONFIRM_SIGNUP_TEMPLATE + "**")
                 .permitAll()
 
                 .antMatchers("/h2-console/**").permitAll()

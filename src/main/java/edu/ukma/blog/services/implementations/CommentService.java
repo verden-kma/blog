@@ -93,8 +93,8 @@ public class CommentService implements ICommentService {
         CriteriaDelete<CommentEntity> criteriaDelete = cb.createCriteriaDelete(CommentEntity.class);
         Root<CommentEntity> root = criteriaDelete.from(CommentEntity.class);
 
-        criteriaDelete.where(cb.equal(root.get(CommentEntity_.ID), commentID),
-                cb.equal(root.get(CommentEntity_.COMMENTATOR_ID), commentatorId));
+        criteriaDelete.where(cb.equal(root.get(CommentEntity_.id), commentID),
+                cb.equal(root.get(CommentEntity_.commentatorId), commentatorId));
         boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
 
         if (hasDeleted) publisherStatsRepo.decCommentsCount(commentID.getRecordId().getPublisherId());

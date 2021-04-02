@@ -61,7 +61,7 @@ public class FollowerService implements IFollowerService {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaDelete<Follower> criteriaDelete = cb.createCriteriaDelete(Follower.class);
         Root<Follower> root = criteriaDelete.from(Follower.class);
-        criteriaDelete.where(cb.equal(root.get(Follower_.ID), new FollowerId(publisherId, followerId)));
+        criteriaDelete.where(cb.equal(root.get(Follower_.id), new FollowerId(publisherId, followerId)));
         boolean hasDeleted = em.createQuery(criteriaDelete).executeUpdate() == 1;
         userNodesRepo.setUnfollow(followerId, publisherId);
 

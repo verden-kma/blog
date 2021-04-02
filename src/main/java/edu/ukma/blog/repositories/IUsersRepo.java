@@ -4,6 +4,7 @@ import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.repositories.projections.user.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -29,6 +30,7 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
 
     List<UserNameView> findAllByIdIn(Collection<Long> id);
 
+    @Modifying
     boolean deleteByUsername(String username);
 
     @Query("SELECT user FROM " +

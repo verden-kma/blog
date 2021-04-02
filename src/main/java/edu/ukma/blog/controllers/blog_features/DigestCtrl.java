@@ -20,8 +20,6 @@ import javax.validation.constraints.Min;
 public class DigestCtrl {
     @Value("${digestPageSize}")
     private final int DIGEST_PAGE_SIZE;
-//            = ((PropertyAccessor) SpringApplicationContext
-//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getDigestPageSize();
 
     private final IRecordService recordService;
 

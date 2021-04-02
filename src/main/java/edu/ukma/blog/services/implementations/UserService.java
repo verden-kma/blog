@@ -2,28 +2,36 @@ package edu.ukma.blog.services.implementations;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import edu.ukma.blog.exceptions.user.SignupRequestTimedOut;
 import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
 import edu.ukma.blog.exceptions.user.UsernameMissingException;
 import edu.ukma.blog.exceptions.user.WrongPasswordProvidedException;
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
-import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;
+import edu.ukma.blog.models.user.RegistrationRequestEntity;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
+import edu.ukma.blog.models.user.mappers.IRegistrationRequest_User;
+import edu.ukma.blog.models.user.mappers.IUserEntity_SignupResponse;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IRecordsRepo;
+import edu.ukma.blog.repositories.IRegistrationRequestRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
+import edu.ukma.blog.services.IEmailService;
 import edu.ukma.blog.services.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,12 +47,18 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService {
+
+    @Value("${signupExpiration}")
+    private final long SIGNUP_EXPIRATION;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -59,26 +73,48 @@ public class UserService implements IUserService {
 
     private final IUserNodesRepo userNodesRepo;
 
-    public UserService(IUsersRepo usersRepo, BCryptPasswordEncoder passwordEncoder,
-                       IFollowersRepo followersRepo, IRecordsRepo recordsRepo, IUserNodesRepo userNodesRepo) {
-        this.usersRepo = usersRepo;
-        this.passwordEncoder = passwordEncoder;
-        this.followersRepo = followersRepo;
-        this.recordsRepo = recordsRepo;
-        this.userNodesRepo = userNodesRepo;
+    private final IRegistrationRequestRepo signupRepo;
+
+    private final IRegistrationRequest_User registrationRequest_userMapper;
+
+    private final IUserEntity_SignupResponse userEntity_signupResponseMapper;
+
+    private final IEmailService emailService;
+
+    @Override
+    @Transactional
+    public void createSignUpRequest(UserSignupRequest userData) {
+        if (usersRepo.existsUserByUsername(userData.getUsername()))
+            throw new UsernameDuplicateException(userData.getUsername());
+        RegistrationRequestEntity registrationRequest = RegistrationRequestEntity.builder()
+                .token(UUID.randomUUID())
+                .expires(LocalDateTime.now().plusSeconds(SIGNUP_EXPIRATION))
+                .email(userData.getEmail())
+                .username(userData.getUsername())
+                .encryptedPassword(passwordEncoder.encode(userData.getPassword()))
+                .status(userData.getStatus())
+                .description(userData.getDescription())
+                .build();
+
+        signupRepo.save(registrationRequest);
+        signupRepo.deleteByExpiresBefore(LocalDateTime.now());
+        emailService.sendAccountActivation(registrationRequest.getEmail(), registrationRequest.getUsername(),
+                registrationRequest.getToken().toString());
     }
 
     @Override
-    public void addUser(UserSignupRequest userData) {
-        if (usersRepo.existsUserByUsername(userData.getUsername()))
-            throw new UsernameDuplicateException(userData.getUsername());
-        UserEntity newUser = new UserEntity();
-        BeanUtils.copyProperties(userData, newUser);
-        newUser.setEncryptedPassword(passwordEncoder.encode(userData.getPassword()));
+    public SignupResponse confirmRequest(UUID token) {
+        RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
+                .orElseThrow(SignupRequestTimedOut::new);
+
+        UserEntity newUser = registrationRequest_userMapper.registrationRequestToUser(registrationRequest);
         newUser.setStatistics(new PublisherStats(newUser));
+
+        if (usersRepo.existsUserByUsername(newUser.getUsername()))
+            throw new UsernameDuplicateException(newUser.getUsername());
         usersRepo.save(newUser);
 
-        userNodesRepo.save(new UserGraphEntity(newUser.getId()));
+        return userEntity_signupResponseMapper.userEntityToSignupResponse(newUser);
     }
 
     @Override

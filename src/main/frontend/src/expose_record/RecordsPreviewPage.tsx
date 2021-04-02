@@ -50,7 +50,7 @@ interface ILazyRecordsPage {
     isLast: boolean
 }
 
-class RecordPreview extends React.Component<IProps, IState> {
+class RecordsPreviewPage extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
@@ -62,6 +62,7 @@ class RecordPreview extends React.Component<IProps, IState> {
         this.loadCurrentPage = this.loadCurrentPage.bind(this);
         this.handleEvaluation = this.handleEvaluation.bind(this);
         this.loadImages = this.loadImages.bind(this);
+        this.handlePageChange = this.handlePageChange.bind(this);
     }
 
     getUrl(): string {
@@ -79,6 +80,8 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
+        console.log(`mounted preview ${new Date().getSeconds()}`)
+
         if (this.props.previewContext == RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
                 headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
@@ -144,6 +147,8 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
     render() {
+        console.log(`rendered preview recs ${new Date().getSeconds()}`)
+
         const records = this.state.recordJsons.map((r: IRecord) =>
             <RecordCard key={r.id} {...{
                 ...r, image: this.state.recordImgs.get(r.id),
@@ -155,10 +160,7 @@ class RecordPreview extends React.Component<IProps, IState> {
                                                                   pageRangeDisplayed={3}
                                                                   marginPagesDisplayed={2}
                                                                   onPageChange={this.handlePageChange}
-            // not implemented
-                                                                  containerClassName={"pagination"}
-                                                                  activeClassName={"active"}
-                                                                  breakClassName={"break-me"}/>)
+        />)
 
         return (<div>
             {records}
@@ -167,14 +169,14 @@ class RecordPreview extends React.Component<IProps, IState> {
     }
 
 
-    // fixme
     handlePageChange(event: { selected: number }) {
+        console.log(event.selected)
         this.setState((oldState) => {
             return {...oldState, currPage: event.selected}
-        })
+        }, () => this.loadCurrentPage());
     }
 }
 
 export {RecordPreviewContext};
 export type {IRecord};
-export default withRouter(RecordPreview);
+export default withRouter(RecordsPreviewPage);

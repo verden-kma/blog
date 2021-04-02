@@ -3,6 +3,7 @@ package edu.ukma.blog.controllers.actors;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.services.IUserService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -25,7 +27,12 @@ public class UserCtrl {
 
     @PostMapping
     public void addUser(@Valid @RequestBody UserSignupRequest user) {
-        userService.addUser(user);
+        userService.createSignUpRequest(user);
+    }
+
+    @PostMapping("/confirm/{token}")
+    public SignupResponse confirmSignup(@PathVariable String token) {
+        return userService.confirmRequest(UUID.fromString(token));
     }
 
     // use to load user's page and to get old user data while editing user's profile

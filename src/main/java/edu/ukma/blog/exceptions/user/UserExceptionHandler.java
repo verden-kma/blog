@@ -33,4 +33,9 @@ public class UserExceptionHandler {
     public ResponseEntity<Object> handleWrongPasswordException(WrongPasswordProvidedException e) {
         return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> handleSignupRequestTimedOut(SignupRequestTimedOut e) {
+        return new ResponseEntity<>(e.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
 }

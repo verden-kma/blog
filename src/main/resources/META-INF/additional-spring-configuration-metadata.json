@@ -93,6 +93,16 @@
       "name": "compressionThreshold",
       "type": "java.lang.Integer",
       "description": "If image that is being stored is bigger that this, then a compressed copy of this image is created."
+    },
+    {
+      "name": "signupExpiration",
+      "type": "java.lang.String",
+      "description": "Time a user has to confirm his registration."
+    },
+    {
+      "name": "confirmSignUpUrl",
+      "type": "java.lang.String",
+      "description": "Url to be used as a base to confirm registration request."
     }
   ]
 }

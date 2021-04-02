@@ -4,11 +4,13 @@ import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
 import edu.ukma.blog.models.user.requests.UserSignupRequest;
+import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface IUserService extends UserDetailsService {
     long getUserIdByUsername(String username);
@@ -17,7 +19,9 @@ public interface IUserService extends UserDetailsService {
 
     BiMap<Long, String> getUserIdentifiersBimap(List<Long> ids);
 
-    void addUser(UserSignupRequest userData);
+    void createSignUpRequest(UserSignupRequest userData);
+
+    SignupResponse confirmRequest(UUID token);
 
     UserDataResponse getPublisher(String user, String publisher);
 

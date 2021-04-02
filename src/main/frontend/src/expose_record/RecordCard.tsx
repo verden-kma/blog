@@ -1,5 +1,5 @@
 import React from "react";
-import {IRecord} from "./RecordsPreview";
+import {IRecord} from "./RecordsPreviewPage";
 import {monthNames} from "../cms_backbone/CMSNavbarRouting";
 import {Link} from "react-router-dom";
 

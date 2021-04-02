@@ -3,7 +3,7 @@ import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import store from "store"
-import {IRecord} from "../RecordsPreview";
+import {IRecord} from "../RecordsPreviewPage";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 import UserStats from "../../expose_publisher/UserStats";
