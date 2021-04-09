@@ -30,9 +30,9 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
 
     List<UserNameView> findAllByIdIn(Collection<Long> id);
 
-    @Modifying
-        // temporarily unused, was required for user self deletion
-    boolean deleteByUsername(String username);
+//    @Modifying
+//        // temporarily unused, was required for user self deletion
+//    boolean deleteByUsername(String username);
 
     @Query("SELECT user FROM " +
             "UserEntity user INNER JOIN user.statistics stats " +
@@ -41,6 +41,9 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
     List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(String usernamePrefix, Pageable pageable);
 
     int countAllByUsernameStartingWithIgnoreCase(String usernamePrefix);
+
+    @Query("SELECT user.isActive FROM UserEntity user WHERE user.username=:username")
+    Optional<Boolean> getActiveStatus(@Param("username") String username);
 
     @Modifying
     @Query("UPDATE UserEntity user SET user.isActive=:isActive WHERE user.username=:username")

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IUserService extends UserDetailsService {
+    void assertActive(String username);
+
     long getUserIdByUsername(String username);
 
     List<String> getUsernamesByIds(List<Long> userIds);

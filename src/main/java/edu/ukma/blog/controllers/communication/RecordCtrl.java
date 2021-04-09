@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +49,7 @@ public class RecordCtrl {
 
     private final IRecordImageService recordImageService;
 
+    @PreAuthorize("hasAuthority('POST_RECORDS')")
     @PostMapping
             (
                     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
@@ -55,6 +57,7 @@ public class RecordCtrl {
     public int addRecord(@RequestPart @Valid RequestRecord recordData,
                          @RequestPart MultipartFile image,
                          Principal principal) {
+        // inactive user won't be able to get jwt in first place
         long publisherId = userService.getUserIdByUsername(principal.getName());
         return recordService.addRecord(publisherId, recordData, image);
     }
@@ -63,6 +66,7 @@ public class RecordCtrl {
     public EagerContentPage<ResponseRecord> getRecordsPage(@PathVariable @NotEmpty String publisher,
                                                            @RequestParam int page,
                                                            Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         Pageable pageable = PageRequest.of(page, RECORD_PAGE_SIZE, Sort.by(RecordEntity_.TIMESTAMP).descending());
@@ -73,6 +77,7 @@ public class RecordCtrl {
     public ResponseRecord getRecord(@PathVariable @NotEmpty String publisher,
                                     @PathVariable @Min(1) int recordId,
                                     Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         return recordService.getRecordCore(new RecordId(publisherId, recordId), userId);
@@ -80,6 +85,7 @@ public class RecordCtrl {
 
     @GetMapping(path = "/short")
     public List<MinResponseRecord> getRecordsMin(@PathVariable String publisher, @RequestParam List<Integer> rids) {
+        userService.assertActive(publisher);
         return recordService.getSelectedMinResponse(publisher, rids);
     }
 
@@ -87,6 +93,7 @@ public class RecordCtrl {
     @GetMapping(path = "/{recordId}/image", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImage(@PathVariable @NotEmpty String publisher,
                            @PathVariable @Min(1) int recordId) {
+        userService.assertActive(publisher);
         return getSelectedImage(Collections.singletonList(recordImageService::getImage), publisher, recordId);
     }
 
@@ -112,6 +119,7 @@ public class RecordCtrl {
     @GetMapping(path = "/{recordId}/image-min", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageMin(@PathVariable @NotEmpty String publisher,
                               @PathVariable @Min(1) int recordId) {
+        userService.assertActive(publisher);
         return getSelectedImage(Arrays.asList(recordImageService::getImageMin, recordImageService::getImage),
                 publisher, recordId);
     }
@@ -120,9 +128,11 @@ public class RecordCtrl {
     @GetMapping(path = "/{recordId}/image-icon", produces = ImageConstants.TARGET_MEDIA_TYPE)
     public byte[] getImageIcon(@PathVariable @NotEmpty String publisher,
                                @PathVariable @Min(1) int recordId) {
+        userService.assertActive(publisher);
         return getSelectedImage(Collections.singletonList(recordImageService::getImageIcon), publisher, recordId);
     }
 
+    @PreAuthorize("hasAuthority('POST_RECORDS')")
     @PutMapping(path = "/{recordId}")
     public void editRecord(@PathVariable @Min(1) int recordId,
                            @RequestBody @Valid RequestRecord updatedRecord,
@@ -133,6 +143,7 @@ public class RecordCtrl {
         recordService.editRecord(new RecordId(publisherId, recordId), updatedRecord);
     }
 
+    @PreAuthorize("hasAuthority('POST_RECORDS')")
     @DeleteMapping(path = "/{recordOwnId}")
     public void removeRecord(@PathVariable @Min(1) int recordOwnId,
                              Principal principal) {

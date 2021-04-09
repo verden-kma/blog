@@ -15,6 +15,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,8 +29,6 @@ import java.security.Principal;
 public class CommentCtrl {
     @Value("${commentsPerBlock}")
     private final int COMMENTS_BLOCK_SIZE;
-//            = ((PropertyAccessor) SpringApplicationContext
-//            .getBean(PropertyAccessor.PROPERTY_ACCESSOR_BEAN_NAME)).getCommentBlockSize();
 
     private final ICommentService commentService;
 
@@ -43,10 +42,12 @@ public class CommentCtrl {
      * @param newComment - core comment data
      * @return valid id of a new comment in a database
      */
+    @PreAuthorize("hasAuthority('POST_COMMENTS')")
     @PostMapping
     public int addComment(@PathVariable @NotEmpty String publisher,
                           @PathVariable @Min(1) int recordId,
                           @RequestBody @Valid RequestComment newComment) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         RecordId fullRecordId = new RecordId(publisherId, recordId);
         long commenterId = userService.getUserIdByUsername(newComment.getCommenter());
@@ -57,11 +58,13 @@ public class CommentCtrl {
     public LazyContentPage<ResponseComment> getComments(@PathVariable @NotEmpty String publisher,
                                                         @PathVariable @Min(1) int recordId,
                                                         @RequestParam @Min(0) int block) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         Pageable pageable = PageRequest.of(block, COMMENTS_BLOCK_SIZE, Sort.by(CommentEntity_.TIMESTAMP).descending());
-        return commentService.getCommentsBlock(publisherId, new RecordId(publisherId, recordId), pageable);
+        return commentService.getCommentsBlock(new RecordId(publisherId, recordId), pageable);
     }
 
+    @PreAuthorize("hasAuthority('POST_COMMENTS')")
     @DeleteMapping(path = "/{commentId}")
     public void removeComment(@PathVariable @NotEmpty String publisher,
                               @PathVariable @Min(1) int recordId,

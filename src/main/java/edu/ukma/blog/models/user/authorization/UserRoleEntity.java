@@ -18,7 +18,7 @@ public class UserRoleEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRole role;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_to_permission",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))

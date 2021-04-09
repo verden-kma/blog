@@ -61,7 +61,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public LazyContentPage<ResponseComment> getCommentsBlock(long publisherId, RecordId recordId, Pageable pageable) {
+    public LazyContentPage<ResponseComment> getCommentsBlock(RecordId recordId, Pageable pageable) {
         Slice<CommentEntity> comments = commentsRepo.findAllById_RecordId(recordId, pageable);
 
         // different comments are written by different users, users can write multiple comments

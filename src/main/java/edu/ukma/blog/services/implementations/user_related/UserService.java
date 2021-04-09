@@ -2,16 +2,14 @@ package edu.ukma.blog.services.implementations.user_related;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import edu.ukma.blog.exceptions.user.SignupRequestTimedOut;
-import edu.ukma.blog.exceptions.user.UsernameDuplicateException;
-import edu.ukma.blog.exceptions.user.UsernameMissingException;
-import edu.ukma.blog.exceptions.user.WrongPasswordProvidedException;
+import edu.ukma.blog.exceptions.user.*;
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.RegistrationRequestEntity;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
+import edu.ukma.blog.models.user.authorization.UserPermissionEntity;
 import edu.ukma.blog.models.user.authorization.UserRole;
 import edu.ukma.blog.models.user.mappers.IRegistrationRequest_User;
 import edu.ukma.blog.models.user.mappers.ISignupRequest_UserEntity;
@@ -46,8 +44,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -106,6 +104,13 @@ public class UserService implements IUserService {
         usersRepo.save(newUser);
 
         return userEntity_signupResponseMapper.userEntityToSignupResponse(newUser);
+    }
+
+    @Override
+    public void assertActive(String username) {
+        Optional<Boolean> maybeActiveStatus = usersRepo.getActiveStatus(username);
+        boolean isActive = maybeActiveStatus.orElseThrow(() -> new UsernameNotFoundException(username));
+        if (!isActive) throw new AttemptToAccessBannedUserException(username);
     }
 
     @Override
@@ -220,6 +225,8 @@ public class UserService implements IUserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = usersRepo.findByUsername(username);
         if (user == null) throw new UsernameNotFoundException(username);
-        return new User(user.getUsername(), user.getEncryptedPassword(), Collections.emptyList());
+        if (!user.isActive()) throw new AttemptToAccessBannedUserException(username);
+        return new User(user.getUsername(), user.getEncryptedPassword(), user.getRole().getPermissions()
+                .stream().map(UserPermissionEntity::getPermission).collect(Collectors.toList()));
     }
 }

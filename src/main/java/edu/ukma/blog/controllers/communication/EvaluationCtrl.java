@@ -7,6 +7,7 @@ import edu.ukma.blog.utils.LazyContentPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
@@ -35,23 +36,28 @@ public class EvaluationCtrl {
     public LazyContentPage<String> getLikers(@PathVariable @NotEmpty String publisher,
                                              @PathVariable @Min(1) int recordId,
                                              @RequestParam @Min(0) int block) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         return reactionService.getLikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
+    @PreAuthorize("hasAuthority('EVALUATE')")
     @PutMapping("/likers")
     public void likeRecord(@PathVariable @NotEmpty String publisher,
                            @PathVariable @Min(1) int recordId,
                            Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, true);
     }
 
+    @PreAuthorize("hasAuthority('EVALUATE')")
     @DeleteMapping("/likers")
     public void removeLike(@PathVariable @NotEmpty String publisher,
                            @PathVariable @Min(1) int recordId,
                            Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, true);
@@ -61,23 +67,28 @@ public class EvaluationCtrl {
     public LazyContentPage<String> getDislikers(@PathVariable @NotEmpty String publisher,
                                                 @PathVariable @Min(1) int recordId,
                                                 @RequestParam @Min(0) int block) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         return reactionService.getDislikers(new RecordId(publisherId, recordId), PageRequest.of(block, EVAL_BLOCK_SIZE));
     }
 
+    @PreAuthorize("hasAuthority('EVALUATE')")
     @PutMapping("/dislikers")
     public void dislikeRecord(@PathVariable @NotEmpty String publisher,
                               @PathVariable @Min(1) int recordId,
                               Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         reactionService.putEvaluation(new RecordId(publisherId, recordId), userId, false);
     }
 
+    @PreAuthorize("hasAuthority('EVALUATE')")
     @DeleteMapping("/dislikers")
     public void removeDislike(@PathVariable @NotEmpty String publisher,
                               @PathVariable @Min(1) int recordId,
                               Principal principal) {
+        userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         long userId = userService.getUserIdByUsername(principal.getName());
         reactionService.removeEvaluation(new RecordId(publisherId, recordId), userId, false);

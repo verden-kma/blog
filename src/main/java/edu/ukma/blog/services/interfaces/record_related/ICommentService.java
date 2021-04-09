@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface ICommentService {
     int addComment(RecordId recordId, long commenterId, String text);
 
-    LazyContentPage<ResponseComment> getCommentsBlock(long publisherId, RecordId recordId, Pageable pageable);
+    LazyContentPage<ResponseComment> getCommentsBlock(RecordId recordId, Pageable pageable);
 
     void removeComment(CommentId commentID, long commentatorId);
 }

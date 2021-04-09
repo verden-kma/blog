@@ -22,7 +22,6 @@ import java.util.UUID;
 public class UserCtrl {
     @Value("${recordsPreviewBlock}")
     private final int RECORDS_PREVIEW_BLOCK_SIZE;
-
     private final IUserService userService;
 
     @PostMapping
@@ -38,12 +37,14 @@ public class UserCtrl {
     @GetMapping("/{publisher}")
     public UserDataResponse getUserData(@PathVariable @NotEmpty String publisher,
                                         Principal principal) {
+        userService.assertActive(publisher);
         return userService.getPublisher(principal.getName(), publisher);
     }
 
     @GetMapping("/{publisher}/short")
     public UserDataPreviewResponse getShortData(@PathVariable @NotEmpty String publisher,
                                                 Principal principal) {
+        userService.assertActive(publisher);
         return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
@@ -60,7 +61,7 @@ public class UserCtrl {
     }
 
     @DeleteMapping
-    public void deleteAccount(Principal principal) {
+    public void disableAccount(Principal principal) {
         userService.banUser(principal.getName());
     }
 }
