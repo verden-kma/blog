@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.record_related;
 
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;

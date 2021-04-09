@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.record_related;
 
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.utils.LazyContentPage;

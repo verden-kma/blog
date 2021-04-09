@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.features;
 
 import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;

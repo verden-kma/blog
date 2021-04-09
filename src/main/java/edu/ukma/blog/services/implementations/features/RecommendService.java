@@ -1,11 +1,11 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.features;
 
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
 import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.repositories.graph_repos.graph_projections.RecordRecomView;
 import edu.ukma.blog.repositories.graph_repos.graph_projections.UserRecomView;
-import edu.ukma.blog.services.IRecommendService;
+import edu.ukma.blog.services.interfaces.features.IRecommendService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

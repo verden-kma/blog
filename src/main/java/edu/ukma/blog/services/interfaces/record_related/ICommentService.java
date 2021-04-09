@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.record_related;
 
 import edu.ukma.blog.models.comment.ResponseComment;
 import edu.ukma.blog.models.composite_id.CommentId;

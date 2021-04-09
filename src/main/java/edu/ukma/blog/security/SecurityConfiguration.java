@@ -1,6 +1,6 @@
 package edu.ukma.blog.security;
 
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

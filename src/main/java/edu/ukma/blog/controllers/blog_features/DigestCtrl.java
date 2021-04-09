@@ -2,7 +2,7 @@ package edu.ukma.blog.controllers.blog_features;
 
 import edu.ukma.blog.models.record.MinResponseRecord;
 import edu.ukma.blog.models.record.RecordEntity_;
-import edu.ukma.blog.services.IRecordService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordService;
 import edu.ukma.blog.utils.LazyContentPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.user_related;
 
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.simple_interaction.Follower;
@@ -6,7 +6,7 @@ import edu.ukma.blog.models.simple_interaction.Follower_;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
-import edu.ukma.blog.services.IFollowerService;
+import edu.ukma.blog.services.interfaces.user_related.IFollowerService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

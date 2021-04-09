@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.features;
 
 import edu.ukma.blog.models.composite_id.RecordId;
 

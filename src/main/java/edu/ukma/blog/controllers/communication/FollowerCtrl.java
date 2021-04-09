@@ -1,8 +1,8 @@
 package edu.ukma.blog.controllers.communication;
 
 import edu.ukma.blog.exceptions.user.SelfFollowerException;
-import edu.ukma.blog.services.IFollowerService;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.user_related.IFollowerService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;

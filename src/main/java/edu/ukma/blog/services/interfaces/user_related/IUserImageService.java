@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.user_related;
 
 import org.springframework.web.multipart.MultipartFile;
 

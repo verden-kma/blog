@@ -6,6 +6,7 @@ import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.IFollowersRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
+import edu.ukma.blog.services.implementations.user_related.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

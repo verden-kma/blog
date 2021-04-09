@@ -1,6 +1,6 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.features;
 
-import edu.ukma.blog.services.IEmailService;
+import edu.ukma.blog.services.interfaces.features.IEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;

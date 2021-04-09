@@ -1,9 +1,9 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.user_related;
 
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
-import edu.ukma.blog.services.IUserImageService;
+import edu.ukma.blog.services.interfaces.user_related.IUserImageService;
 import edu.ukma.blog.utils.IconHandler;
 import edu.ukma.blog.utils.VarLenRWayTree;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class UserImageService implements IUserImageService, InitializingBean {
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
     @Value("${minUsernameLen}")
     private final int MIN_USERNAME_LEN;
-    @Value("#{T(edu.ukma.blog.services.implementations.UserImageService).buildPath(${minUsernameLen})}")
+    @Value("#{T(edu.ukma.blog.services.implementations.user_related.UserImageService).buildPath(${minUsernameLen})}")
     private final String PATH_TEMPLATE;
     private static final String AVATAR_SUFFIX = "-ava." + ImageConstants.TARGET_IMAGE_FORMAT;
     private static final String BANNER_SUFFIX = "-bnr." + ImageConstants.TARGET_IMAGE_FORMAT;

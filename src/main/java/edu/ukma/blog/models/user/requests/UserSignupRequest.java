@@ -11,7 +11,6 @@ import javax.validation.constraints.Pattern;
 
 @Data
 public class UserSignupRequest {
-
     @Email
     @NotNull
     private String email;

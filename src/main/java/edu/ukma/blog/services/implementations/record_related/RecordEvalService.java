@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.record_related;
 
 import edu.ukma.blog.models.composite_id.EvaluatorId;
 import edu.ukma.blog.models.composite_id.RecordId;
@@ -9,7 +9,7 @@ import edu.ukma.blog.repositories.IPublisherStatsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
-import edu.ukma.blog.services.IRecordEvalService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordEvalService;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

@@ -1,8 +1,8 @@
 package edu.ukma.blog.controllers.communication;
 
 import edu.ukma.blog.models.composite_id.RecordId;
-import edu.ukma.blog.services.IRecordEvalService;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordEvalService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

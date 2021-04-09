@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.user_related;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -12,7 +12,9 @@ import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.RegistrationRequestEntity;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
+import edu.ukma.blog.models.user.authorization.UserRole;
 import edu.ukma.blog.models.user.mappers.IRegistrationRequest_User;
+import edu.ukma.blog.models.user.mappers.ISignupRequest_UserEntity;
 import edu.ukma.blog.models.user.mappers.IUserEntity_SignupResponse;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
@@ -20,15 +22,11 @@ import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
-import edu.ukma.blog.repositories.IFollowersRepo;
-import edu.ukma.blog.repositories.IRecordsRepo;
-import edu.ukma.blog.repositories.IRegistrationRequestRepo;
-import edu.ukma.blog.repositories.IUsersRepo;
-import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
+import edu.ukma.blog.repositories.*;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
-import edu.ukma.blog.services.IEmailService;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.features.IEmailService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,24 +60,17 @@ public class UserService implements IUserService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
     private final IUsersRepo usersRepo;
-
     private final PasswordEncoder passwordEncoder;
-
     private final IFollowersRepo followersRepo;
-
     private final IRecordsRepo recordsRepo;
-
-    private final IUserNodesRepo userNodesRepo;
-
+    //    private final IUserNodesRepo userNodesRepo;
     private final IRegistrationRequestRepo signupRepo;
-
     private final IRegistrationRequest_User registrationRequest_userMapper;
-
     private final IUserEntity_SignupResponse userEntity_signupResponseMapper;
-
+    private final ISignupRequest_UserEntity signupRequest_userEntity;
     private final IEmailService emailService;
+    private final IRoleReadonlyRepo roleRepo;
 
     @Override
     @Transactional
@@ -188,9 +179,19 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean banUser(String username) {
-        usersRepo.getByUsername(username).ifPresent(idView -> userNodesRepo.deleteById(idView.getId()));
-        return usersRepo.deleteByUsername(username);
+    public void createAdmin(UserSignupRequest signupRequest) {
+        UserEntity newAdmin = signupRequest_userEntity.toUserEntity(signupRequest);
+        newAdmin.setEncryptedPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        PublisherStats adminStats = new PublisherStats(newAdmin);
+        newAdmin.setStatistics(adminStats);
+        newAdmin.setRole(roleRepo.findByRole(UserRole.ADMIN));
+        usersRepo.save(newAdmin);
+    }
+
+    @Override
+    @Transactional
+    public void banUser(String username) {
+        usersRepo.getByUsername(username).ifPresent(idView -> usersRepo.setActive(username, false));
     }
 
     @Override
@@ -201,6 +202,12 @@ public class UserService implements IUserService {
                         UserEntityIdsView::getUsername,
                         (String a, String b) -> b,
                         HashBiMap::create));
+    }
+
+    @Override
+    @Transactional
+    public void cancelBan(String username) {
+        usersRepo.getByUsername(username).ifPresent(idView -> usersRepo.setActive(username, true));
     }
 
     @Override

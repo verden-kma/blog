@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.record_related;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.BiMap;
@@ -20,9 +20,9 @@ import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
 import edu.ukma.blog.repositories.projections.record.MinRecordView;
 import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
 import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
-import edu.ukma.blog.services.IRecordImageService;
-import edu.ukma.blog.services.IRecordService;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordImageService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import edu.ukma.blog.utils.EagerContentPage;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.BeanUtils;

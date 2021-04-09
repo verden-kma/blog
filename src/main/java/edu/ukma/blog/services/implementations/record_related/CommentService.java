@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.record_related;
 
 import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.comment.CommentEntity;
@@ -8,8 +8,8 @@ import edu.ukma.blog.models.composite_id.CommentId;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.repositories.ICommentsRepo;
 import edu.ukma.blog.repositories.IPublisherStatsRepo;
-import edu.ukma.blog.services.ICommentService;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.record_related.ICommentService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
@@ -82,7 +82,6 @@ public class CommentService implements ICommentService {
     /**
      * deletes a comment denoted by the <code>commentId</code> if it is being deleted by a publisher of the comment
      * in the event of successful deletion, publisher statistics is updated
-     *
      * @param commentID     compound primary key of CommentEntity stored in database
      * @param commentatorId id of a user who wants to delete a comment
      */

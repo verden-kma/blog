@@ -2,6 +2,7 @@ package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
+import edu.ukma.blog.services.implementations.user_related.UserImageService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;

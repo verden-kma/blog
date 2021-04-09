@@ -1,5 +1,6 @@
 package edu.ukma.blog.models.user;
 
+import edu.ukma.blog.models.user.authorization.UserRoleEntity;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -10,7 +11,8 @@ import javax.validation.constraints.NotBlank;
 @Table(name = "user_entity")
 public class UserEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_id_gen")
+    @TableGenerator(name = "user_id_gen", initialValue = 1, allocationSize = 1)
     @Column(name = "id")
     private long id;
 
@@ -25,9 +27,15 @@ public class UserEntity {
     @NotBlank
     private String encryptedPassword;
 
-    private String status; // short description
+    private String status;
 
     private String description;
+
+    private boolean isActive;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", columnDefinition = "int default 1")
+    private UserRoleEntity role;
 
     @OneToOne(mappedBy = "publisher", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

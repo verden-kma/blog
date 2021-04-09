@@ -1,4 +1,4 @@
-package edu.ukma.blog.controllers.actors;
+package edu.ukma.blog.controllers.user;
 
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
 import edu.ukma.blog.models.user.requests.EditUserRequest;
@@ -6,7 +6,7 @@ import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
-import edu.ukma.blog.services.IUserService;
+import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +35,6 @@ public class UserCtrl {
         return userService.confirmRequest(UUID.fromString(token));
     }
 
-    // use to load user's page and to get old user data while editing user's profile
     @GetMapping("/{publisher}")
     public UserDataResponse getUserData(@PathVariable @NotEmpty String publisher,
                                         Principal principal) {
@@ -60,9 +59,8 @@ public class UserCtrl {
         userService.updateUserPassword(principal.getName(), request);
     }
 
-    // possible feature: add admins who can actually ban users, for now it is just self deletion
     @DeleteMapping
-    public boolean banUser(Principal principal) {
-        return userService.banUser(principal.getName());
+    public void deleteAccount(Principal principal) {
+        userService.banUser(principal.getName());
     }
 }

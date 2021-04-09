@@ -1,4 +1,4 @@
-package edu.ukma.blog.services;
+package edu.ukma.blog.services.interfaces.user_related;
 
 import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
@@ -19,6 +19,8 @@ public interface IUserService extends UserDetailsService {
 
     BiMap<Long, String> getUserIdentifiersBimap(List<Long> ids);
 
+    void createAdmin(UserSignupRequest signupRequest);
+
     void createSignUpRequest(UserSignupRequest userData);
 
     SignupResponse confirmRequest(UUID token);
@@ -31,5 +33,7 @@ public interface IUserService extends UserDetailsService {
 
     void updateUserPassword(String username, EditUserPasswordRequest editRequest);
 
-    boolean banUser(String username);
+    void banUser(String username);
+
+    void cancelBan(String username);
 }

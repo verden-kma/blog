@@ -1,10 +1,10 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.record_related;
 
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.repositories.IRecordsRepo;
-import edu.ukma.blog.services.IRecordImageService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class RecordImageService implements IRecordImageService, InitializingBean
     // It is not enough for 2^63 users, but just fine for debug
     // 3x512 with 8 IMG_ID_LENGTH should be enough
     private static final File IMAGE_ROOT = new File(ImageConstants.PATH_PREFIX + "/records");
-    @Value("#{T(edu.ukma.blog.services.implementations.RecordImageService).buildPath(${recordsDirectoriesDepth})}")
+    @Value("#{T(edu.ukma.blog.services.implementations.record_related.RecordImageService).buildPath(${recordsDirectoriesDepth})}")
     private final String PATH_TEMPLATE;
     @Value("${recordsDirectoriesDepth}")
     private final int DIR_DEPTH;

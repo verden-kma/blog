@@ -1,4 +1,4 @@
-package edu.ukma.blog.services.implementations;
+package edu.ukma.blog.services.implementations.features;
 
 import edu.ukma.blog.models.record.RecordEntity;
 import edu.ukma.blog.models.record.ResponseRecord;
@@ -8,8 +8,8 @@ import edu.ukma.blog.repositories.IRecordsRepo;
 import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.projections.record.RecordIdView;
 import edu.ukma.blog.repositories.projections.user.PublisherPreviewBaseView;
-import edu.ukma.blog.services.IRecordService;
-import edu.ukma.blog.services.ISearchService;
+import edu.ukma.blog.services.interfaces.features.ISearchService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordService;
 import edu.ukma.blog.utils.EagerContentPage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

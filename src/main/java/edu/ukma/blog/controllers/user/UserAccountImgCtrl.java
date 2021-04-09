@@ -1,8 +1,8 @@
-package edu.ukma.blog.controllers.actors;
+package edu.ukma.blog.controllers.user;
 
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
-import edu.ukma.blog.services.IUserImageService;
+import edu.ukma.blog.services.interfaces.user_related.IUserImageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.*;

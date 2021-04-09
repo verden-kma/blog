@@ -1,6 +1,7 @@
 package edu.ukma.blog.services.implementations;
 
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
+import edu.ukma.blog.services.implementations.record_related.RecordImageService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
