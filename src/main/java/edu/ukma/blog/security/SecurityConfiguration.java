@@ -15,8 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,10 +54,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(new LoginFilter(jwtUtils, authenticationManagerBean()))
                 .addFilterBefore(new JwtFilter(jwtUtils, userDetailsService), LoginFilter.class)
                 .addFilterAfter(new RefreshJwtFilter(new AntPathRequestMatcher(refreshTokenUrl, HttpMethod.GET.name()), jwtUtils), LoginFilter.class)
-                .addFilterAfter(new LogoutFilter((request, response, authentication) ->
-                        response.setStatus(HttpStatus.NO_CONTENT.value()), new SecurityContextLogoutHandler()), RefreshJwtFilter.class)
+// todo: add logout for jwt
+//                .addFilterAfter(new LogoutFilter((request, response, authentication) ->
+//                        response.setStatus(HttpStatus.NO_CONTENT.value()), new SecurityContextLogoutHandler()), RefreshJwtFilter.class)
                 .exceptionHandling().authenticationEntryPoint((request, response, authException) ->
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), authException.getMessage()))
+        {
+            authException.printStackTrace();
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), authException.getMessage());
+        })
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
@@ -70,15 +72,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    // attention&kek: 'corsFilter()' works, 'corsFilterBean()' doesn't
     @Bean
-    public CorsFilter corsFilterBean() {
+    public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedMethod("*");
-        configurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowCredentials(true);
+        corsConfig.addAllowedOrigin("*");
+        corsConfig.addAllowedHeader("*");
+        corsConfig.addAllowedMethod("OPTIONS");
+        corsConfig.addAllowedMethod("HEAD");
+        corsConfig.addAllowedMethod("GET");
+        corsConfig.addAllowedMethod("PUT");
+        corsConfig.addAllowedMethod("POST");
+        corsConfig.addAllowedMethod("PATCH");
+        corsConfig.addAllowedMethod("DELETE");
+        configurationSource.registerCorsConfiguration("/**", corsConfig);
         return new CorsFilter(configurationSource);
     }
+
+
 }

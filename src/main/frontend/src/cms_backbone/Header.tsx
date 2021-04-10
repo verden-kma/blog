@@ -26,7 +26,6 @@ class Header extends React.Component<IProps, any> {
                     <Nav.Link><Link to={"/post-record"}>NewRecord</Link></Nav.Link>
                     <Search {...this.props}/>
                     <Nav.Link><UserOptionsDropdown username={this.props.username}/></Nav.Link>
-
                 </Nav>
             </Navbar.Collapse>
         </Navbar>)

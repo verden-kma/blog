@@ -30,11 +30,6 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
         })
     }
 
-    // handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    //     event.preventDefault();
-    //     // this.props.searchCallback({...this.state}) // copy
-    // }
-
     render() {
         return (
             <Form inline onSubmit={(event => event.preventDefault())}>

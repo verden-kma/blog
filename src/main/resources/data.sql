@@ -31,14 +31,19 @@ INSERT INTO user_entity (id, username, email, encrypted_password, role_id, is_ac
 INSERT INTO publisher_stats (publisher_id, uploads, followers, likes, dislikes, comments) VALUES
 (1, 0, 0, 0, 0, 0);
 
---insert into user_entity (id, username, encrypted_password, status, description) values
---(1, 'niceUsername', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'someStatus', 'someDesc'),
---(2, 'Orest', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'OrestStatus', 'OrestDesc'),
---(3, 'Vasyl', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'VasylStatus', 'VasylDesc'),
---(4, 'Yaroslav', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'YaroslavStatus', 'YaroslavDesc'),
---(5, 'Mykhailo', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'MykhailoStatus', 'MykhailoDesc'),
---(6, 'Ivan', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'IvanStatus', 'IvanDesc'),
---(7, 'Kyrylo', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'KyryloStatus', 'KyryloDesc'),
---(8, 'Volodymyr', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'VolodymyrStatus', 'VolodymyrDesc'),
---(9, 'Svyatoslav', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'SvyatoslavStatus', 'SvyatoslavDesc'),
---(10, 'Hryhir', '$2a$10$aaroqu8EsZpaS4S8lvtKcu73lO6ltyVU71IqBTE3hj0PrOL7BAEDK', 'HryhirStatus', 'HryhirDesc');
+-- password = '00000'
+-- there is a non-auto id generator for UserEntity which depends on the number of hardcoded users
+insert into user_entity (id, username, email, encrypted_password, role_id, is_active, status, description) values
+(2, 'niceUsername', 'mock1@mail.com', '$2a$10$WWZ6p..W7MMR8UcJKlUEO.VQeoVfE2HNyFhiKeHHHHZAeDmbhlRxO', 1, true, 'someStatus', 'someDesc');
+--(2, 'Orest', 'mock2@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'OrestStatus', 'OrestDesc'),
+--(3, 'Vasyl', 'mock3@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'VasylStatus', 'VasylDesc'),
+--(4, 'Yaroslav', 'mock4@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'YaroslavStatus', 'YaroslavDesc'),
+--(5, 'Mykhailo', 'mock5@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'MykhailoStatus', 'MykhailoDesc'),
+--(6, 'Ivan', 'mock6@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'IvanStatus', 'IvanDesc'),
+--(7, 'Kyrylo', 'mock7@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'KyryloStatus', 'KyryloDesc'),
+--(8, 'Volodymyr', 'mock8@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'VolodymyrStatus', 'VolodymyrDesc'),
+--(9, 'Svyatoslav', 'mock9@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'SvyatoslavStatus', 'SvyatoslavDesc'),
+--(10, 'Hryhir', 'mock10@mail.com', '$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO', 1, true, 'HryhirStatus', 'HryhirDesc');
+
+INSERT INTO publisher_stats (publisher_id, uploads, followers, likes, dislikes, comments) VALUES
+(2, 0, 0, 0, 0, 0);

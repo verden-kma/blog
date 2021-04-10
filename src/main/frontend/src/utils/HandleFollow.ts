@@ -12,7 +12,7 @@ function handleFollow(publisher: IPublisherFollow, auth: IAuthProps, setStateCB:
         {
             method: publisher.isFollowed ? "delete" : "put",
             url: `http://localhost:8080/users/${publisher.publisherName}/followers`,
-            headers: {'Authorization': `${auth.authType} ${auth.token}`}
+            headers: {'Authorization': `Bearer ${auth.token}`}
         }
     ).then(success => {
         let updPubl: IPublisherFollow = {...publisher};

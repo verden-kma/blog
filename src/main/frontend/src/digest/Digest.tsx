@@ -24,7 +24,7 @@ class Digest extends React.Component<IAuthProps, IState> {
     componentDidMount() {
         axios.get('http://localhost:8080/digest?page=0', {
             headers: {
-                'Authorization': `${this.props.authType} ${this.props.token}`
+                'Authorization': `Bearer ${this.props.token}`
             }
         }).then((response) => {
             this.setState({records: response.data.pageItems})

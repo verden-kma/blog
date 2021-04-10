@@ -28,7 +28,7 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
     componentDidMount() {
         axios.get(`http://localhost:8080/users/${this.state.targetUsername}/top-banner`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => {
             if (success.data) {
                 this.setState({topBanner: Buffer.from(success.data, 'binary').toString('base64')})

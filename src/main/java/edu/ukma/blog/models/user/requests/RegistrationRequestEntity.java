@@ -1,4 +1,4 @@
-package edu.ukma.blog.models.user;
+package edu.ukma.blog.models.user.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

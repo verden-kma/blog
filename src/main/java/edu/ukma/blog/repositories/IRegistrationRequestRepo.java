@@ -1,6 +1,6 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.models.user.RegistrationRequestEntity;
+import edu.ukma.blog.models.user.requests.RegistrationRequestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

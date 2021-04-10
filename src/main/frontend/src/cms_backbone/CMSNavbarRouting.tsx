@@ -15,8 +15,9 @@ import ChangePassword from "../expose_publisher/user_profile_details/ChangePassw
 
 interface IAuthProps {
     username: string,
-    authType: string,
-    token: string
+    token: string,
+    // todo: send role from login filter
+    permissions?: Array<string>
 }
 
 class CMSNavbarRouting extends React.Component<any, any> {
@@ -30,7 +31,6 @@ class CMSNavbarRouting extends React.Component<any, any> {
         }
         const authData: IAuthProps = {
             username: store.get("username"),
-            authType: store.get("authType"),
             token: store.get("token")
         }
 

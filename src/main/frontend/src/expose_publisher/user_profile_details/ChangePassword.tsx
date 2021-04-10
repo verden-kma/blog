@@ -39,7 +39,7 @@ class ChangePassword extends React.Component<IAuthProps, IState> {
     handlePasswordChange() {
         const passUpd = {currentPassword: this.state.suggestedCurrPassword, newPassword: this.state.newPassword};
         axios.patch("http://localhost:8080/users/password", passUpd, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            headers: {'Authorization': `Bearer ${this.props.token}`}
         }).then(() => {
             store.clearAll();
             window.location.reload();

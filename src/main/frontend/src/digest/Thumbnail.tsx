@@ -24,7 +24,7 @@ class Thumbnail extends React.Component<IProps, IState> {
             {
                 responseType: 'arraybuffer',
                 headers: {
-                    'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`,
+                    'Authorization': `Bearer ${this.props.auth.token}`,
                     'Accept': 'image/jpeg'
                 }
             }).then((response) => {

@@ -39,7 +39,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
 
     componentDidMount() {
         axios.get(`http://localhost:8080/users/${this.props.username}`, {
-            headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+            headers: {'Authorization': `Bearer ${this.props.token}`}
         }).then(success => {
             this.setState({
                 oldStatus: success.data.status,
@@ -93,7 +93,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         if (Object.keys(textUpdate).length > 0) {
             const textPromise: Promise<any> =
                 axios.patch(`http://localhost:8080/users/details`, textUpdate, {
-                    headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.token}`}
                 }).then(() => {
                 }, error => console.log(error));
             updatePromises.push(textPromise);
@@ -112,14 +112,14 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         if (mode === "delete") {
             return axios.delete(`http://localhost:8080/users/${urlSuffix}`,
                 {
-                    headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.token}`}
                 }).then(() => {
             }, error => console.log(error))
         } else if (mode === "update" && newImage !== undefined) {
             let body = new FormData();
             body.append("image", newImage);
             return axios.put(`http://localhost:8080/users/${urlSuffix}`, body, {
-                headers: {'Authorization': `${this.props.authType} ${this.props.token}`}
+                headers: {'Authorization': `Bearer ${this.props.token}`}
             }).then(() => {
             }, error => console.log(error))
         }

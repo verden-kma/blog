@@ -27,20 +27,20 @@ class Login extends React.Component<any, IState> {
 
     handleLogin(event: React.ChangeEvent<HTMLInputElement>) {
         event.preventDefault();
-        axios.post("http://localhost:8080/users/login", {
+        axios.post("http://localhost:8080/login", {
             username: this.state.username,
             password: this.state.password
         }).then((response) => {
             console.log("logged in");
             store.set('username', this.state.username)
-            store.set('authType', response.data.authType)
-            store.set('token', response.data.token)
+            store.set('token', response.data)
             store.set('isAuthorized', true);
 
             let {from} = this.props.location.state || {from: {pathname: "/"}};
             this.props.history.replace(from);
         }, (error) => {
-            alert("wrong credentials " + (error.response && error.response.status))
+            alert("wrong credentials ")
+            console.log(error)
         })
     }
 

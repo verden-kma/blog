@@ -84,7 +84,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
 
         if (this.props.previewContext == RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
-                headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                headers: {'Authorization': `Bearer ${this.props.auth.token}`}
             }).then((success: AxiosResponse<ILazyRecordsPage>) => {
                 this.setState({recordJsons: success.data.pageItems},
                     () => this.loadImages())
@@ -94,7 +94,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
 
     loadCurrentPage() {
         axios.get(this.getUrl(), {
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`},
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`},
             params: {page: this.state.currPage}
         }).then((success: AxiosResponse<IEagerRecordsPage>) => {
             const {pageItems, totalPagesNum} = success.data;
@@ -109,7 +109,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
                 {
                     responseType: 'arraybuffer',
                     headers: {
-                        'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`
+                        'Authorization': `Bearer ${this.props.auth.token}`
                     }
                 }).then(response => {
                 this.setState((oldState: IState) => {

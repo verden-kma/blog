@@ -1,12 +1,7 @@
 import React from "react";
 import Dropzone from "../Dropzone";
 import axios from "axios";
-
-interface IProps {
-    username: string,
-    authType: string,
-    token: string
-}
+import {IAuthProps} from "./CMSNavbarRouting";
 
 interface IState {
     caption: string,
@@ -14,8 +9,8 @@ interface IState {
     file?: File
 }
 
-class PostRecord extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
+class PostRecord extends React.Component<IAuthProps, IState> {
+    constructor(props: IAuthProps) {
         super(props);
         this.state = {
             caption: "",
@@ -61,7 +56,7 @@ class PostRecord extends React.Component<IProps, IState> {
             data: body,
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `${this.props.authType} ${this.props.token}`
+                'Authorization': `Bearer ${this.props.token}`
             }
         }).then(success => {
                 alert("success")

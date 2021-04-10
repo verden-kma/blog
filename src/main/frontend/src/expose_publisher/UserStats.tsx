@@ -66,7 +66,7 @@ class UserStats extends React.Component<IProps, IState> {
     componentDidMount() {
         axios.get(`http://localhost:8080/users/${this.props.targetUsername}/avatar`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => {
             if (success.data) {
                 this.setState(oldState => ({
@@ -76,7 +76,7 @@ class UserStats extends React.Component<IProps, IState> {
             }
         }, error => console.log(error));
         axios.get(`http://localhost:8080/users/${this.props.targetUsername}`, {
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then((success: AxiosResponse<IUserData>) => {
             this.setState(oldState => ({...oldState, userData: success.data}))
         }, error => console.log(error));

@@ -73,7 +73,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         axios.post(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
             commenter: this.props.auth.username,
             text: this.state.newCommentText
-        }, {headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}})
+        }, {headers: {'Authorization': `Bearer ${this.props.auth.token}`}})
             .then(success => {
                 this.setState((oldState: IState) => {
                     let topComments: Array<IComment> = oldState.comments.get(0) || [];
@@ -110,7 +110,7 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}`, {
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -122,7 +122,7 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/image`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -133,7 +133,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         }, error => console.log(error));
 
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/comments?block=0`, {
-            headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 let comments: Map<number, Array<IComment>> = new Map();
@@ -147,7 +147,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                 success.data.pageItems.forEach((comment: IComment, index: number) => {
                     axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
                         responseType: 'arraybuffer',
-                        headers: {'Authorization': `${this.props.auth.authType} ${this.props.auth.token}`}
+                        headers: {'Authorization': `Bearer ${this.props.auth.token}`}
                     }).then(success => {
                         if (success.data !== null) {
                             this.setState(oldState => {
@@ -210,6 +210,9 @@ class FullRecordView extends React.Component<IProps, IState> {
                                 onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
                         </button>
                     </div>
+
+                    <button>Edit record</button>
+                    <button>Delete record</button>
                 </div>
                 <h6>Comments: {this.state.recordJson.numOfComments}</h6>
                 <br/>
