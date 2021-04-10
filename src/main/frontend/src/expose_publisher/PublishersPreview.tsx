@@ -81,7 +81,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
         const updFlwState = (updPublFlw: IPublisherFollow) => {
             this.setState((oldState: IState) => {
                 const publisherIndex: number = oldState.publisherJsons.findIndex(publ => publ.publisher === updPublFlw.publisherName);
-                if (publisherIndex == -1) return oldState;
+                if (publisherIndex === -1) return oldState;
                 let updPublishers = [...oldState.publisherJsons];
                 let updTarget = {...updPublishers[publisherIndex]};
                 updTarget.isFollowed = updPublFlw.isFollowed;

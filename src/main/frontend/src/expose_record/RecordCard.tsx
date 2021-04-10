@@ -10,9 +10,6 @@ interface ICardProps extends IRecord {
 }
 
 class RecordCard extends React.Component<ICardProps, any> {
-    constructor(props: ICardProps) {
-        super(props);
-    }
 
     render() {
         const activeStyle = {"font-weight": "bold"};

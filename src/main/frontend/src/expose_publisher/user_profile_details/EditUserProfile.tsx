@@ -70,7 +70,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
     }
 
     checkImageValid(imageField: string): boolean {
-        if (imageField == "newAvatar" && this.state.newAvatar) {
+        if (imageField === "newAvatar" && this.state.newAvatar) {
             const maybeGoodImage: File = this.state.newAvatar;
             const fileType: string = maybeGoodImage.type;
             console.log(fileType)

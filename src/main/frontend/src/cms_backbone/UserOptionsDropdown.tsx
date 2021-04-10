@@ -1,7 +1,6 @@
 import React from 'react';
 import NavDropdown from "react-bootstrap/NavDropdown";
 import store from "store"
-import {Link} from "react-router-dom";
 import axios from "axios";
 import {IAuthProps} from "./CMSNavbarRouting";
 
@@ -26,9 +25,9 @@ class UserOptionsDropdown extends React.Component<any, IAuthProps> {
     render() {
         return (
             <NavDropdown title={this.state.username} id="user-options-navbar">
-                <NavDropdown.Item><Link to={`/profile/${this.state.username}`}>Profile</Link></NavDropdown.Item>
-                <NavDropdown.Item><Link to={"/edit-user-details"}>Edit profile</Link></NavDropdown.Item>
-                <NavDropdown.Item><Link to={"/change-password"}>Change password</Link></NavDropdown.Item>
+                <NavDropdown.Item href={`/profile/${this.state.username}`}>Profile</NavDropdown.Item>
+                <NavDropdown.Item href={"/edit-user-details"}>Edit profile</NavDropdown.Item>
+                <NavDropdown.Item href={"/change-password"}>Change password</NavDropdown.Item>
                 <NavDropdown.Divider/>
                 <NavDropdown.Item onClick={this.doLogout}>Log out</NavDropdown.Item>
             </NavDropdown>

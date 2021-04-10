@@ -133,7 +133,7 @@ public class RecordCtrl {
     }
 
     @PreAuthorize("hasAuthority('POST_RECORDS')")
-    @PutMapping(path = "/{recordId}")
+    @PatchMapping(path = "/{recordId}")
     public void editRecord(@PathVariable @Min(1) int recordId,
                            @RequestBody @Valid RequestRecord updatedRecord,
                            Principal principal) {

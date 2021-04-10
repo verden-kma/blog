@@ -1,12 +1,16 @@
 import React from 'react';
 import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
-import {RouteComponentProps, withRouter} from "react-router";
+import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import store from "store"
 import {IRecord} from "../RecordsPreviewPage";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 import UserStats from "../../expose_publisher/UserStats";
+import {Link} from "react-router-dom";
+import {Button, Modal, ModalBody, ModalFooter, ModalTitle} from "react-bootstrap";
+import ModalHeader from "react-bootstrap/ModalHeader";
+
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps
@@ -18,7 +22,9 @@ interface IState {
     comments: Map<number, Array<IComment>>,
     currCommentPage: number,
     hasMorePages: boolean,
-    newCommentText: string
+    newCommentText: string,
+    deleteRequested: boolean,
+    deleteAccomplished: boolean
 }
 
 interface IComment {
@@ -38,12 +44,15 @@ class FullRecordView extends React.Component<IProps, IState> {
             comments: new Map(),
             currCommentPage: 0,
             hasMorePages: false,
-            newCommentText: ""
+            newCommentText: "",
+            deleteRequested: false,
+            deleteAccomplished: false
         }
         this.handleEvaluation = this.handleEvaluation.bind(this);
         this.loadMoreComments = this.loadMoreComments.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.sendComment = this.sendComment.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     handleEvaluation(forLike: boolean) {
@@ -64,6 +73,7 @@ class FullRecordView extends React.Component<IProps, IState> {
     }
 
     loadMoreComments() {
+        // todo: add this feature
         alert("not implemented")
     }
 
@@ -169,14 +179,24 @@ class FullRecordView extends React.Component<IProps, IState> {
         }, error => console.log(error));
     }
 
+    handleDelete() {
+        if (this.state.recordJson === undefined) return;
+        const {publisher, id} = this.state.recordJson;
+        axios.delete(`http://localhost:8080/users/${publisher}/records/${id}`, {
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+        }).then(success => this.setState({deleteAccomplished: true}), error => alert(error));
+    }
+
     render() {
         if (!this.state.recordJson) return <div>empty div</div>;
+        if (this.state.deleteAccomplished) return <Redirect to={`/profile/${this.state.recordJson.publisher}`}/>;
+
         const date: Date = new Date(this.state.recordJson.timestamp);
         const activeStyle = {"font-weight": "bold"};
         const ls = (this.state.recordJson.reaction !== null && this.state.recordJson.reaction) ? activeStyle : {};
         const dls = (this.state.recordJson.reaction !== null && !this.state.recordJson.reaction) ? activeStyle : {};
 
-        let comments: Array<Comment> = []
+        let comments: Array<Comment> = [];
         for (let i = 0; i <= this.state.currCommentPage; i++) {
             if (this.state.comments.get(i) === undefined) {
                 console.log("failed to load comments block");
@@ -194,6 +214,21 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         return (
             <div>
+                <Modal show={this.state.deleteRequested} onHide={() => this.setState({deleteRequested: false})}>
+                    <ModalHeader closeButton>
+                        <ModalTitle>Are you sure you want to delete this record?</ModalTitle>
+                    </ModalHeader>
+                    <ModalBody>
+                        It will also delete all comments, evaluation and so affect your statistics.
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant={"danger"} onClick={this.handleDelete}>Yes, delete this record.</Button>
+                        <Button variant={"info"} onClick={() => this.setState({deleteRequested: false})}>
+                            No, I have changed my mind.
+                        </Button>
+                    </ModalFooter>
+                </Modal>
+
                 <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
                 <div>
                     <img width={700} height={300} src={'data:image/jpeg;base64, ' + this.state.image}
@@ -206,13 +241,19 @@ class FullRecordView extends React.Component<IProps, IState> {
                         <button style={ls}
                                 onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
                         </button>
-                        <button style={dls}
-                                onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
+                        <button style={dls} onClick={this.handleEvaluation.bind(this, false)}>
+                            Dislike {this.state.recordJson.dislikes}
                         </button>
                     </div>
-
-                    <button>Edit record</button>
-                    <button>Delete record</button>
+                    {this.state.recordJson.publisher === this.props.auth.username &&
+                    <div>
+                        <Link
+                            to={`/users/${this.props.match.params.publisher}/records/${this.state.recordJson.id}/edit`}>
+                            <button>Edit record</button>
+                        </Link>
+                        <button onClick={() => this.setState({deleteRequested: true})}>Delete record</button>
+                    </div>
+                    }
                 </div>
                 <h6>Comments: {this.state.recordJson.numOfComments}</h6>
                 <br/>
@@ -227,6 +268,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                 </form>
                 <div>
                     {comments}
+                    <button>Load more comments</button>
                 </div>
             </div>
         );

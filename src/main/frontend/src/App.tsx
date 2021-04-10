@@ -7,9 +7,6 @@ import ProtectedPage from "./auth/ProtectedPage";
 import ConfirmRegistration from "./auth/ConfirmRegistration";
 
 class App extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-    }
 
     render() {
         return (

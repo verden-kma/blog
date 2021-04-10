@@ -82,7 +82,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     componentDidMount() {
         console.log(`mounted preview ${new Date().getSeconds()}`)
 
-        if (this.props.previewContext == RecordPreviewContext.RECOMMENDATION) {
+        if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
                 headers: {'Authorization': `Bearer ${this.props.auth.token}`}
             }).then((success: AxiosResponse<ILazyRecordsPage>) => {
@@ -147,8 +147,6 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     render() {
-        console.log(`rendered preview recs ${new Date().getSeconds()}`)
-
         const records = this.state.recordJsons.map((r: IRecord) =>
             <RecordCard key={r.id} {...{
                 ...r, image: this.state.recordImgs.get(r.id),

@@ -12,6 +12,7 @@ import FullRecordView from "../expose_record/record_page/FullRecordView";
 import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
 import EditUserProfile from "../expose_publisher/user_profile_details/EditUserProfile";
 import ChangePassword from "../expose_publisher/user_profile_details/ChangePassword";
+import EditRecord from "../expose_record/record_page/EditRecord";
 
 interface IAuthProps {
     username: string,
@@ -21,9 +22,6 @@ interface IAuthProps {
 }
 
 class CMSNavbarRouting extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-    }
 
     render() {
         if (!store.get("isAuthorized")) {
@@ -80,6 +78,9 @@ class CMSNavbarRouting extends React.Component<any, any> {
                         </Route>
                         <Route exact path={"/change-password"}>
                             <ChangePassword  {...authData}/>
+                        </Route>
+                        <Route exact path={"/users/:publisher/records/:recordId/edit"}>
+                            <EditRecord {...{auth: authData}}/>
                         </Route>
                     </Switch>
                     <Footer/>

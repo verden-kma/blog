@@ -49,7 +49,7 @@ class UserStats extends React.Component<IProps, IState> {
 
         const updateStateCB = (updPublFlwData: IPublisherFollow) => {
             this.setState((oldState: IState) => {
-                if (oldState.userData == undefined) return oldState;
+                if (oldState.userData === undefined) return oldState;
                 let updData: IUserData = {...oldState.userData};
                 updData.isFollowed = updPublFlwData.isFollowed;
                 updData.followers = updPublFlwData.followers;
