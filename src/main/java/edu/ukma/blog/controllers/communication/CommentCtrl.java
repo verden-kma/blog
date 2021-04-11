@@ -46,11 +46,12 @@ public class CommentCtrl {
     @PostMapping
     public int addComment(@PathVariable @NotEmpty String publisher,
                           @PathVariable @Min(1) int recordId,
-                          @RequestBody @Valid RequestComment newComment) {
+                          @RequestBody @Valid RequestComment newComment,
+                          Principal principal) {
         userService.assertActive(publisher);
         long publisherId = userService.getUserIdByUsername(publisher);
         RecordId fullRecordId = new RecordId(publisherId, recordId);
-        long commenterId = userService.getUserIdByUsername(newComment.getCommenter());
+        long commenterId = userService.getUserIdByUsername(principal.getName());
         return commentService.addComment(fullRecordId, commenterId, newComment.getText());
     }
 

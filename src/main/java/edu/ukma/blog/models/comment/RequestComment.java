@@ -9,9 +9,6 @@ import javax.validation.constraints.Size;
 
 @Data
 public class RequestComment {
-    @NotBlank(message = "commenter must be known")
-    private String commenter;
-
     @NotBlank(message = "comment cannot be empty")
     @Size(max = ValidationConstants.MAX_COMMENT_LENGTH)
     private String text;

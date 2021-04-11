@@ -81,7 +81,6 @@ class FullRecordView extends React.Component<IProps, IState> {
         event.preventDefault();
         const {publisher, recordId} = this.props.match.params;
         axios.post(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
-            commenter: this.props.auth.username,
             text: this.state.newCommentText
         }, {headers: {'Authorization': `Bearer ${this.props.auth.token}`}})
             .then(success => {

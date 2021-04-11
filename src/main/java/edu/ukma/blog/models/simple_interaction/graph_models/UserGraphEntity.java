@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NodeEntity
-// @RelationshipEntity
 @NoArgsConstructor
 @Data
 public class UserGraphEntity {

@@ -1,0 +1,11 @@
+1,meant to demonstrate admin functionality,admin@sprout.com,$2a$10$gTb5.07BiacADrxy5Cg0pO8.0AKwmbgLzlRs6IMwHFZ2JyqpBmfQO,true,default admin,admin,2
+2,someDesc,mock1@mail.com,$2a$10$WWZ6p..W7MMR8UcJKlUEO.VQeoVfE2HNyFhiKeHHHHZAeDmbhlRxO,true,someStatus,niceUsername,1
+3,OrestDesc,mock2@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,OrestStatus,Orest,1
+4,VasylDesc,mock3@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,VasylStatus,Vasyl,1
+5,YaroslavDesc,mock4@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,YaroslavStatus,Yaroslav,1
+6,MykhailoDesc,mock5@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,MykhailoStatus,Mykhailo,1
+7,IvanDesc,mock6@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,IvanStatus,Ivan,1
+8,KyryloDesc,mock7@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,KyryloStatus,Kyrylo,1
+9,VolodymyrDesc,mock8@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,VolodymyrStatus,Volodymyr,1
+10,SvyatoslavDesc,mock9@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,SvyatoslavStatus,Svyatoslav,1
+11,HryhirDesc,mock10@mail.com,$2a$10$Cx/wrhb468//X7a66LM8puEbfXPYE8gi6PHWzyTv9ktggx7q3i4gO,true,HryhirStatus,Hryhir,1
