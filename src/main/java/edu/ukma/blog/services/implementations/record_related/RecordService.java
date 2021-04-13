@@ -25,6 +25,7 @@ import edu.ukma.blog.services.interfaces.record_related.IRecordService;
 import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import edu.ukma.blog.utils.EagerContentPage;
 import edu.ukma.blog.utils.LazyContentPage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -45,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RecordService implements IRecordService {
 
     @PersistenceContext
@@ -63,16 +65,6 @@ public class RecordService implements IRecordService {
     private final IUserService userService;
 
     private final IRecordNodesRepo recordNodesRepo;
-
-    public RecordService(IRecordsRepo recordsRepo, ICommentsRepo commentsRepo, IRecordImageService imageService, IEvaluatorsRepo evaluatorsRepo, IPublisherStatsRepo publisherStatsRepo, IUserService userService, IRecordNodesRepo recordNodesRepo) {
-        this.recordsRepo = recordsRepo;
-        this.commentsRepo = commentsRepo;
-        this.imageService = imageService;
-        this.evaluatorsRepo = evaluatorsRepo;
-        this.publisherStatsRepo = publisherStatsRepo;
-        this.userService = userService;
-        this.recordNodesRepo = recordNodesRepo;
-    }
 
     @Override
     @Transactional
@@ -256,5 +248,10 @@ public class RecordService implements IRecordService {
         return recordsRepo.findByIdPublisherIdAndIdRecordOwnIdIn(pid, rids).stream()
                 .map(view -> new MinResponseRecord(publisher, view.getId().getRecordOwnId(), view.getCaption()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ResponseRecord> getResponseByIds(List<RecordId> recordIdList, long userId) {
+        return buildRespRecs(Collections.singletonList(recordsRepo.findAllById(recordIdList)), userId);
     }
 }

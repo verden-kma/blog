@@ -1,5 +1,5 @@
 import axios from "axios";
-import {IRecord} from "../expose_record/RecordsPreviewPage";
+import {IRecord} from "../expose_record/multiple_records/RecordsPreviewPage";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 
 function genericHandleEvaluation(record: IRecord, forLike: boolean, auth: IAuthProps,

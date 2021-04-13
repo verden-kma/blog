@@ -10,7 +10,7 @@ import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
 import edu.ukma.blog.models.user.authorization.UserPermissionEntity;
 import edu.ukma.blog.models.user.authorization.UserRole;
-import edu.ukma.blog.models.user.mappers.IRegistrationRequest_User;
+import edu.ukma.blog.models.user.mappers.IRegistrationRequest_UserEntity;
 import edu.ukma.blog.models.user.mappers.ISignupRequest_UserEntity;
 import edu.ukma.blog.models.user.mappers.IUserEntity_SignupResponse;
 import edu.ukma.blog.models.user.requests.EditUserPasswordRequest;
@@ -64,7 +64,7 @@ public class UserService implements IUserService {
     private final IRecordsRepo recordsRepo;
     //    private final IUserNodesRepo userNodesRepo;
     private final IRegistrationRequestRepo signupRepo;
-    private final IRegistrationRequest_User registrationRequest_userMapper;
+    private final IRegistrationRequest_UserEntity registrationRequest_userMapper;
     private final IUserEntity_SignupResponse userEntity_signupResponseMapper;
     private final ISignupRequest_UserEntity signupRequest_userEntity;
     private final IEmailService emailService;
@@ -96,14 +96,14 @@ public class UserService implements IUserService {
         RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
                 .orElseThrow(SignupRequestTimedOut::new);
 
-        UserEntity newUser = registrationRequest_userMapper.registrationRequestToUser(registrationRequest);
+        UserEntity newUser = registrationRequest_userMapper.toUserEntity(registrationRequest);
         newUser.setStatistics(new PublisherStats(newUser));
 
         if (usersRepo.existsUserByUsername(newUser.getUsername()))
             throw new UsernameDuplicateException(newUser.getUsername());
         usersRepo.save(newUser);
 
-        return userEntity_signupResponseMapper.userEntityToSignupResponse(newUser);
+        return userEntity_signupResponseMapper.toSignupResponse(newUser);
     }
 
     @Override

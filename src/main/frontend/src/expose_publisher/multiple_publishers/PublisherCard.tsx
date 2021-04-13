@@ -1,8 +1,8 @@
 import React from 'react';
-import defaultAvatar from "../assets/defaultAvatar.png"
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
-import {IMiniRecord} from "../digest/Digest";
-import Thumbnail from "../digest/Thumbnail";
+import defaultAvatar from "../../assets/defaultAvatar.png"
+import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IMiniRecord} from "../../digest/Digest";
+import Thumbnail from "../../digest/Thumbnail";
 import {Link} from "react-router-dom";
 
 interface IProps {

@@ -40,4 +40,6 @@ public interface IRecordService {
     void removeRecord(RecordId id);
 
     List<MinResponseRecord> getSelectedMinResponse(String publisher, List<Integer> rids);
+
+    List<ResponseRecord> getResponseByIds(List<RecordId> recordIdList, long userId);
 }

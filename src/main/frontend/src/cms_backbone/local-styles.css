@@ -1,0 +1,21 @@
+#content {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+#footer {
+    flex: 1;
+}
+
+#handshake {
+    font-size: 9em;
+}
+
+.faculty-name {
+    font-size: 5em;
+}
+
+.trap {
+    font-size: 3em;
+}

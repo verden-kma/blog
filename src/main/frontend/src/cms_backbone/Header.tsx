@@ -12,19 +12,22 @@ interface IProps extends RouteComponentProps<any> {
 
 class Header extends React.Component<IProps, any> {
     render() {
-        return (<Navbar expand="lg">
-            <Navbar.Brand><Link to={"/digest"}>Sprout</Link></Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-            <Navbar.Collapse>
-                <Nav className="mr-auto">
-                    <Nav.Link href={"/publishers"}>Publishers</Nav.Link>
-                    <Nav.Link href={"/records"}>Records</Nav.Link>
-                    <Nav.Link href={"/post-record"}>NewRecord</Nav.Link>
-                    <Search {...this.props}/>
-                    <UserOptionsDropdown username={this.props.username}/>
-                </Nav>
-            </Navbar.Collapse>
-        </Navbar>)
+        return (
+            <header>
+                <Navbar expand="lg">
+                    <Navbar.Brand><Link to={"/digest"}>Sprout</Link></Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+                    <Navbar.Collapse>
+                        <Nav className="mr-auto">
+                            <Nav.Link href={"/publishers"}>Publishers</Nav.Link>
+                            <Nav.Link href={"/records"}>Records</Nav.Link>
+                            <Nav.Link href={"/post-record"}>NewRecord</Nav.Link>
+                            <Search {...this.props}/>
+                            <UserOptionsDropdown username={this.props.username}/>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Navbar>
+            </header>)
     }
 }
 

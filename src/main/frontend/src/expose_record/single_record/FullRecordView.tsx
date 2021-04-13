@@ -3,28 +3,38 @@ import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import store from "store"
-import {IRecord} from "../RecordsPreviewPage";
+import {IRecord} from "../multiple_records/RecordsPreviewPage";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 import UserStats from "../../expose_publisher/UserStats";
 import {Link} from "react-router-dom";
 import {Button, Modal, ModalBody, ModalFooter, ModalTitle} from "react-bootstrap";
 import ModalHeader from "react-bootstrap/ModalHeader";
+import RecordTargetRecom from "./RecordTargetRecom";
 
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps
 }
 
+interface ICommDel {
+    targetId: number,
+    targetBlock: number
+}
+
 interface IState {
     recordJson?: IRecord,
     image?: string,
     comments: Map<number, Array<IComment>>,
-    currCommentPage: number,
-    hasMorePages: boolean,
+    nextCommentPage: number,
+    hasMoreCommentPages: boolean,
     newCommentText: string,
     deleteRequested: boolean,
-    deleteAccomplished: boolean
+    deleteAccomplished: boolean,
+
+    // deleteCommentRequested : boolean
+
+    commDel?: ICommDel
 }
 
 interface IComment {
@@ -42,18 +52,22 @@ class FullRecordView extends React.Component<IProps, IState> {
             recordJson: undefined,
             image: undefined,
             comments: new Map(),
-            currCommentPage: 0,
-            hasMorePages: false,
+            nextCommentPage: 0,
+            hasMoreCommentPages: true,
             newCommentText: "",
             deleteRequested: false,
-            deleteAccomplished: false
+            deleteAccomplished: false,
+            // deleteCommentRequested : false
         }
         this.handleEvaluation = this.handleEvaluation.bind(this);
-        this.loadMoreComments = this.loadMoreComments.bind(this);
+        this.loadNextComments = this.loadNextComments.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.sendComment = this.sendComment.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleCommentDeleteRequest = this.handleCommentDeleteRequest.bind(this);
+        this.doCommentDelete = this.doCommentDelete.bind(this);
     }
+
 
     handleEvaluation(forLike: boolean) {
         if (this.state.recordJson === undefined) {
@@ -72,9 +86,46 @@ class FullRecordView extends React.Component<IProps, IState> {
         genericHandleEvaluation(this.state.recordJson, forLike, this.props.auth, handleStateUpdate)
     }
 
-    loadMoreComments() {
-        // todo: add this feature
-        alert("not implemented")
+    loadNextComments() {
+        if (!this.state.hasMoreCommentPages) return;
+        const {publisher, recordId} = this.props.match.params;
+        axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`},
+            params: {block: this.state.nextCommentPage}
+        }).then(success => {
+            this.setState((oldState: IState) => {
+                let comments: Map<number, Array<IComment>> = new Map(oldState.comments);
+                comments.set(oldState.nextCommentPage, success.data.pageItems || []);
+                return {
+                    ...oldState,
+                    nextCommentPage: oldState.nextCommentPage + 1,
+                    hasMoreCommentPages: !success.data.isLast,
+                    comments: comments
+                }
+            }, () => {
+                success.data.pageItems.forEach((comment: IComment, index: number) => {
+                    axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
+                        responseType: 'arraybuffer',
+                        headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                    }).then(success => {
+                        if (success.data !== null) {
+                            this.setState(oldState => {
+                                let comments: Map<number, Array<IComment>> = new Map(oldState.comments);
+                                // @ts-ignore
+                                comments.get(oldState.nextCommentPage - 1)[index].commenterAva =
+                                    Buffer.from(success.data, 'binary').toString('base64');
+                                return {
+                                    ...oldState,
+                                    comments: comments
+                                }
+                            })
+                        }
+                    }, error => {
+                        console.log(error);
+                    });
+                });
+            });
+        }, error => console.log(error));
     }
 
     sendComment(event: React.FormEvent<HTMLFormElement>) {
@@ -140,42 +191,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                 }
             });
         }, error => console.log(error));
-
-        axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/comments?block=0`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
-        }).then(success => {
-            this.setState((oldState: IState) => {
-                let comments: Map<number, Array<IComment>> = new Map();
-                comments.set(0, success.data.pageItems || []);
-                return {
-                    ...oldState,
-                    hasMorePages: success.data.isLast,
-                    comments: comments
-                }
-            }, () => {
-                success.data.pageItems.forEach((comment: IComment, index: number) => {
-                    axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
-                        responseType: 'arraybuffer',
-                        headers: {'Authorization': `Bearer ${this.props.auth.token}`}
-                    }).then(success => {
-                        if (success.data !== null) {
-                            this.setState(oldState => {
-                                let comments: Map<number, Array<IComment>> = new Map(oldState.comments);
-                                // @ts-ignore
-                                comments.get(0)[index].commenterAva =
-                                    Buffer.from(success.data, 'binary').toString('base64');
-                                return {
-                                    ...oldState,
-                                    comments: comments
-                                }
-                            })
-                        }
-                    }, error => {
-                        console.log(error);
-                    });
-                });
-            });
-        }, error => console.log(error));
+        this.loadNextComments();
     }
 
     handleDelete() {
@@ -184,6 +200,35 @@ class FullRecordView extends React.Component<IProps, IState> {
         axios.delete(`http://localhost:8080/users/${publisher}/records/${id}`, {
             headers: {'Authorization': `Bearer ${this.props.auth.token}`}
         }).then(success => this.setState({deleteAccomplished: true}), error => alert(error));
+    }
+
+    handleCommentDeleteRequest(commId: number, blockNum: number) {
+        console.log(`attempt to delete comId ${commId} blockNum ${blockNum}`);
+        this.setState({commDel: {targetId: commId, targetBlock: blockNum}});
+    }
+
+    doCommentDelete() {
+        if (this.state.commDel === undefined) {
+            console.log("unexpected state: comment delete data is undefined");
+            return;
+        }
+        if (this.state.recordJson === undefined) {
+            console.log("unexpected state: record json is not yet loaded");
+            return;
+        }
+        const {publisher, id} = this.state.recordJson;
+        const {targetId, targetBlock} = this.state.commDel;
+        axios.delete(`http://localhost:8080/users/${publisher}/records/${id}/comments/${targetId}`, {
+            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+        })
+            .then(success =>
+                this.setState((oldState: IState) => {
+                    // @ts-ignore
+                    const updCommsBlock = oldState.comments.get(targetBlock).filter(x => x.commentId !== targetId);
+                    let updComms = new Map(oldState.comments);
+                    updComms.set(targetBlock, updCommsBlock);
+                    return {comments: updComms, commDel: undefined};
+                }), error => console.log(error));
     }
 
     render() {
@@ -195,19 +240,17 @@ class FullRecordView extends React.Component<IProps, IState> {
         const ls = (this.state.recordJson.reaction !== null && this.state.recordJson.reaction) ? activeStyle : {};
         const dls = (this.state.recordJson.reaction !== null && !this.state.recordJson.reaction) ? activeStyle : {};
 
-        let comments: Array<Comment> = [];
-        for (let i = 0; i <= this.state.currCommentPage; i++) {
+        let commentComponents: Array<Comment> = [];
+        for (let i = 0; i <= this.state.nextCommentPage; i++) {
             if (this.state.comments.get(i) === undefined) {
                 console.log("failed to load comments block");
                 continue;
             }
             // @ts-ignore
-            comments.push(...this.state.comments.get(i).map((cd: IComment) =>
-                <Comment commentId={cd.commentId}
-                         commentator={cd.commentator}
-                         text={cd.text}
-                         timestamp={cd.timestamp}
-                         commenterAva={cd.commenterAva}/>
+            commentComponents.push(...this.state.comments.get(i).map((cd: IComment) =>
+                <Comment key={cd.commentId} comment={cd} deleteCB={cd.commentator === this.props.auth.username
+                    ? () => this.handleCommentDeleteRequest(cd.commentId, i)
+                    : undefined}/>
             ));
         }
 
@@ -223,6 +266,21 @@ class FullRecordView extends React.Component<IProps, IState> {
                     <ModalFooter>
                         <Button variant={"danger"} onClick={this.handleDelete}>Yes, delete this record.</Button>
                         <Button variant={"info"} onClick={() => this.setState({deleteRequested: false})}>
+                            No, I have changed my mind.
+                        </Button>
+                    </ModalFooter>
+                </Modal>
+
+                <Modal show={this.state.commDel} onHide={() => this.setState({commDel: undefined})}>
+                    <ModalHeader closeButton>
+                        <ModalTitle>Are you sure you want to delete this comment?</ModalTitle>
+                    </ModalHeader>
+                    <ModalBody>
+                        The consequences of your actions here are irreversible.
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant={"danger"} onClick={this.doCommentDelete}>Yes, delete this comment.</Button>
+                        <Button variant={"info"} onClick={() => this.setState({commDel: undefined})}>
                             No, I have changed my mind.
                         </Button>
                     </ModalFooter>
@@ -254,6 +312,14 @@ class FullRecordView extends React.Component<IProps, IState> {
                     </div>
                     }
                 </div>
+
+                <div>
+                    <h3>You may also like these</h3>
+                    <RecordTargetRecom auth={this.props.auth}
+                                       publisher={this.state.recordJson.publisher}
+                                       recordId={this.state.recordJson.id}/>
+                </div>
+
                 <h6>Comments: {this.state.recordJson.numOfComments}</h6>
                 <br/>
                 <form onSubmit={this.sendComment}>
@@ -266,8 +332,9 @@ class FullRecordView extends React.Component<IProps, IState> {
                     <button>Send</button>
                 </form>
                 <div>
-                    {comments}
-                    <button>Load more comments</button>
+                    {commentComponents}
+                    {this.state.hasMoreCommentPages &&
+                    <button onClick={this.loadNextComments}>Load more comments</button>}
                 </div>
             </div>
         );

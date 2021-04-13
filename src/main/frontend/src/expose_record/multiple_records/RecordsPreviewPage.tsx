@@ -1,10 +1,10 @@
 import React from "react"
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import axios, {AxiosResponse} from "axios";
 import RecordCard from "./RecordCard";
 import ReactPaginate from 'react-paginate';
-import genericHandleEvaluation from "../utils/GenericHandleEvaluation";
+import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps,
@@ -80,13 +80,11 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        console.log(`mounted preview ${new Date().getSeconds()}`)
-
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
                 headers: {'Authorization': `Bearer ${this.props.auth.token}`}
-            }).then((success: AxiosResponse<ILazyRecordsPage>) => {
-                this.setState({recordJsons: success.data.pageItems},
+            }).then((success: AxiosResponse<Array<IRecord>>) => {
+                this.setState({recordJsons: success.data},
                     () => this.loadImages())
             }, error => console.log(error))
         } else this.loadCurrentPage();
@@ -104,20 +102,18 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     loadImages() {
-        this.state.recordJsons.forEach(({id}: IRecord) => {
-            axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${id}/image-min`,
+        this.state.recordJsons.forEach(({publisher, id}: IRecord) => {
+            axios.get(`http://localhost:8080/users/${publisher}/records/${id}/image-min`,
                 {
                     responseType: 'arraybuffer',
-                    headers: {
-                        'Authorization': `Bearer ${this.props.auth.token}`
-                    }
+                    headers: {'Authorization': `Bearer ${this.props.auth.token}`}
                 }).then(response => {
                 this.setState((oldState: IState) => {
                     let updImgs: Map<number, string> = new Map(oldState.recordImgs);
                     updImgs.set(id, Buffer.from(response.data, 'binary').toString('base64'));
-                        return {
-                            ...oldState,
-                            recordImgs: updImgs
+                    return {
+                        ...oldState,
+                        recordImgs: updImgs
                         }
                     });
                 })

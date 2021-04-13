@@ -1,10 +1,10 @@
 import React from "react"
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import axios, {AxiosResponse} from "axios";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
-import {IMiniRecord} from "../digest/Digest";
-import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
+import {IMiniRecord} from "../../digest/Digest";
+import handleFollow, {IPublisherFollow} from "../../utils/HandleFollow";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps,
@@ -62,7 +62,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
         if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION) {
             return "http://localhost:8080/recommendations/subscriptions";
         }
-        throw "Unknown PublisherPreviewContext";
+        throw new Error("Unknown PublisherPreviewContext");
     }
 
     handleFollow(publisher: string) {
@@ -106,8 +106,18 @@ class PublishersPreview extends React.Component<IProps, IState> {
             headers: {'Authorization': `Bearer ${this.props.auth.token}`},
             params: {page: this.state.currPage}
         }).then(success => {
-            this.setState({publisherJsons: success.data.pageItems, totalPageNum: success.data.totalPagesNum})
-            success.data.pageItems.forEach((pd: IPublisher) => {
+            let updState: { publisherJsons: Array<IPublisher>, totalPageNum?: number };
+            if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
+                updState = {publisherJsons: success.data.pageItems, totalPageNum: success.data.totalPagesNum};
+            } else if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION) {
+                updState = {publisherJsons: success.data};
+            } else {
+                console.log(`Provided state: ${this.props.previewContext}`);
+                throw new Error("Unexpected state error.");
+            }
+
+            this.setState(updState);
+            updState.publisherJsons.forEach((pd: IPublisher) => {
                 axios.get(`http://localhost:8080/users/${pd.publisher}/avatar`, {
                     responseType: 'arraybuffer',
                     headers: {'Authorization': `Bearer ${this.props.auth.token}`}
@@ -176,8 +186,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
                            followCallback={this.handleFollow}/>
         );
         return (<div>
-                <div>{publisherCards}</div>
-                // pagination will be here
+                {publisherCards}
             </div>
         );
     }

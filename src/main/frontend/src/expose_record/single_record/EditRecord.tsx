@@ -2,7 +2,7 @@ import React from 'react';
 import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios, {AxiosResponse} from "axios";
-import {IRecord} from "../RecordsPreviewPage";
+import {IRecord} from "../multiple_records/RecordsPreviewPage";
 import {Badge, Button, Form, FormControl, FormGroup, FormLabel, Image} from "react-bootstrap";
 
 interface IProps extends RouteComponentProps<any> {

@@ -1,6 +1,6 @@
 import React from "react";
 import {IRecord} from "./RecordsPreviewPage";
-import {monthNames} from "../cms_backbone/CMSNavbarRouting";
+import {monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Link} from "react-router-dom";
 
 interface ICardProps extends IRecord {
@@ -12,7 +12,7 @@ interface ICardProps extends IRecord {
 class RecordCard extends React.Component<ICardProps, any> {
 
     render() {
-        const activeStyle = {"font-weight": "bold"};
+        const activeStyle = {"fontWeight": "bold"};
         const ls = (this.props.reaction !== null && this.props.reaction) ? activeStyle : {};
         const dls = (this.props.reaction !== null && !this.props.reaction) ? activeStyle : {};
 

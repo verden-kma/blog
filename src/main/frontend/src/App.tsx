@@ -10,16 +10,14 @@ class App extends React.Component<any, any> {
 
     render() {
         return (
-            <div>
-                <Switch>
-                    <Route exact path={"/login"} component={Login}/>
-                    <Route exact path={"/register"} component={Registration}/>
-                    <Route exact path={"/confirm/:token"} component={ConfirmRegistration}/>
-                    <ProtectedPage path={"/"}>
-                        <CMSMain/>
-                    </ProtectedPage>
-                </Switch>
-            </div>
+            <Switch>
+                <Route exact path={"/login"} component={Login}/>
+                <Route exact path={"/register"} component={Registration}/>
+                <Route exact path={"/confirm/:token"} component={ConfirmRegistration}/>
+                <ProtectedPage path={"/"}>
+                    <CMSMain/>
+                </ProtectedPage>
+            </Switch>
         );
     }
 

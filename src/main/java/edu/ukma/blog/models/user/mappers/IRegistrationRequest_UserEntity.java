@@ -5,6 +5,6 @@ import edu.ukma.blog.models.user.requests.RegistrationRequestEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface IRegistrationRequest_User {
-    UserEntity registrationRequestToUser(RegistrationRequestEntity requestEntity);
+public interface IRegistrationRequest_UserEntity {
+    UserEntity toUserEntity(RegistrationRequestEntity requestEntity);
 }

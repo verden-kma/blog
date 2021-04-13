@@ -2,8 +2,10 @@ package edu.ukma.blog.controllers.blog_features;
 
 import com.google.common.collect.BiMap;
 import edu.ukma.blog.models.composite_id.RecordId;
+import edu.ukma.blog.models.record.ResponseRecord;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.services.interfaces.features.IRecommendService;
+import edu.ukma.blog.services.interfaces.record_related.IRecordService;
 import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +38,8 @@ public class RecommendationsCtrl {
 
     private final IUserService userService;
 
+    private final IRecordService recordService;
+
     @GetMapping("/subscriptions")
     public List<UserDataPreviewResponse> bySubscriptions(Principal principal) {
         List<Long> recomPubl = recommendService.getSubscriptionRecoms(userService.getUserIdByUsername(principal.getName()),
@@ -46,41 +50,10 @@ public class RecommendationsCtrl {
                 .collect(Collectors.toList());
     }
 
-//    @GetMapping("/evaluations")
-//    public LazyContentPage<PublicRecordId> byRecordEvaluations(@RequestBody(required = false) PublicRecordId publicRecordId,
-//                                                               Principal principal) {
-//        List<RecordId> recomRecs;
-//        if (publicRecordId == null) {
-//            recomRecs = recommendService.getRecordRecoms(
-//                    userService.getUserIdByUsername(principal.getName()), RECORDS_RECOM_LIMIT);
-//        } else {
-//            long publisherId = userService.getUserIdByUsername(publicRecordId.getPublisher());
-//            recomRecs = recommendService.getRecordRecomsByRecord(
-//                    new RecordId(publisherId, publicRecordId.getRecordOwnId()), RECORDS_RECOM_LIMIT);
-//        }
-//
-//        BiMap<Long, String> idsBiMap = userService.getUserIdentifiersBimap(recomRecs.stream()
-//                .map(RecordId::getPublisherId)
-//                .collect(Collectors.toList()));
-//        List<PublicRecordId> content = recomRecs.stream()
-//                .map(x -> new PublicRecordId(idsBiMap.get(x.getPublisherId()), x.getRecordOwnId()))
-//                .collect(Collectors.toList());
-//        return new LazyContentPage<>(content, true);
-//    }
-
     @GetMapping("/evaluations")
-    public List<PublicRecordId> byEvaluationUserTargeted(Principal principal) {
+    public List<ResponseRecord> byEvaluationUserTargeted(Principal principal) {
         List<RecordId> recomRecs = recommendService.getRecordRecoms(userService.getUserIdByUsername(principal.getName()), RECORDS_RECOM_LIMIT);
-        return toPublicRecordIds(recomRecs);
-    }
-
-    private List<PublicRecordId> toPublicRecordIds(List<RecordId> recordIdList) {
-        BiMap<Long, String> idsBiMap = userService.getUserIdentifiersBimap(recordIdList.stream()
-                .map(RecordId::getPublisherId)
-                .collect(Collectors.toList()));
-        return recordIdList.stream()
-                .map(x -> new PublicRecordId(idsBiMap.get(x.getPublisherId()), x.getRecordOwnId()))
-                .collect(Collectors.toList());
+        return recordService.getResponseByIds(recomRecs, userService.getUserIdByUsername(principal.getName()));
     }
 
     @GetMapping("/evaluations/{publisher}/{recordId}")
@@ -88,7 +61,12 @@ public class RecommendationsCtrl {
         long publisherId = userService.getUserIdByUsername(publisher);
         List<RecordId> recomRecs = recommendService.getRecordRecomsByRecord(
                 new RecordId(publisherId, recordId), RECORDS_RECOM_LIMIT);
-        return toPublicRecordIds(recomRecs);
+        BiMap<Long, String> idsBiMap = userService.getUserIdentifiersBimap(recomRecs.stream()
+                .map(RecordId::getPublisherId)
+                .collect(Collectors.toList()));
+        return recomRecs.stream()
+                .map(x -> new PublicRecordId(idsBiMap.get(x.getPublisherId()), x.getRecordOwnId()))
+                .collect(Collectors.toList());
     }
 
     @Data

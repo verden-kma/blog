@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface IUserEntity_SignupResponse {
-    SignupResponse userEntityToSignupResponse(UserEntity user);
+    SignupResponse toSignupResponse(UserEntity user);
 }
