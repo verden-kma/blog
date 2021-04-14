@@ -3,7 +3,7 @@ import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
 import {Button, Form, Modal} from "react-bootstrap";
 import {Redirect} from "react-router";
 import axios from "axios";
-import store from "store"
+import store from "store2"
 
 interface IState {
     suggestedCurrPassword: string,
@@ -41,7 +41,7 @@ class ChangePassword extends React.Component<IAuthProps, IState> {
         axios.patch("http://localhost:8080/users/password", passUpd, {
             headers: {'Authorization': `Bearer ${this.props.token}`}
         }).then(() => {
-            store.clearAll();
+            store.session.clearAll();
             window.location.reload();
         }, error => {
             if (error.response.status === 401) {

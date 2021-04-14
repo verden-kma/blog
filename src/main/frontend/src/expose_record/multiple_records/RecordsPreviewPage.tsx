@@ -45,11 +45,6 @@ interface IEagerRecordsPage {
     totalPagesNum: number
 }
 
-interface ILazyRecordsPage {
-    pageItems: Array<IRecord>,
-    isLast: boolean
-}
-
 class RecordsPreviewPage extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
@@ -71,6 +66,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
         }
         if (this.props.previewContext === RecordPreviewContext.SEARCH) {
             const paramValue = new URLSearchParams(this.props.location.search).get("query");
+            // const paramValue = this.props.match.params.query;
             return `http://localhost:8080/search/records?title=${paramValue}`
         }
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
@@ -80,6 +76,8 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
+        console.log("MOUNTS")
+
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
                 headers: {'Authorization': `Bearer ${this.props.auth.token}`}
@@ -114,10 +112,10 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
                     return {
                         ...oldState,
                         recordImgs: updImgs
-                        }
-                    });
-                })
+                    }
+                });
             })
+        })
     }
 
     handleEvaluation(id: number, forLike: boolean) {
@@ -142,9 +140,25 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
         genericHandleEvaluation(record, forLike, this.props.auth, handleStateUpdate);
     }
 
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (prevProps.location.search !== this.props.location.search) {
+            this.setState({
+                recordJsons: [],
+                recordImgs: new Map(),
+                currPage: 0,
+                numPages: undefined
+            }, this.componentDidMount);
+        }
+    }
+
     render() {
+        console.log("attempt to render")
+        if (this.state.numPages === 0) {
+            return (<div className={"container"}>No results found.</div>);
+        }
+
         const records = this.state.recordJsons.map((r: IRecord) =>
-            <RecordCard key={r.id} {...{
+            <RecordCard key={r.publisher + r.id} {...{
                 ...r, image: this.state.recordImgs.get(r.id),
                 handleEvaluation: this.handleEvaluation,
             }}/>

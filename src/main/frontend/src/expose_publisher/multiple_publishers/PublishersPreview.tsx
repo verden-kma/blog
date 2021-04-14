@@ -173,9 +173,29 @@ class PublishersPreview extends React.Component<IProps, IState> {
         }, error => console.log(error));
     }
 
+    componentDidUpdate(prevProps: Readonly<IProps>) {
+        if (prevProps.location.search !== this.props.location.search) {
+            let freshState: IState = {
+                publisherJsons: [],
+                publisherAvas: {},
+                publisherBanners: {},
+                previewRecordCores: {},
+                currPage: undefined,
+                totalPageNum: undefined
+            }
+
+            if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
+                freshState.currPage = 0;
+            }
+
+            this.setState(freshState, this.componentDidMount);
+        }
+    }
+
     render() {
         const publisherCards = this.state.publisherJsons.map((pd: IPublisher) =>
-            <PublisherCard auth={this.props.auth}
+            <PublisherCard key={pd.publisher}
+                           auth={this.props.auth}
                            publisher={pd.publisher}
                            publisherAva={this.state.publisherAvas[pd.publisher]}
                            publisherBanner={this.state.publisherBanners[pd.publisher]}
@@ -185,7 +205,11 @@ class PublishersPreview extends React.Component<IProps, IState> {
                            lastRecords={this.state.previewRecordCores[pd.publisher]}
                            followCallback={this.handleFollow}/>
         );
-        return (<div>
+        return (<div style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "flex-start"
+            }}>
                 {publisherCards}
             </div>
         );

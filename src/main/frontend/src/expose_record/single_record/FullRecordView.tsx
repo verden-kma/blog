@@ -2,7 +2,7 @@ import React from 'react';
 import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
-import store from "store"
+import store from "store2"
 import {IRecord} from "../multiple_records/RecordsPreviewPage";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
@@ -143,7 +143,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                         commentator: this.props.auth.username,
                         text: oldState.newCommentText,
                         timestamp: new Date().toUTCString(),
-                        commenterAva: store.get("userAva")
+                        commenterAva: store.session.get("userAva")
                     };
                     updTopComments.unshift(newComment);
                     let updMap: Map<number, Array<IComment>> = new Map(oldState.comments);

@@ -2,11 +2,10 @@ import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Digest from "../digest/Digest";
-import store from "store"
-import {BrowserRouter, Redirect, Route, Switch, withRouter} from "react-router-dom";
+import store from "store2"
+import {BrowserRouter, Redirect, Route, RouteComponentProps, Switch, withRouter} from "react-router-dom";
 import PostRecord from "./PostRecord";
 import RecordsPreviewPage, {RecordPreviewContext} from "../expose_record/multiple_records/RecordsPreviewPage";
-import {searchModes} from "./Search";
 import PublishersPreview, {PublisherPreviewContext} from "../expose_publisher/multiple_publishers/PublishersPreview";
 import FullRecordView from "../expose_record/single_record/FullRecordView";
 import PublisherMainPage from "../expose_publisher/full_publisher_page/PublisherMainPage";
@@ -24,23 +23,32 @@ interface IAuthProps {
     permissions?: Array<string>
 }
 
-class CMSNavbarRouting extends React.Component<any, any> {
+interface IState {
+    query: string
+}
+
+class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState> {
+    constructor(props: RouteComponentProps<any>) {
+        super(props);
+        this.state = {
+            query: ""
+        }
+    }
 
     render() {
-        if (!store.get("isAuthorized")) {
+        if (!store.session.get("isAuthorized")) {
             return <Redirect to={"/login"}/>
         }
         const authData: IAuthProps = {
-            username: store.get("username"),
-            token: store.get("token")
+            username: store.session.get("username"),
+            token: store.session.get("token")
         }
 
         return (
             <BrowserRouter>
                 <div id={"content"}>
-                    {/*<div id={"content-wrap"}>*/}
                     <Header username={authData.username}/>
-                    <main id={"content-wrap"}>
+                    <main>
                         <Switch>
                             <Route exact path={"/"}>
                                 <MainPage/>
@@ -55,7 +63,7 @@ class CMSNavbarRouting extends React.Component<any, any> {
                                 }} />
                             </Route>
                             <Route exact path={"/records"}>
-                                <RecordsPreviewPage key={"records"}{...{
+                                <RecordsPreviewPage key={"records"} {...{
                                     auth: authData,
                                     previewContext: RecordPreviewContext.RECOMMENDATION
                                 }}/>
@@ -66,14 +74,16 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             <Route exact path={"/profile/:targetUsername"}>
                                 <PublisherMainPage auth={authData}/>
                             </Route>
-                            <Route exact path={`/search/${searchModes[0]}`}>
-                                <RecordsPreviewPage key={"search=records"} {...{
-                                    auth: authData,
-                                    previewContext: RecordPreviewContext.SEARCH
-                                }}/>
+                            <Route exact path={"/search/record"}>
+                                <RecordsPreviewPage key={"search-records" + this.state.query}
+                                                    {...{
+                                                        auth: authData,
+                                                        previewContext: RecordPreviewContext.SEARCH
+                                                    }}
+                                />
                             </Route>
-                            <Route exact path={`/search/${searchModes[1]}`}>
-                                <PublishersPreview key={"search-publisher"} {...{
+                            <Route exact path={"/search/publisher"}>
+                                <PublishersPreview key={"search-publisher" + this.state.query} {...{
                                     auth: authData,
                                     previewContext: PublisherPreviewContext.SEARCH
                                 }}/>
@@ -92,7 +102,6 @@ class CMSNavbarRouting extends React.Component<any, any> {
                             </Route>
                         </Switch>
                     </main>
-                    {/*</div>*/}
                     <Footer/>
                 </div>
             </BrowserRouter>

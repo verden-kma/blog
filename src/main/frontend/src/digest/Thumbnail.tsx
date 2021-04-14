@@ -28,17 +28,18 @@ class Thumbnail extends React.Component<IProps, IState> {
                     'Accept': 'image/jpeg'
                 }
             }).then((response) => {
-            const imgUrl = Buffer.from(response.data, 'binary').toString('base64')
-            this.setState({image: imgUrl})
+            this.setState({image: Buffer.from(response.data, 'binary').toString('base64')})
         }, (error) => console.log(error.response))
     }
 
     render() {
         return (
-            <div>
+            <div className={"col-sm-6 col-md-3 col-lg-2 p-0"}>
                 <Link to={`/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}`}>
                     {this.state.image &&
-                    <img src={"data:image/jpeg;base64, " + this.state.image} alt={`${this.props.data.caption}`}/>}
+                    <img className={"thumbnail-image"}
+                         src={"data:image/jpeg;base64, " + this.state.image}
+                         alt={`${this.props.data.caption}`}/>}
                 </Link>
             </div>
         )

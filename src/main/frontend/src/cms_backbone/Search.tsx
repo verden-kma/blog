@@ -20,7 +20,6 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
             mode: searchModes[0]
         }
         this.handleChange = this.handleChange.bind(this);
-        // this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -32,7 +31,7 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
 
     render() {
         return (
-            <Form inline onSubmit={(event => event.preventDefault())}>
+            <Form inline onSubmit={event => event.preventDefault()}>
                 <FormControl type={"text"}
                              name={"query"}
                              value={this.state.query}
@@ -54,8 +53,11 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
                                  onChange={this.handleChange}/>
                     Publishers
                 </div>
+
                 <Link to={`/search/${this.state.mode}?query=${this.state.query}`}>
-                    <Button><img src={searchIcon} alt={"searchIcon"}/></Button>
+                    <Button type={"submit"}>
+                        <img src={searchIcon} alt={"searchIcon"}/>
+                    </Button>
                 </Link>
             </Form>
         )

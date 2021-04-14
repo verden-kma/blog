@@ -1,10 +1,12 @@
 import React from "react";
-import axios from 'axios'
+import axios, {AxiosResponse} from 'axios'
 import Thumbnail from "./Thumbnail";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 
 interface IState {
-    records: Array<IMiniRecord>
+    records: Array<IMiniRecord>,
+    nextPage: number,
+    hasMorePages: boolean
 }
 
 interface IMiniRecord {
@@ -13,21 +15,36 @@ interface IMiniRecord {
     caption: string
 }
 
+interface ILazyRecordsPage {
+    pageItems: Array<IMiniRecord>,
+    isLast: boolean
+}
+
 class Digest extends React.Component<IAuthProps, IState> {
     constructor(props: IAuthProps) {
         super(props);
         this.state = {
-            records: []
+            records: [],
+            nextPage: 0,
+            hasMorePages: true
         }
+        this.loadNextPage = this.loadNextPage.bind(this);
     }
 
     componentDidMount() {
-        axios.get('http://localhost:8080/digest?page=0', {
-            headers: {
-                'Authorization': `Bearer ${this.props.token}`
-            }
-        }).then((response) => {
-            this.setState({records: response.data.pageItems})
+        this.loadNextPage();
+    }
+
+    loadNextPage() {
+        axios.get('http://localhost:8080/digest', {
+            params: {page: this.state.nextPage},
+            headers: {'Authorization': `Bearer ${this.props.token}`}
+        }).then((response: AxiosResponse<ILazyRecordsPage>) => {
+            this.setState(oldState => ({
+                records: oldState.records.concat(response.data.pageItems),
+                nextPage: oldState.nextPage + 1,
+                hasMorePages: !response.data.isLast
+            }))
         }, (error) => {
             console.log(error)
         })
@@ -40,9 +57,17 @@ class Digest extends React.Component<IAuthProps, IState> {
                 auth={this.props}
                 data={record}/>
         )
+
+        const galleryStyles = {}
+
         return (
             <div>
-                {thumbnails}
+                <div className={"container-fluid"}>
+                    <div className={"row"}>
+                        {thumbnails}
+                    </div>
+                </div>
+                {this.state.hasMorePages && <button onClick={this.loadNextPage}>load more</button>}
             </div>
         )
     }

@@ -1,0 +1,12 @@
+@import "~bootstrap";
+
+// npm uninstall node-sass
+
+.follow-btn {
+  @extend .btn, .btn-secondary;
+  border: 3px green solid;
+}
+
+.unfollow-btn {
+
+}

@@ -6,6 +6,17 @@
 
 #footer {
     flex: 1;
+
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+#footer-content {
+    flex-grow: 1;
+
+    display: flex;
+    align-items: flex-end;
 }
 
 #handshake {
@@ -18,4 +29,10 @@
 
 .trap {
     font-size: 3em;
+}
+
+.thumbnail-image {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
 }

@@ -5,7 +5,9 @@ import 'bootstrap/dist/css/bootstrap.css';
 function Footer() {
     return (
         <footer id={"footer"}>
-            <h3>Developed for UKMA</h3>
+            <div id={"footer-content"}>
+                <h3>Developed for UKMA</h3>
+            </div>
         </footer>
     )
 }

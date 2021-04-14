@@ -22,7 +22,7 @@ class Header extends React.Component<IProps, any> {
                             <Nav.Link href={"/publishers"}>Publishers</Nav.Link>
                             <Nav.Link href={"/records"}>Records</Nav.Link>
                             <Nav.Link href={"/post-record"}>NewRecord</Nav.Link>
-                            <Search {...this.props}/>
+                            <Search/>
                             <UserOptionsDropdown username={this.props.username}/>
                         </Nav>
                     </Navbar.Collapse>

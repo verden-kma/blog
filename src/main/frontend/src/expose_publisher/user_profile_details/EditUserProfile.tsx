@@ -75,7 +75,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
             const fileType: string = maybeGoodImage.type;
             console.log(fileType)
         }
-        // todo
+        // todo: real validation
         return true;
     }
 

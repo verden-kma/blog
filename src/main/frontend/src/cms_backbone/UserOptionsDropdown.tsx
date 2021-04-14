@@ -1,6 +1,6 @@
 import React from 'react';
 import NavDropdown from "react-bootstrap/NavDropdown";
-import store from "store"
+import store from "store2"
 import axios from "axios";
 import {IAuthProps} from "./CMSNavbarRouting";
 
@@ -8,14 +8,14 @@ class UserOptionsDropdown extends React.Component<any, IAuthProps> {
     constructor(props: any) {
         super(props);
         this.state = {
-            username: store.get("username"),
-            token: store.get("token")
+            username: store.session.get("username"),
+            token: store.session.get("token")
         }
         this.doLogout = this.doLogout.bind(this);
     }
 
     doLogout() {
-        store.clearAll();
+        store.session.clearAll();
         window.location.reload();
         axios.post("http://localhost:8080/logout", {}, {
             headers: {'Authorization': `Bearer ${this.state.token}`}
