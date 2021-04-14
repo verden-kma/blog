@@ -43,7 +43,7 @@ class PublisherCard extends React.Component<IProps, any> {
             //         {this.props.isFollowed ? "Unfollow" : "Follow"}
             //     </button>}
             // </div>
-
+// todo: clean up
             <div className={"m-3 p-2 border border-secondary"}>
                 <img src={ava} alt={`${this.props.publisher}-ava`}/>
                 <Link to={`/profile/${this.props.publisher}`}><h3>{this.props.publisher}</h3></Link>

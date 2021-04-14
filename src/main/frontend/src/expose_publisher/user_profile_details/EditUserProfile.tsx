@@ -126,6 +126,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
     }
 
     render() {
+        // todo: add clear button (for files), restore current
         if (this.state.hasEdited) {
             return <Redirect to={`/profile/${this.props.username}`}/>
         }

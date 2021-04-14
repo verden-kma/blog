@@ -152,9 +152,29 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     render() {
-        console.log("attempt to render")
         if (this.state.numPages === 0) {
-            return (<div className={"container"}>No results found.</div>);
+            if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
+                return (<div className={"container"}>
+                    <p>
+                        No recommendations for you as of this moment.<br/>
+                        Try evaluating other user's records.
+                    </p>
+                </div>);
+            }
+            if (this.props.previewContext === RecordPreviewContext.SEARCH) {
+                return (<div className={"container"}>
+                    <p>
+                        No records found for your query.
+                    </p>
+                </div>);
+            }
+            if (this.props.previewContext === RecordPreviewContext.PUBLISHER_RECORDS) {
+                return (<div className={"container"}>
+                    <p>
+                        This user is yet to publish his (her) first record.
+                    </p>
+                </div>);
+            }
         }
 
         const records = this.state.recordJsons.map((r: IRecord) =>

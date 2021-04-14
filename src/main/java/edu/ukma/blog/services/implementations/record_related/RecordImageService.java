@@ -8,6 +8,7 @@ import edu.ukma.blog.services.interfaces.record_related.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -145,10 +148,10 @@ public class RecordImageService implements IRecordImageService, InitializingBean
     }
 
     @Override
-    public boolean deleteImage(String location) {
-        File original = new File(IMAGE_ROOT, location + TARGET_SUFFIX);
-        File compressed = new File(IMAGE_ROOT, location + COMPRESSED_SUFFIX);
-        File icon = new File(IMAGE_ROOT, location + ICON_SUFFIX);
-        return original.delete() & compressed.delete() & icon.delete();
+    @SneakyThrows
+    public void deleteImage(String location) {
+        Files.delete(Paths.get(IMAGE_ROOT.getPath(), location + TARGET_SUFFIX));
+        Files.deleteIfExists(Paths.get(IMAGE_ROOT.getPath(), location + COMPRESSED_SUFFIX));
+        Files.delete(Paths.get(IMAGE_ROOT.getPath(), location + ICON_SUFFIX));
     }
 }

@@ -1,12 +1,16 @@
 import React from "react";
-import Dropzone from "../Dropzone";
 import axios from "axios";
 import {IAuthProps} from "./CMSNavbarRouting";
+import {Button, Form, FormControl, FormFile, FormGroup, FormLabel, Modal, ModalTitle, Spinner} from "react-bootstrap";
+import ModalHeader from "react-bootstrap/ModalHeader";
 
 interface IState {
     caption: string,
-    adText?: string,
-    file?: File
+    adText: string,
+    file?: File,
+    isBeingSent: boolean,
+    uploadResult?: boolean,
+    selectedFileName: string
 }
 
 class PostRecord extends React.Component<IAuthProps, IState> {
@@ -14,21 +18,18 @@ class PostRecord extends React.Component<IAuthProps, IState> {
         super(props);
         this.state = {
             caption: "",
-            adText: ""
+            adText: "",
+            isBeingSent: false,
+            selectedFileName: ""
         }
         this.handleChange = this.handleChange.bind(this);
-        this.handleFile = this.handleFile.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const {name, value} = event.target;
+        const {name, value, files} = event.target;
+        if (files) this.setState({file: files[0]});
         this.setState(current => ({...current, [name]: value}))
-    }
-
-    handleFile({target: {files}}: React.ChangeEvent<HTMLInputElement>) {
-        if (files === null) return;
-        this.setState(current => ({...current, file: files[0]}))
     }
 
     handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -50,6 +51,8 @@ class PostRecord extends React.Component<IAuthProps, IState> {
             type: 'application/json'
         }))
 
+        this.setState({isBeingSent: true});
+
         axios({
             method: 'post',
             url: `http://localhost:8080/users/${this.props.username}/records`,
@@ -59,33 +62,58 @@ class PostRecord extends React.Component<IAuthProps, IState> {
                 'Authorization': `Bearer ${this.props.token}`
             }
         }).then(success => {
-                alert("success")
-                this.setState({});
+                this.setState({
+                    caption: "",
+                    adText: "",
+                    file: undefined,
+                    isBeingSent: false,
+                    uploadResult: true,
+                    selectedFileName: ""
+                });
             },
-            error => alert("error"))
+            error => this.setState({
+                isBeingSent: false, uploadResult: false
+            }))
     }
 
     render() {
+        // todo: validation
         return (
             <div>
-                <form onSubmit={this.handleSubmit}>
-                    Caption&nbsp;
-                    <input required
-                           type={"text"}
-                           name={"caption"}
-                           value={this.state.caption}
-                           onChange={this.handleChange}/>
-                    <br/>
-                    Description&nbsp;
-                    <input type={"text"}
-                           name={"adText"}
-                           value={this.state.adText}
-                           onChange={this.handleChange}/>
-                    <br/>
-                    <Dropzone prompt={"Record image "} handleFile={this.handleFile}/>
-                    <br/>
-                    <button>upload</button>
-                </form>
+                <Modal show={this.state.uploadResult !== undefined}
+                       onHide={() => this.setState({uploadResult: undefined})}>
+                    <ModalHeader closeButton>
+                        <ModalTitle>
+                            {this.state.uploadResult ? "Your record is successfully uploaded." : "Failed to upload your record."}
+                        </ModalTitle>
+                    </ModalHeader>
+                </Modal>
+                <Form onSubmit={this.handleSubmit}>
+                    <FormGroup>
+                        <FormLabel>Caption:</FormLabel>
+                        <FormControl type="text"
+                                     name="caption"
+                                     value={this.state.caption}
+                                     onChange={this.handleChange}
+                                     placeholder="this will be displayed as a title of your record"/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormLabel>Description:</FormLabel>
+                        <FormControl type="text"
+                                     name="adText"
+                                     value={this.state.adText}
+                                     onChange={this.handleChange}
+                                     placeholder="what else do you have to tell?"/>
+                    </FormGroup>
+                    <FormGroup>
+                        <FormFile name={"selectedFileName"} value={this.state.selectedFileName}
+                                  label="Select an image to upload."
+                                  onChange={this.handleChange}/>
+                    </FormGroup>
+                    {this.state.isBeingSent
+                        ? <Spinner animation={"border"}><span className="sr-only">Uploading...</span></Spinner>
+                        : <Button type="submit">Upload</Button>}
+                </Form>
             </div>
         )
     }

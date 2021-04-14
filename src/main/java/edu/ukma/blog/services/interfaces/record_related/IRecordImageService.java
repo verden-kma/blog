@@ -16,5 +16,5 @@ public interface IRecordImageService {
 
     File getImageIcon(String location);
 
-    boolean deleteImage(String location);
+    void deleteImage(String location);
 }

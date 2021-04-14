@@ -5,7 +5,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.Multimap;
 import edu.ukma.blog.exceptions.record.NoSuchRecordException;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
-import edu.ukma.blog.exceptions.server_internal.ServerLogicsError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
 import edu.ukma.blog.models.composite_id.EvaluatorId;
 import edu.ukma.blog.models.composite_id.RecordId;
@@ -229,7 +228,7 @@ public class RecordService implements IRecordService {
         Optional<RecordEntity> maybeRecord = recordsRepo.findById(id);
         maybeRecord.ifPresent(record -> {
             String imgPath = record.getImgLocation();
-            if (!imageService.deleteImage(imgPath)) throw new ServerLogicsError("record image missing");
+            imageService.deleteImage(imgPath);
             int numLikes = evaluatorsRepo.countAllById_RecordIdAndIsLiker(id, true);
             int numDislikes = evaluatorsRepo.countAllById_RecordIdAndIsLiker(id, false);
             int numComments = commentsRepo.countAllById_RecordId(id);
