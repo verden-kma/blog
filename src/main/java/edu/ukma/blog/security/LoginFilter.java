@@ -2,9 +2,8 @@ package edu.ukma.blog.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ukma.blog.models.user.requests.UserLoginRequest;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import edu.ukma.blog.security.models.LoginResponse;
+import edu.ukma.blog.security.services.IBlacklistTokenService;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,23 +19,22 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final IJwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
-    //    private final UserDetailsService userDetailsService;
     private final long tokenExpiration;
+    private final IBlacklistTokenService blacklistTokenService;
 
-    public LoginFilter(IJwtUtils jwtUtils, AuthenticationManager authenticationManager, long tokenExpiration) {
+    public LoginFilter(IJwtUtils jwtUtils, AuthenticationManager authenticationManager, long tokenExpiration, IBlacklistTokenService blacklistTokenService) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.tokenExpiration = tokenExpiration;
+        this.blacklistTokenService = blacklistTokenService;
     }
 
-    // fixme: maybe add permissions here
     @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -62,6 +60,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .authorities(userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .build();
 
+        blacklistTokenService.removeInvalid(userDetails.getUsername());
         objectMapper.writeValue(response.getWriter(), loginResponse);
     }
 
@@ -69,14 +68,5 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                            AuthenticationException failed) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @Data
-    @AllArgsConstructor
-    @Builder
-    static class LoginResponse {
-        private final String token;
-        private final long expiration;
-        private final List<String> authorities;
     }
 }

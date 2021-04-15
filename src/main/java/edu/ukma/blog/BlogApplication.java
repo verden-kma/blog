@@ -13,8 +13,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @SpringBootApplication
 //@EnableJpaRepositories(basePackageClasses = IUsersRepo.class)
-@EnableJpaRepositories(basePackages = "edu.ukma.blog.repositories")
-@EntityScan("edu.ukma.blog.models")
+@EnableJpaRepositories(basePackages = {"edu.ukma.blog.repositories", "edu.ukma.blog.security.repositories"})
+@EntityScan({"edu.ukma.blog.models", "edu.ukma.blog.security.models"})
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class BlogApplication {

@@ -15,11 +15,13 @@ class UserOptionsDropdown extends React.Component<any, IAuthProps> {
     }
 
     doLogout() {
-        store.session.clearAll();
-        window.location.reload();
-        axios.post("http://localhost:8080/logout", {}, {
+        axios.post("http://localhost:8080/logout-invalidate", {}, {
             headers: {'Authorization': `Bearer ${this.state.token}`}
-        }).then(() => console.log("logged out on server"), (error) => console.log("failed to log out" + error.data));
+        }).then(() => {
+            console.log("logged out on server");
+            store.session.clearAll();
+            window.location.reload();
+        }, (error) => console.log("failed to log out" + error.data));
     }
 
     render() {

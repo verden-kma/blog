@@ -1,13 +1,16 @@
 package edu.ukma.blog.security;
 
+import edu.ukma.blog.security.services.IBlacklistTokenService;
 import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +23,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.function.BiConsumer;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -29,6 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${expirationTime}")
     private final long tokenExpiration;
     private IUserService userDetailsService; // ex-final
+    private final IBlacklistTokenService blacklistTokenService;
 
     @Autowired
     public void setUserDetailsService(final IUserService userDetailsService) {
@@ -53,12 +61,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/users", "/users/confirm/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new LoginFilter(jwtUtils, authenticationManagerBean(), tokenExpiration))
-                .addFilterBefore(new JwtFilter(jwtUtils, userDetailsService), LoginFilter.class)
-                .addFilterAfter(new RefreshJwtFilter(new AntPathRequestMatcher(refreshTokenUrl, HttpMethod.GET.name()), jwtUtils), LoginFilter.class)
-// todo: add logout for jwt
-//                .addFilterAfter(new LogoutFilter((request, response, authentication) ->
-//                        response.setStatus(HttpStatus.NO_CONTENT.value()), new SecurityContextLogoutHandler()), RefreshJwtFilter.class)
+                .addFilter(new LoginFilter(jwtUtils, authenticationManagerBean(), tokenExpiration, blacklistTokenService))
+                .addFilterBefore(new JwtFilter(jwtUtils, userDetailsService, blacklistTokenService), LoginFilter.class)
+                .addFilterAfter(new RefreshJwtFilter(new AntPathRequestMatcher(refreshTokenUrl, HttpMethod.GET.name()),
+                        refreshJwtFilter()), LoginFilter.class)
+                .addFilterAfter(new LogoutFilter(new AntPathRequestMatcher("/logout-invalidate", HttpMethod.POST.name()),
+                        logoutFilter()), RefreshJwtFilter.class)
                 .exceptionHandling().authenticationEntryPoint((request, response, authException) ->
         {
             authException.printStackTrace();
@@ -69,12 +77,35 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         ;
     }
 
+
+    private BiConsumer<HttpServletResponse, String> refreshJwtFilter() {
+        return (response, username) -> {
+            if (!blacklistTokenService.checkIsValid(username)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return;
+            }
+
+            response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+            try {
+                response.getWriter().write(jwtUtils.generateJwt(username));
+            } catch (IOException e) {
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            }
+        };
+    }
+
+    private BiConsumer<HttpServletResponse, String> logoutFilter() {
+        return (response, username) -> {
+            blacklistTokenService.setIsInvalid(username);
+            response.setStatus(HttpStatus.NO_CONTENT.value());
+        };
+    }
+
     @Bean
     public PasswordEncoder passwordEncoderBean() {
         return new BCryptPasswordEncoder();
     }
 
-    // attention&kek: 'corsFilter()' works, 'corsFilterBean()' doesn't
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
