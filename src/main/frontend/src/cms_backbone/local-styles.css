@@ -36,3 +36,27 @@
     height: 100%;
     width: 100%;
 }
+
+[type=radio] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+[type=radio] + img {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    opacity: 0.5;
+}
+
+[type=radio]:checked + img {
+    opacity: 1;
+}
+
+.even-navbar {
+    flex: 1;
+    display: flex;
+    justify-content: space-around;
+}

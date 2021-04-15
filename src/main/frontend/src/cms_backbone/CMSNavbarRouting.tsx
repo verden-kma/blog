@@ -24,20 +24,31 @@ interface IAuthProps {
 }
 
 interface IState {
-    query: string
+    query: string,
+    auth: IAuthProps
 }
 
 class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState> {
     constructor(props: RouteComponentProps<any>) {
         super(props);
         this.state = {
-            query: ""
+            query: "",
+            auth: {
+                username: store.session.get("username"),
+                token: store.session.get("token")
+            }
         }
+    }
+
+    componentDidMount() {
         setInterval(() => {
             console.log("request refresh")
             axios.get("http://localhost:8080/refresh-token", {
                 headers: {'Authorization': `Bearer ${store.session.get('token')}`}
-            }).then(success => store.session.set('token', success.data),
+            }).then(success => {
+                    store.session.set('token', success.data);
+                    this.setState(oldState => ({auth: {username: oldState.auth.username, token: oldState.auth.token}}))
+                },
                 error => {
                     console.log(error);
                     store.session.clearAll();
@@ -45,71 +56,66 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
         }, store.session.get('expiration') / 2);
     }
 
-
     render() {
         if (!store.session.get("isAuthorized")) {
             return <Redirect to={"/login"}/>
-        }
-        const authData: IAuthProps = {
-            username: store.session.get("username"),
-            token: store.session.get("token")
         }
 
         return (
             <BrowserRouter>
                 <div id={"content"}>
-                    <Header username={authData.username}/>
+                    <Header username={this.state.auth.username}/>
                     <main>
                         <Switch>
                             <Route exact path={"/"}>
                                 <MainPage/>
                             </Route>
                             <Route exact path={"/digest"}>
-                                <Digest {...authData} />
+                                <Digest {...this.state.auth} />
                             </Route>
                             <Route exact path={"/publishers"}>
                                 <PublishersPreview key={"publisher"} {...{
-                                    auth: authData,
+                                    auth: this.state.auth,
                                     previewContext: PublisherPreviewContext.RECOMMENDATION
                                 }} />
                             </Route>
                             <Route exact path={"/records"}>
                                 <RecordsPreviewPage key={"records"} {...{
-                                    auth: authData,
+                                    auth: this.state.auth,
                                     previewContext: RecordPreviewContext.RECOMMENDATION
                                 }}/>
                             </Route>
                             <Route exact path={"/post-record"}>
-                                <PostRecord {...authData}/>
+                                <PostRecord {...this.state.auth}/>
                             </Route>
                             <Route exact path={"/profile/:targetUsername"}>
-                                <PublisherMainPage auth={authData}/>
+                                <PublisherMainPage auth={this.state.auth}/>
                             </Route>
                             <Route exact path={"/search/record"}>
                                 <RecordsPreviewPage key={"search-records" + this.state.query}
                                                     {...{
-                                                        auth: authData,
+                                                        auth: this.state.auth,
                                                         previewContext: RecordPreviewContext.SEARCH
                                                     }}
                                 />
                             </Route>
                             <Route exact path={"/search/publisher"}>
                                 <PublishersPreview key={"search-publisher" + this.state.query} {...{
-                                    auth: authData,
+                                    auth: this.state.auth,
                                     previewContext: PublisherPreviewContext.SEARCH
                                 }}/>
                             </Route>
                             <Route exact path={"/users/:publisher/records/:recordId"}>
-                                <FullRecordView {...{auth: authData}}/>
+                                <FullRecordView {...{auth: this.state.auth}}/>
                             </Route>
                             <Route exact path={"/edit-user-details"}>
-                                <EditUserProfile {...authData}/>
+                                <EditUserProfile {...this.state.auth}/>
                             </Route>
                             <Route exact path={"/change-password"}>
-                                <ChangePassword  {...authData}/>
+                                <ChangePassword  {...this.state.auth}/>
                             </Route>
                             <Route exact path={"/users/:publisher/records/:recordId/edit"}>
-                                <EditRecord {...{auth: authData}}/>
+                                <EditRecord {...{auth: this.state.auth}}/>
                             </Route>
                         </Switch>
                     </main>

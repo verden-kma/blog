@@ -21,7 +21,11 @@ class UserOptionsDropdown extends React.Component<any, IAuthProps> {
             console.log("logged out on server");
             store.session.clearAll();
             window.location.reload();
-        }, (error) => console.log("failed to log out" + error.data));
+        }, (error) => {
+            alert("failed to log out" + error.data);
+            store.session.clearAll();
+            window.location.reload();
+        });
     }
 
     render() {

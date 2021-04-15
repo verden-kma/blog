@@ -1,5 +1,5 @@
 import React from "react";
-import {Link, withRouter} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import Search from "./Search";
 import {RouteComponentProps} from "react-router";
 import Nav from "react-bootstrap/Nav";
@@ -15,13 +15,16 @@ class Header extends React.Component<IProps, any> {
         return (
             <header>
                 <Navbar expand="lg">
-                    <Navbar.Brand><Link to={"/digest"}>Sprout</Link></Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                     <Navbar.Collapse>
-                        <Nav className="mr-auto">
-                            <Nav.Link href={"/publishers"}>Publishers</Nav.Link>
-                            <Nav.Link href={"/records"}>Records</Nav.Link>
-                            <Nav.Link href={"/post-record"}>NewRecord</Nav.Link>
+                        <Nav className="mr-auto even-navbar">
+                            <Navbar.Brand href={"/"}>Sprout</Navbar.Brand>
+                            <div className={"d-flex"}>
+                                <Nav.Link href={"/digest"} className={"mx-3"}>Digest</Nav.Link>
+                                <Nav.Link href={"/publishers"} className={"mx-3"}>Recommended publishers</Nav.Link>
+                                <Nav.Link href={"/records"} className={"mx-3"}>Recommended records</Nav.Link>
+                                <Nav.Link href={"/post-record"} className={"mx-3"}>Post new record</Nav.Link>
+                            </div>
                             <Search/>
                             <UserOptionsDropdown username={this.props.username}/>
                         </Nav>
