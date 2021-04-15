@@ -18,7 +18,7 @@ public class ResponseRecord {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
-    private boolean isEdited;
+    private Boolean isEdited;
 
     // like - true, dislike - false, ignore - null
     private Boolean reaction;

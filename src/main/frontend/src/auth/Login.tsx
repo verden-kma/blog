@@ -1,11 +1,17 @@
 import React from "react";
 import {withRouter} from "react-router-dom";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import store from "store2";
 
 interface IState {
     username: string,
     password: string
+}
+
+interface LoginResponse {
+    token: string,
+    expiration: number,
+    permissions: Array<string>
 }
 
 class Login extends React.Component<any, IState> {
@@ -30,11 +36,12 @@ class Login extends React.Component<any, IState> {
         axios.post("http://localhost:8080/login", {
             username: this.state.username,
             password: this.state.password
-        }).then((response) => {
+        }).then((response: AxiosResponse<LoginResponse>) => {
             console.log("logged in");
             store.session.set('username', this.state.username)
-            store.session.set('token', response.data)
+            store.session.set('token', response.data.token)
             store.session.set('isAuthorized', true);
+            store.session.set('expiration', response.data.expiration);
 
             let {from} = this.props.location.state || {from: {pathname: "/"}};
             this.props.history.replace(from);

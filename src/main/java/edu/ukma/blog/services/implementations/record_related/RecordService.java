@@ -190,7 +190,6 @@ public class RecordService implements IRecordService {
         res.setReaction(evaluatorsRepo.findById(new EvaluatorId(recordId, userId))
                 .map(Evaluation::getIsLiker)
                 .orElse(null));
-
         res.setNumOfComments(commentsRepo.countAllById_RecordId(recordId));
         return res;
     }

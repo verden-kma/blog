@@ -1,7 +1,9 @@
 package edu.ukma.blog.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -31,6 +33,7 @@ public class RefreshJwtFilter extends OncePerRequestFilter {
         } else {
             Object userToken = SecurityContextHolder.getContext().getAuthentication();
             String username = (String) ((UsernamePasswordAuthenticationToken) userToken).getPrincipal();
+            response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
             response.getWriter().write(jwtUtils.generateJwt(username));
         }
 

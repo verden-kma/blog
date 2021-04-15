@@ -15,12 +15,12 @@ import EditRecord from "../expose_record/single_record/EditRecord";
 import "./local-styles.css"
 import 'bootstrap/dist/css/bootstrap.css';
 import MainPage from "./MainPage";
+import axios from "axios";
 
 interface IAuthProps {
     username: string,
     token: string,
-    // todo: send role from login filter & expiration for token to set a refresher callback
-    permissions?: Array<string>
+    permissions?: Array<any> // todo: user enum
 }
 
 interface IState {
@@ -33,7 +33,18 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
         this.state = {
             query: ""
         }
+        setInterval(() => {
+            console.log("request refresh")
+            axios.get("http://localhost:8080/refresh-token", {
+                headers: {'Authorization': `Bearer ${store.session.get('token')}`}
+            }).then(success => store.session.set('token', success.data),
+                error => {
+                    console.log(error);
+                    store.session.clearAll();
+                })
+        }, store.session.get('expiration') / 2);
     }
+
 
     render() {
         if (!store.session.get("isAuthorized")) {

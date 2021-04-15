@@ -26,6 +26,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final IJwtUtils jwtUtils;
     @Value("${refreshTokenUrl}")
     private final String refreshTokenUrl;
+    @Value("${expirationTime}")
+    private final long tokenExpiration;
     private IUserService userDetailsService; // ex-final
 
     @Autowired
@@ -51,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/users", "/users/confirm/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new LoginFilter(jwtUtils, authenticationManagerBean()))
+                .addFilter(new LoginFilter(jwtUtils, authenticationManagerBean(), tokenExpiration))
                 .addFilterBefore(new JwtFilter(jwtUtils, userDetailsService), LoginFilter.class)
                 .addFilterAfter(new RefreshJwtFilter(new AntPathRequestMatcher(refreshTokenUrl, HttpMethod.GET.name()), jwtUtils), LoginFilter.class)
 // todo: add logout for jwt
