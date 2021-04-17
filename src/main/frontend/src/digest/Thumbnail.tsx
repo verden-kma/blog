@@ -39,7 +39,9 @@ class Thumbnail extends React.Component<IProps, IState> {
                     {this.state.image &&
                     <img className={"thumbnail-image"}
                          src={"data:image/jpeg;base64, " + this.state.image}
-                         alt={`${this.props.data.caption}`}/>}
+                         alt={`${this.props.data.caption}`}/>
+
+                    }
                 </Link>
             </div>
         )

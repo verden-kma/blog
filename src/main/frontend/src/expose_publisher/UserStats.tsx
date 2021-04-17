@@ -87,34 +87,35 @@ class UserStats extends React.Component<IProps, IState> {
     render() {
         if (!this.state.userData) return (<div/>);
         const userAva = this.state.userAva ? 'data:image/jpeg;base64, ' + this.state.userAva : defaultAva;
-        const followBtnStyle: Object =
-            this.state.userData.isFollowed
-                ? {"fontWeight": "bold"} :
-                {"fontStyle": "italic"};
         return (
-            <div className={"vertical-flex"}>
-                <h3>{this.state.userData.username}</h3>
-                <img className={"my-3"} src={userAva} alt={`${this.props.targetUsername}'s avatar`}/>
+            <div className={"my-5 mx-2"} style={{
+                position: "sticky",
+                top: "2em"
+            }}>
+                <div className={"vertical-flex"}>
+                    <h3>{this.state.userData.username}</h3>
+                    <img className={"my-3"} src={userAva} alt={`${this.props.targetUsername}'s avatar`}/>
 
-                <div>
-                    <h4>{this.state.userData.status}</h4>
-                    <p>{this.state.userData.description}</p>
-                    <hr className={"publisher-stats-split"}/>
-                    <h5>Uploads: {this.state.userData.uploads}</h5>
-                    <h5>Likes: {this.state.userData.likes}</h5>
-                    <h5>Dislikes: {this.state.userData.dislikes}</h5>
-                    <h5>Comments: {this.state.userData.comments}</h5>
-                    <h5>Followers: {this.state.userData.followers}</h5>
-
-                    {this.props.targetUsername !== this.props.auth.username &&
-                    <div className={"vertical-flex"}>
+                    <div>
+                        <h4>{this.state.userData.status}</h4>
+                        <p>{this.state.userData.description}</p>
                         <hr className={"publisher-stats-split"}/>
-                        <div className={"follow-btn-wrapper"}>
-                            <Button variant={"dark"} className={"follow-btn"} onClick={this.handleFollowAction}>
-                                {this.state.userData.isFollowed ? "Unfollow" : "Follow"}
-                            </Button>
-                        </div>
-                    </div>}
+                        <h5>Uploads: {this.state.userData.uploads}</h5>
+                        <h5>Likes: {this.state.userData.likes}</h5>
+                        <h5>Dislikes: {this.state.userData.dislikes}</h5>
+                        <h5>Comments: {this.state.userData.comments}</h5>
+                        <h5>Followers: {this.state.userData.followers}</h5>
+
+                        {this.props.targetUsername !== this.props.auth.username &&
+                        <div className={"vertical-flex"}>
+                            <hr className={"publisher-stats-split"}/>
+                            <div className={"follow-btn-wrapper"}>
+                                <Button variant={"dark"} className={"follow-btn"} onClick={this.handleFollowAction}>
+                                    {this.state.userData.isFollowed ? "Unfollow" : "Follow"}
+                                </Button>
+                            </div>
+                        </div>}
+                    </div>
                 </div>
             </div>
         );

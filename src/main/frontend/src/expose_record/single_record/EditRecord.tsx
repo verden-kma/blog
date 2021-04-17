@@ -3,7 +3,7 @@ import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios, {AxiosResponse} from "axios";
 import {IRecord} from "../multiple_records/RecordsPreviewPage";
-import {Badge, Button, Form, FormControl, FormGroup, FormLabel, Image} from "react-bootstrap";
+import {Badge, Button, Container, Form, FormControl, FormGroup, FormLabel, Image, Row} from "react-bootstrap";
 
 interface IProps extends RouteComponentProps<any> {
     auth: IAuthProps
@@ -96,11 +96,23 @@ class EditRecord extends React.Component<IProps, IState> {
         const date: Date = new Date(this.state.timestamp);
 
         return (
-            <div>
-                <Badge variant={badgeVar}>{badgeText}</Badge>
-                <Badge
-                    variant={"second"}>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</Badge>
-                <Image src={"data:image/jpeg;base64, " + this.state.image} alt={"no image loaded"} fluid/>
+            <Container className={"my-5"}>
+                <Row className={"justify-content-center"}>
+                    <h3>Edit '<span style={{fontStyle: "italic"}}>{this.state.currCaption}</span>'</h3>
+                </Row>
+                <Row>
+                    <Badge variant={badgeVar}>{badgeText}</Badge>
+                    <Badge
+                        variant={"second"}>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}
+                    </Badge>
+                </Row>
+                <Row className={"justify-content-center"}>
+                    <Image style={{
+                        maxWidth: "100%",
+                        height: "auto",
+                        objectFit: "contain"
+                    }} src={"data:image/jpeg;base64, " + this.state.image} alt={"no image loaded"} thumbnail/>
+                </Row>
                 <Form>
                     <FormGroup>
                         <FormLabel>Caption:</FormLabel>
@@ -112,13 +124,15 @@ class EditRecord extends React.Component<IProps, IState> {
                         <FormControl type={"text"} name={"newAdText"} value={this.state.newAdText}
                                      onChange={this.handleChange}/>
                     </FormGroup>
-                    <Button type={"submit"} onClick={this.handleSubmit}>Update</Button>
-                    <Button type={"button"} onClick={this.handleRestore}>Restore</Button>
-                    <Button type={"button"} onClick={() => this.setState({redirectRequested: true})}>
-                        Cancel
-                    </Button>
+                    <div className={"d-flex justify-content-around"}>
+                        <Button type={"submit"} onClick={this.handleSubmit}>Update</Button>
+                        <Button type={"button"} onClick={this.handleRestore}>Restore</Button>
+                        <Button type={"button"} onClick={() => this.setState({redirectRequested: true})}>
+                            Cancel
+                        </Button>
+                    </div>
                 </Form>
-            </div>
+            </Container>
         );
     }
 }

@@ -45,6 +45,10 @@ class RecordTargetRecom extends React.Component<IProps, IState> {
     }
 
     render() {
+        if (this.state.recordIcons.size === 0) return (<div>
+            <h4>Evaluate other users' records to get recommendations.</h4>
+        </div>);
+
         const recommThumbnails = Array.from(this.state.recordIcons).map(([recId, img]) =>
             <Link to={`/users/${recId.publisher}/records/${recId.recordOwnId}`}
                   key={JSON.stringify({publisher: recId.publisher, rOwnId: recId.recordOwnId})}>
@@ -54,6 +58,7 @@ class RecordTargetRecom extends React.Component<IProps, IState> {
 
         return (
             <div>
+                <h3>You may also like these</h3>
                 {recommThumbnails}
             </div>
         );

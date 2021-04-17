@@ -39,26 +39,29 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
 
 
     render() {
+        const screenWidth = window.innerWidth;
+        const records = (<div className={"col-sm-8 col-md-7 col-lg-9 mx-3"}>
+            <RecordPreview auth={this.props.auth} previewContext={RecordPreviewContext.PUBLISHER_RECORDS}
+                           targetUsername={this.state.targetUsername}/>
+        </div>);
+
+        const stats = (<div className={"col-sm-8 col-md-4 col-lg-2 d-flex justify-content-center"}>
+            <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>
+        </div>);
+
         return (<div>
             <Container fluid>
                 <Row>
                     {this.state.topBanner &&
                     <img width={"100%"} src={'data:image/jpeg;base64, ' + this.state.topBanner} alt={'top banner'}/>}
                 </Row>
-                <Row style={{}}>
-                    <div className={"col mx-3"}>
-                        <RecordPreview auth={this.props.auth} previewContext={RecordPreviewContext.PUBLISHER_RECORDS}
-                                       targetUsername={this.state.targetUsername}/>
-                    </div>
-                    <div className={"col-3"} style={{}}>
-                        <div className={"my-5 mx-2"} style={{
-                            position: "sticky",
-                            top: "2em"
-                        }}>
-                            <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>
-                        </div>
-                    </div>
-                </Row>
+                {/*<Row>*/}
+                {
+                    screenWidth > 768
+                        ? <Row>{records} {stats}</Row>
+                        : <Row className={"justify-content-center"}>{stats} {records}</Row>
+                }
+                {/*</Row>*/}
 
             </Container>
         </div>)

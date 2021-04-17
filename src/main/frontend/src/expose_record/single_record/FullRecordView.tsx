@@ -8,9 +8,10 @@ import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
 import UserStats from "../../expose_publisher/UserStats";
 import {Link} from "react-router-dom";
-import {Button, Modal, ModalBody, ModalFooter, ModalTitle} from "react-bootstrap";
+import {Button, Container, Image, Modal, ModalBody, ModalFooter, ModalTitle, Row} from "react-bootstrap";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import RecordTargetRecom from "./RecordTargetRecom";
+import "./../record-styles.css";
 
 
 interface IProps extends RouteComponentProps<any> {
@@ -166,8 +167,6 @@ class FullRecordView extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        console.log("full record did mount")
-
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}`, {
             headers: {'Authorization': `Bearer ${this.props.auth.token}`}
@@ -203,7 +202,6 @@ class FullRecordView extends React.Component<IProps, IState> {
     }
 
     handleCommentDeleteRequest(commId: number, blockNum: number) {
-        console.log(`attempt to delete comId ${commId} blockNum ${blockNum}`);
         this.setState({commDel: {targetId: commId, targetBlock: blockNum}});
     }
 
@@ -252,12 +250,12 @@ class FullRecordView extends React.Component<IProps, IState> {
         if (this.state.deleteAccomplished) return <Redirect to={`/profile/${this.state.recordJson.publisher}`}/>;
 
         const date: Date = new Date(this.state.recordJson.timestamp);
-        const activeStyle = {"font-weight": "bold"};
+        const activeStyle = {fontWeight: "bold"};
         const ls = (this.state.recordJson.reaction !== null && this.state.recordJson.reaction) ? activeStyle : {};
         const dls = (this.state.recordJson.reaction !== null && !this.state.recordJson.reaction) ? activeStyle : {};
 
         let commentComponents: Array<Comment> = [];
-        for (let i = 0; i <= this.state.nextCommentPage; i++) {
+        for (let i = 0; i < this.state.nextCommentPage; i++) {
             if (this.state.comments.get(i) === undefined) {
                 console.log("failed to load comments block");
                 continue;
@@ -302,56 +300,88 @@ class FullRecordView extends React.Component<IProps, IState> {
                     </ModalFooter>
                 </Modal>
 
-                <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
-                <div>
-                    <img width={500} src={'data:image/jpeg;base64, ' + this.state.image}
-                         alt={this.state.recordJson.caption + "-image"}/>
-                    <h3>{this.state.recordJson.caption}</h3>
-                    <h5>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</h5>
-                    <p>{this.state.recordJson.adText}</p>
-                    <hr/>
-                    <div>
-                        <button style={ls}
-                                onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
-                        </button>
-                        <button style={dls} onClick={this.handleEvaluation.bind(this, false)}>
-                            Dislike {this.state.recordJson.dislikes}
-                        </button>
-                    </div>
-                    {this.state.recordJson.publisher === this.props.auth.username &&
-                    <div>
-                        <Link
-                            to={`/users/${this.props.match.params.publisher}/records/${this.state.recordJson.id}/edit`}>
-                            <button>Edit record</button>
-                        </Link>
-                        <button onClick={() => this.setState({deleteRequested: true})}>Delete record</button>
-                    </div>
-                    }
-                </div>
+                <Container>
+                    <Row>
+                        <div className={"col-8 mt-5"}>
+                            <Image src={'data:image/jpeg;base64, ' + this.state.image}
+                                   alt={this.state.recordJson.caption + "-image"}
+                                   width={"100%"}/>
+                            <div className={"d-flex flex-column"}>
+                                <div className={"d-flex"}>
+                                    <div style={{flexGrow: 7}}>
+                                        <h3>{this.state.recordJson.caption}</h3>
+                                    </div>
 
-                <div>
-                    <h3>You may also like these</h3>
-                    <RecordTargetRecom auth={this.props.auth}
-                                       publisher={this.state.recordJson.publisher}
-                                       recordId={this.state.recordJson.id}/>
-                </div>
+                                    <div className={"record-card-footer-comment-wrapper"}>
+                                        <div className={"mx-3 record-card-footer-comment"}>
+                                            <h5>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p>{this.state.recordJson.adText}</p>
+                                </div>
+                            </div>
+                            <hr/>
 
-                <h6>Comments: {this.state.recordJson.numOfComments}</h6>
-                <br/>
-                <form onSubmit={this.sendComment}>
-                    <h3>Add your comment</h3>
-                    <input type={"text"}
-                           placeholder={"My opinion is..."}
-                           name={"newCommentText"}
-                           value={this.state.newCommentText}
-                           onChange={this.handleChange}/>
-                    <button>Send</button>
-                </form>
-                <div>
-                    {commentComponents}
-                    {this.state.hasMoreCommentPages &&
-                    <button onClick={this.loadNextComments}>Load more comments</button>}
-                </div>
+
+                            <div className={"d-flex"}>
+                                <div className={"record-card-footer-buttons"}>
+                                    <Button variant={"dark"} className={"ml-3 mr-1 my-1 btn-outline-light"} style={ls}
+                                            onClick={this.handleEvaluation.bind(this, true)}>Like {this.state.recordJson.likes}
+                                    </Button>
+                                    <Button variant={"dark"} className={"mr-3 ml-1 my-1 btn-outline-light"} style={dls}
+                                            onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
+                                    </Button>
+
+                                    {this.state.recordJson.publisher === this.props.auth.username &&
+                                    <Link
+                                        to={`/users/${this.props.match.params.publisher}/records/${this.state.recordJson.id}/edit`}>
+                                        <Button variant={"dark"} className={"ml-3 mr-1 my-1 btn-outline-warning"}>
+                                            Edit record
+                                        </Button>
+                                    </Link>}
+
+                                    {this.state.recordJson.publisher === this.props.auth.username &&
+                                    <Button variant={"dark"} className={"mr-3 ml-1 my-1 btn-outline-danger"}
+                                            onClick={() => this.setState({deleteRequested: true})}>
+                                        Delete record
+                                    </Button>}
+                                </div>
+
+                                <div className={"record-card-footer-comment-wrapper"}>
+                                    <div className={"mx-3 record-card-footer-comment"}>
+                                        <span>Comments: {this.state.recordJson.numOfComments}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={"col-3"}>
+                            <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
+                        </div>
+                    </Row>
+
+                    <Row className={"my-4"}>
+                        <RecordTargetRecom auth={this.props.auth}
+                                           publisher={this.state.recordJson.publisher}
+                                           recordId={this.state.recordJson.id}/>
+                    </Row>
+
+                    <form onSubmit={this.sendComment}>
+                        <h3>Add your comment</h3>
+                        <input type={"text"}
+                               placeholder={"My opinion is..."}
+                               name={"newCommentText"}
+                               value={this.state.newCommentText}
+                               onChange={this.handleChange}/>
+                        <button>Send</button>
+                    </form>
+                    <div>
+                        {commentComponents}
+                        {this.state.hasMoreCommentPages &&
+                        <button onClick={this.loadNextComments}>Load more comments</button>}
+                    </div>
+                </Container>
             </div>
         );
     }

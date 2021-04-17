@@ -2,6 +2,7 @@ import React from "react";
 import axios, {AxiosResponse} from 'axios'
 import Thumbnail from "./Thumbnail";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {Container, Row} from "react-bootstrap";
 
 interface IState {
     records: Array<IMiniRecord>,
@@ -58,15 +59,13 @@ class Digest extends React.Component<IAuthProps, IState> {
                 data={record}/>
         )
 
-        const galleryStyles = {}
-
         return (
             <div>
-                <div className={"container-fluid"}>
-                    <div className={"row"}>
+                <Container fluid>
+                    <Row>
                         {thumbnails}
-                    </div>
-                </div>
+                    </Row>
+                </Container>
                 {this.state.hasMorePages && <button onClick={this.loadNextPage}>load more</button>}
             </div>
         )

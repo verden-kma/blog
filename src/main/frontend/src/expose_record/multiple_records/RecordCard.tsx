@@ -34,7 +34,7 @@ class RecordCard extends React.Component<ICardProps, any> {
                 <div className={"col-12"}>
                     <Link to={`/users/${this.props.publisher}/records/${this.props.id}`}>
                         <Image width={"100%"} src={'data:image/jpeg;base64, ' + this.props.image}
-                               alt={this.props.caption} fluid/>
+                               alt={this.props.caption}/>
                     </Link>
                 </div>
             </Row>
