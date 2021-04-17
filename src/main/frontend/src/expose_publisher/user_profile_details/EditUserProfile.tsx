@@ -33,7 +33,6 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         this.handleChange = this.handleChange.bind(this);
         this.resetOld = this.resetOld.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
-        this.checkImageValid = this.checkImageValid.bind(this);
         this.updateImage = this.updateImage.bind(this);
     }
 
@@ -67,16 +66,6 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         const {name, value, type} = event.target;
         if (type === "file") this.setState(oldState => ({...oldState, [name]: event.target.files[0]}));
         else this.setState(oldState => ({...oldState, [name]: value}));
-    }
-
-    checkImageValid(imageField: string): boolean {
-        if (imageField === "newAvatar" && this.state.newAvatar) {
-            const maybeGoodImage: File = this.state.newAvatar;
-            const fileType: string = maybeGoodImage.type;
-            console.log(fileType)
-        }
-        // todo: real validation
-        return true;
     }
 
     handleUpdate(event: React.FormEvent<HTMLFormElement>) {
@@ -152,7 +141,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
                                        checked={this.state.avatarUpdateMode === "update"} onChange={this.handleChange}/>
                             <FormFile name={"newAvatar"} label={"New avatar:"}
                                       disabled={this.state.avatarUpdateMode !== "update"}
-                                      isValid={this.checkImageValid("newAvatar")}
+                                      accept={".jpg,.jpeg,.png"}
                                       onChange={this.handleChange}/>
                         </FormGroup>
                         <FormGroup>
@@ -167,7 +156,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
                                        checked={this.state.bannerUpdateMode === "update"} onChange={this.handleChange}/>
                             <FormFile name={"newBanner"} label={"New banner:"}
                                       disabled={this.state.bannerUpdateMode !== "update"}
-                                      isValid={this.checkImageValid("newBanner")}
+                                      accept={".jpg,.jpeg,.png"}
                                       onChange={this.handleChange}/>
                         </FormGroup>
                         <FormGroup>

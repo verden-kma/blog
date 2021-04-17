@@ -24,5 +24,5 @@ public class RecordEntity {
 
     private LocalDateTime timestamp;
 
-    private Boolean isEdited;
+    private boolean isEdited;
 }

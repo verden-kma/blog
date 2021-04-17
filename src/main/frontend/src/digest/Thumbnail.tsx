@@ -20,7 +20,7 @@ class Thumbnail extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}/image-icon`,
+        axios.get(`http://localhost:8080/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}/image-min`,
             {
                 responseType: 'arraybuffer',
                 headers: {

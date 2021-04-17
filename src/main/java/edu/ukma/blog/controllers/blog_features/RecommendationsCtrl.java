@@ -57,10 +57,11 @@ public class RecommendationsCtrl {
     }
 
     @GetMapping("/evaluations/{publisher}/{recordId}")
-    public List<PublicRecordId> byEvaluationRecordTargeted(@PathVariable String publisher, @PathVariable int recordId) {
+    public List<PublicRecordId> byEvaluationRecordTargeted(@PathVariable String publisher, @PathVariable int recordId, Principal principal) {
+        long userId = userService.getUserIdByUsername(principal.getName());
         long publisherId = userService.getUserIdByUsername(publisher);
         List<RecordId> recomRecs = recommendService.getRecordRecomsByRecord(
-                new RecordId(publisherId, recordId), RECORDS_RECOM_LIMIT);
+                new RecordId(publisherId, recordId), userId, RECORDS_RECOM_LIMIT);
         BiMap<Long, String> idsBiMap = userService.getUserIdentifiersBimap(recomRecs.stream()
                 .map(RecordId::getPublisherId)
                 .collect(Collectors.toList()));

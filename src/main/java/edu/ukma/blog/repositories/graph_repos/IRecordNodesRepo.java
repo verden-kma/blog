@@ -25,8 +25,9 @@ public interface IRecordNodesRepo extends Neo4jRepository<RecordGraphEntity, UUI
 
     @Query("MATCH (users:UserGraphEntity)-[:LIKES]->(:RecordGraphEntity {publisherId : {0}, recordOwnId : {1}}),\n" +
             "(users)-[:LIKES]->(records:RecordGraphEntity)\n" +
-            "RETURN records.publisherId AS publisherId, records.recordOwnId AS recordOwnId, COUNT(*) AS Strength ORDER BY Strength DESC")
-    List<RecordView> getRecordRecomsSimilarToRecord(long publisherId, int recordOwnId, int limit);
+            "WHERE records.publisherId <> {2} AND NOT exists ((:UserGraphEntity {userId : {2}})-[:LIKES]->(records))\n" +
+            "RETURN records.publisherId AS publisherId, records.recordOwnId AS recordOwnId, COUNT(*) AS Strength ORDER BY Strength DESC LIMIT {3}")
+    List<RecordView> getRecordRecomsSimilarToRecord(long publisherId, int recordOwnId, long userId, int limit);
 
     @Query("MATCH (target:UserGraphEntity {userId:{0}})-[:LIKES]->(likeRecs:RecordGraphEntity), " +
             "(simLikeUsr:UserGraphEntity)-[:LIKES]->(likeRecs), " +

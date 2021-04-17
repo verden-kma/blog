@@ -30,7 +30,7 @@ class UserOptionsDropdown extends React.Component<any, IAuthProps> {
 
     render() {
         return (
-            <NavDropdown title={this.state.username} id="user-options-navbar">
+            <NavDropdown style={{alignSelf: "center"}} title={this.state.username} id="user-options-navbar">
                 <NavDropdown.Item href={`/profile/${this.state.username}`}>Profile</NavDropdown.Item>
                 <NavDropdown.Item href={"/edit-user-details"}>Edit profile</NavDropdown.Item>
                 <NavDropdown.Item href={"/change-password"}>Change password</NavDropdown.Item>

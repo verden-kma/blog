@@ -75,7 +75,7 @@ class Login extends React.Component<any, IState> {
                 <Row className={"justify-content-center m-3"}>
                     <div className={"col-md-5"}>
                         <div className={"d-flex justify-content-center"}>
-                            <span>Embrace yourself. I hate css.</span>
+                            <span>Brace yourself. I hate css.</span>
                         </div>
                     </div>
                 </Row>

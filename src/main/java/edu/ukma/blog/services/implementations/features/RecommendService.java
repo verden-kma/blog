@@ -33,8 +33,8 @@ public class RecommendService implements IRecommendService {
     }
 
     @Override
-    public List<RecordId> getRecordRecomsByRecord(RecordId recordId, int limit) {
-        return recordNodesRepo.getRecordRecomsSimilarToRecord(recordId.getPublisherId(), recordId.getRecordOwnId(), limit)
+    public List<RecordId> getRecordRecomsByRecord(RecordId recordId, long userId, int limit) {
+        return recordNodesRepo.getRecordRecomsSimilarToRecord(recordId.getPublisherId(), recordId.getRecordOwnId(), userId, limit)
                 .stream()
                 .map(x -> new RecordId(x.getPublisherId(), x.getRecordOwnId()))
                 .collect(Collectors.toList());

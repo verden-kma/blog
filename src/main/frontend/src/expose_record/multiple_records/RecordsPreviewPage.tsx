@@ -15,7 +15,7 @@ interface IProps extends RouteComponentProps<any> {
 // user loads lazy page, publisher posts record, user loads 2nd page, gets duplicate, unable get access to the new record
 interface IState {
     recordJsons: Array<IRecord>,
-    recordImgs: Map<number, string>,
+    recordImgs: Map<string, string>,
     currPage?: number,
     numPages?: number,
 }
@@ -76,8 +76,6 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        console.log("MOUNTS")
-
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
                 headers: {'Authorization': `Bearer ${this.props.auth.token}`}
@@ -107,8 +105,9 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
                     headers: {'Authorization': `Bearer ${this.props.auth.token}`}
                 }).then(response => {
                 this.setState((oldState: IState) => {
-                    let updImgs: Map<number, string> = new Map(oldState.recordImgs);
-                    updImgs.set(id, Buffer.from(response.data, 'binary').toString('base64'));
+                    let updImgs: Map<string, string> = new Map(oldState.recordImgs);
+                    const imgStr = Buffer.from(response.data, 'binary').toString('base64');
+                    updImgs.set(JSON.stringify({publisher: publisher, recOwnId: id}), imgStr);
                     return {
                         ...oldState,
                         recordImgs: updImgs
@@ -179,7 +178,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
 
         const records = this.state.recordJsons.map((r: IRecord) =>
             <RecordCard key={r.publisher + r.id} {...{
-                ...r, image: this.state.recordImgs.get(r.id),
+                ...r, image: this.state.recordImgs.get(JSON.stringify({publisher: r.publisher, recOwnId: r.id})),
                 handleEvaluation: this.handleEvaluation,
             }}/>
         )

@@ -106,7 +106,7 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
                                 }}/>
                             </Route>
                             <Route exact path={"/users/:publisher/records/:recordId"}>
-                                <FullRecordView {...{auth: this.state.auth}}/>
+                                <FullRecordView key={window.location.pathname} {...{auth: this.state.auth}}/>
                             </Route>
                             <Route exact path={"/edit-user-details"}>
                                 <EditUserProfile {...this.state.auth}/>

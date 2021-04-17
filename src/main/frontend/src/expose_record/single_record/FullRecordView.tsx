@@ -231,6 +231,22 @@ class FullRecordView extends React.Component<IProps, IState> {
                 }), error => console.log(error));
     }
 
+    componentDidUpdate(prevProps: Readonly<IProps>, prevState: Readonly<IState>, snapshot?: any) {
+        if (prevProps.location.pathname !== this.props.location.pathname) {
+            this.setState({
+                recordJson: undefined,
+                image: undefined,
+                comments: new Map(),
+                nextCommentPage: 0,
+                hasMoreCommentPages: true,
+                newCommentText: "",
+                deleteRequested: false,
+                deleteAccomplished: false
+            });
+            this.componentDidMount();
+        }
+    }
+
     render() {
         if (!this.state.recordJson) return <div>empty div</div>;
         if (this.state.deleteAccomplished) return <Redirect to={`/profile/${this.state.recordJson.publisher}`}/>;
@@ -288,7 +304,7 @@ class FullRecordView extends React.Component<IProps, IState> {
 
                 <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
                 <div>
-                    <img width={700} height={300} src={'data:image/jpeg;base64, ' + this.state.image}
+                    <img width={500} src={'data:image/jpeg;base64, ' + this.state.image}
                          alt={this.state.recordJson.caption + "-image"}/>
                     <h3>{this.state.recordJson.caption}</h3>
                     <h5>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</h5>

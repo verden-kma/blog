@@ -1,7 +1,20 @@
 import React from "react";
 import axios from "axios";
 import {IAuthProps} from "./CMSNavbarRouting";
-import {Button, Form, FormControl, FormFile, FormGroup, FormLabel, Modal, ModalTitle, Spinner} from "react-bootstrap";
+import {
+    Button,
+    Container,
+    Form,
+    FormControl,
+    FormFile,
+    FormGroup,
+    FormLabel,
+    Image,
+    Modal,
+    ModalTitle,
+    Row,
+    Spinner
+} from "react-bootstrap";
 import ModalHeader from "react-bootstrap/ModalHeader";
 
 interface IState {
@@ -88,32 +101,62 @@ class PostRecord extends React.Component<IAuthProps, IState> {
                         </ModalTitle>
                     </ModalHeader>
                 </Modal>
-                <Form onSubmit={this.handleSubmit}>
-                    <FormGroup>
-                        <FormLabel>Caption:</FormLabel>
-                        <FormControl type="text"
-                                     name="caption"
-                                     value={this.state.caption}
-                                     onChange={this.handleChange}
-                                     placeholder="this will be displayed as a title of your record"/>
-                    </FormGroup>
-                    <FormGroup>
-                        <FormLabel>Description:</FormLabel>
-                        <FormControl type="text"
-                                     name="adText"
-                                     value={this.state.adText}
-                                     onChange={this.handleChange}
-                                     placeholder="what else do you have to tell?"/>
-                    </FormGroup>
-                    <FormGroup>
-                        <FormFile name={"selectedFileName"} value={this.state.selectedFileName}
-                                  label="Select an image to upload."
-                                  onChange={this.handleChange}/>
-                    </FormGroup>
-                    {this.state.isBeingSent
-                        ? <Spinner animation={"border"}><span className="sr-only">Uploading...</span></Spinner>
-                        : <Button type="submit">Upload</Button>}
-                </Form>
+                <Container>
+                    {this.state.file && <Row className={"justify-content-center"}>
+                        <div className={"col-8 d-flex justify-content-center"}>
+                            <Image src={URL.createObjectURL(this.state.file)} alt={this.state.selectedFileName}
+                                   thumbnail/>
+                        </div>
+                    </Row>}
+
+
+                    <Row className={"justify-content-center"}>
+                        {/*{this.state.file && <div className={"col-sm-9 col-md-5 col-lg-4 d-flex justify-content-center"}>*/}
+                        {/*    <Image src={URL.createObjectURL(this.state.file)} alt={this.state.selectedFileName} thumbnail/>*/}
+                        {/*</div>}*/}
+                        <div className={"col-sm-8 col-md-6 col-lg-5"}>
+
+
+                            <Form onSubmit={this.handleSubmit}>
+                                <FormGroup>
+                                    <FormLabel>Caption:</FormLabel>
+                                    <FormControl type="text"
+                                                 name="caption"
+                                                 value={this.state.caption}
+                                                 onChange={this.handleChange}
+                                                 placeholder="this will be displayed as a title of your record"/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Description:</FormLabel>
+                                    <FormControl type="text" as={"textarea"}
+                                                 name="adText"
+                                                 value={this.state.adText}
+                                                 onChange={this.handleChange}
+                                                 placeholder="what else do you have to tell?"/>
+                                </FormGroup>
+                                <FormGroup className={"d-flex"}>
+                                    {/*<FormLabel className={"file-label"} style={{cursor : "pointer"}}>*/}
+                                    {/*    {this.state.selectedFileName === '' ? "Select an image" : "Change the image"}*/}
+                                    <FormFile
+                                        name={"selectedFileName"} value={this.state.selectedFileName}
+                                        accept={".jpg,.jpeg,.png"}
+                                        onChange={this.handleChange}
+                                        // hidden
+                                    />
+
+                                    {/*</FormLabel>*/}
+                                </FormGroup>
+                                <div className={"d-flex justify-content-center"}>
+                                    <Button type="submit">
+                                        {this.state.isBeingSent &&
+                                        <Spinner animation={"border"} size={"sm"} role={"status"}/>}Upload
+                                    </Button>
+                                </div>
+
+                            </Form>
+                        </div>
+                    </Row>
+                </Container>
             </div>
         )
     }

@@ -60,3 +60,9 @@
     display: flex;
     justify-content: space-around;
 }
+
+.file-label {
+    flex: 1 0 max-content;
+    text-align: center;
+    font-size: 3em;
+}

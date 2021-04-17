@@ -35,8 +35,7 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
 // <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
     render() {
         return (
-
-            <Form inline onSubmit={event => event.preventDefault()}>
+            <Form inline style={{flexWrap: "nowrap"}} onSubmit={event => event.preventDefault()}>
                 <FormControl type={"text"}
                              name={"query"}
                              value={this.state.query}
@@ -60,10 +59,7 @@ class Search extends React.Component<RouteComponentProps<any>, ISearchData> {
                                      checked={this.state.mode === searchModes[1]}
                                      onChange={this.handleChange}
                         />
-                        <img src={searchUser} alt={"Publishers"}
-
-
-                        />
+                        <img src={searchUser} alt={"Publishers"}/>
                     </label>
                 </div>
 

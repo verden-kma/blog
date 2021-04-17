@@ -16,7 +16,7 @@ interface IRecordId {
 }
 
 interface IState {
-    recordIcons: Map<IRecordId, string>
+    recordIcons: Map<IRecordId, string>,
 }
 
 class RecordTargetRecom extends React.Component<IProps, IState> {
@@ -47,8 +47,8 @@ class RecordTargetRecom extends React.Component<IProps, IState> {
     render() {
         const recommThumbnails = Array.from(this.state.recordIcons).map(([recId, img]) =>
             <Link to={`/users/${recId.publisher}/records/${recId.recordOwnId}`}
-                  onClick={() => window.location.reload()} key={recId.publisher + recId.recordOwnId}>
-                <Image src={"data:image/jpeg;base64, " + img} alt={""}/>
+                  key={JSON.stringify({publisher: recId.publisher, rOwnId: recId.recordOwnId})}>
+                <Image src={"data:image/jpeg;base64, " + img} alt={"recommendation"}/>
             </Link>
         )
 

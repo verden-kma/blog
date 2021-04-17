@@ -7,7 +7,7 @@ import java.util.List;
 public interface IRecommendService {
     List<Long> getSubscriptionRecoms(long clientId, int limit);
 
-    List<RecordId> getRecordRecomsByRecord(RecordId recordId, int limit);
+    List<RecordId> getRecordRecomsByRecord(RecordId recordId, long userId, int limit);
 
     List<RecordId> getRecordRecoms(long clientId, int limit);
 }
