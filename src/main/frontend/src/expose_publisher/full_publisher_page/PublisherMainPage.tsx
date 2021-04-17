@@ -5,6 +5,7 @@ import axios from "axios";
 import UserStats from "../UserStats";
 import {withRouter} from "react-router";
 import {RouteComponentProps} from "react-router-dom";
+import {Container, Row} from "react-bootstrap";
 
 interface IPublisherProps extends RouteComponentProps<any> {
     auth: IAuthProps
@@ -39,10 +40,27 @@ class PublisherMainPage extends React.Component<IPublisherProps, IPublisherState
 
     render() {
         return (<div>
-            {this.state.topBanner && <img src={'data:image/jpeg;base64, ' + this.state.topBanner} alt={'top banner'}/>}
-            <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>
-            <RecordPreview auth={this.props.auth} previewContext={RecordPreviewContext.PUBLISHER_RECORDS}
-                           targetUsername={this.state.targetUsername}/>
+            <Container fluid>
+                <Row>
+                    {this.state.topBanner &&
+                    <img width={"100%"} src={'data:image/jpeg;base64, ' + this.state.topBanner} alt={'top banner'}/>}
+                </Row>
+                <Row style={{}}>
+                    <div className={"col mx-3"}>
+                        <RecordPreview auth={this.props.auth} previewContext={RecordPreviewContext.PUBLISHER_RECORDS}
+                                       targetUsername={this.state.targetUsername}/>
+                    </div>
+                    <div className={"col-3"} style={{}}>
+                        <div className={"my-5 mx-2"} style={{
+                            position: "sticky",
+                            top: "2em"
+                        }}>
+                            <UserStats auth={this.props.auth} targetUsername={this.state.targetUsername}/>
+                        </div>
+                    </div>
+                </Row>
+
+            </Container>
         </div>)
     }
 }

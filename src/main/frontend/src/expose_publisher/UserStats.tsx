@@ -3,6 +3,8 @@ import axios, {AxiosResponse} from "axios";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 import defaultAva from "../assets/defaultAvatar.png";
 import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
+import "./local-styles.css"
+import {Button} from "react-bootstrap";
 
 interface IProps {
     auth: IAuthProps,
@@ -90,20 +92,30 @@ class UserStats extends React.Component<IProps, IState> {
                 ? {"fontWeight": "bold"} :
                 {"fontStyle": "italic"};
         return (
-            <div>
+            <div className={"vertical-flex"}>
                 <h3>{this.state.userData.username}</h3>
-                <img src={userAva} alt={`${this.props.targetUsername}'s avatar`}/>
-                <h5>{this.state.userData.status}</h5>
-                <p>{this.state.userData.description}</p>
-                <h5>Uploads: {this.state.userData.uploads}</h5>
-                <h5>Likes: {this.state.userData.likes}</h5>
-                <h5>Dislikes: {this.state.userData.dislikes}</h5>
-                <h5>Comments: {this.state.userData.comments}</h5>
-                <h5>Followers: {this.state.userData.followers}</h5>
-                <br/>
-                {this.props.targetUsername !== this.props.auth.username &&
-                <button style={followBtnStyle} onClick={this.handleFollowAction}>Follow
-                </button>}
+                <img className={"my-3"} src={userAva} alt={`${this.props.targetUsername}'s avatar`}/>
+
+                <div>
+                    <h4>{this.state.userData.status}</h4>
+                    <p>{this.state.userData.description}</p>
+                    <hr className={"publisher-stats-split"}/>
+                    <h5>Uploads: {this.state.userData.uploads}</h5>
+                    <h5>Likes: {this.state.userData.likes}</h5>
+                    <h5>Dislikes: {this.state.userData.dislikes}</h5>
+                    <h5>Comments: {this.state.userData.comments}</h5>
+                    <h5>Followers: {this.state.userData.followers}</h5>
+
+                    {this.props.targetUsername !== this.props.auth.username &&
+                    <div className={"vertical-flex"}>
+                        <hr className={"publisher-stats-split"}/>
+                        <div className={"follow-btn-wrapper"}>
+                            <Button variant={"dark"} className={"follow-btn"} onClick={this.handleFollowAction}>
+                                {this.state.userData.isFollowed ? "Unfollow" : "Follow"}
+                            </Button>
+                        </div>
+                    </div>}
+                </div>
             </div>
         );
     }

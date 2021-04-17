@@ -82,8 +82,7 @@ class Registration extends React.Component<any, IState> {
     }
 
     render() {
-        return (
-            <Container fluid className={"full-page-container"}>
+        return (<div>
                 <Modal size={"sm"} show={this.state.hasRequestedSignup} onHide={this.switchToLogin}>
                     <Modal.Header closeButton>
                         <Modal.Title>Congratulations! Your personal data has been accepted.</Modal.Title>
@@ -99,70 +98,72 @@ class Registration extends React.Component<any, IState> {
                     </Modal.Header>
                     <Modal.Body>{this.state.cause}</Modal.Body>
                 </Modal>
+                <Container fluid className={"full-page-container"}>
 
-                <Row className={"justify-content-center"}>
-                    <div className={"col-sm-7 col-md-5 col-lg-4 m-3"}>
-                        <div className={"d-flex justify-content-center"}>
-                            <span>Registration</span>
+                    <Row className={"justify-content-center"}>
+                        <div className={"col-sm-7 col-md-5 col-lg-4 m-3"}>
+                            <div className={"d-flex justify-content-center"}>
+                                <span>Registration</span>
+                            </div>
                         </div>
-                    </div>
-                </Row>
+                    </Row>
 
-                <Row className={"justify-content-center"}>
-                    <div className={"col-sm-7 col-md-5 col-lg-4"}>
-                        <Form onSubmit={this.handleSubmit}>
-                            <FormGroup>
-                                <FormLabel>Email:</FormLabel>
-                                <FormControl type={"email"} name={"email"} onChange={this.handleChange} required/>
-                            </FormGroup>
-                            <FormGroup>
-                                <FormLabel>Username:</FormLabel>
-                                <FormControl type={"text"}
-                                             name={"username"}
-                                             onChange={this.handleChange}
-                                             required/>
-                            </FormGroup>
-                            <FormGroup>
-                                <FormLabel>Password:</FormLabel>
-                                <FormControl type={"password"}
-                                             name={"password"}
-                                             onChange={this.handleChange}
-                                             required/>
-                            </FormGroup>
-                            <FormGroup>
-                                <FormLabel>Confirm the password:</FormLabel>
-                                <FormControl type={"password"}
-                                             name={"passwordConfirm"}
-                                             onChange={this.handleChange}
-                                             required/>
-                            </FormGroup>
-                            <FormGroup>
-                                <FormLabel>Your status:</FormLabel>
-                                <FormControl type={"text"}
-                                             name={"status"}
-                                             onChange={this.handleChange}/>
-                            </FormGroup>
-                            <FormGroup>
-                                <FormLabel>Description (tell about yourself):</FormLabel>
-                                <FormControl type={"text"} as={"textarea"} name={"description"}
-                                             onChange={this.handleChange}/>
-                            </FormGroup>
-                            <ButtonGroup className={"d-flex justify-content-around"}>
-                                <Button type={"submit"} variant={"success"}>
-                                    {this.state.hasSentRequest &&
-                                    <Spinner as={"span"} animation={"border"} size={"sm"} role={"status"}
-                                             aria-hidden={"true"}/>}
-                                    Register
-                                </Button>
-                                <Button type={"button"} variant={"secondary"} onClick={this.switchToLogin}>
-                                    Already have an account
-                                </Button>
-                            </ButtonGroup>
+                    <Row className={"justify-content-center"}>
+                        <div className={"col-sm-7 col-md-5 col-lg-4"}>
+                            <Form onSubmit={this.handleSubmit}>
+                                <FormGroup>
+                                    <FormLabel>Email:</FormLabel>
+                                    <FormControl type={"email"} name={"email"} onChange={this.handleChange} required/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Username:</FormLabel>
+                                    <FormControl type={"text"}
+                                                 name={"username"}
+                                                 onChange={this.handleChange}
+                                                 required/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Password:</FormLabel>
+                                    <FormControl type={"password"}
+                                                 name={"password"}
+                                                 onChange={this.handleChange}
+                                                 required/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Confirm the password:</FormLabel>
+                                    <FormControl type={"password"}
+                                                 name={"passwordConfirm"}
+                                                 onChange={this.handleChange}
+                                                 required/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Your status:</FormLabel>
+                                    <FormControl type={"text"}
+                                                 name={"status"}
+                                                 onChange={this.handleChange}/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <FormLabel>Description (tell about yourself):</FormLabel>
+                                    <FormControl type={"text"} as={"textarea"} name={"description"}
+                                                 onChange={this.handleChange}/>
+                                </FormGroup>
+                                <ButtonGroup className={"d-flex justify-content-around"}>
+                                    <Button type={"submit"} variant={"success"}>
+                                        {this.state.hasSentRequest &&
+                                        <Spinner as={"span"} animation={"border"} size={"sm"} role={"status"}
+                                                 aria-hidden={"true"}/>}
+                                        Register
+                                    </Button>
+                                    <Button type={"button"} variant={"secondary"} onClick={this.switchToLogin}>
+                                        Already have an account
+                                    </Button>
+                                </ButtonGroup>
 
-                        </Form>
-                    </div>
-                </Row>
-            </Container>
+                            </Form>
+                        </div>
+                    </Row>
+                </Container>
+            </div>
         );
     }
 }
