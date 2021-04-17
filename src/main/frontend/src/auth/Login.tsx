@@ -3,7 +3,7 @@ import {withRouter} from "react-router-dom";
 import axios, {AxiosResponse} from "axios";
 import store from "store2";
 import {Button, ButtonGroup, Container, Form, FormControl, FormGroup, FormLabel, Row, Spinner} from "react-bootstrap";
-import "./local-styles.css"
+import "./auth-styles.css"
 
 interface IState {
     username: string,

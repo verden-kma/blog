@@ -100,8 +100,8 @@ class EditRecord extends React.Component<IProps, IState> {
                 <Badge variant={badgeVar}>{badgeText}</Badge>
                 <Badge
                     variant={"second"}>{date.getDate() + ' ' + monthNames[date.getMonth()] + ", " + date.getFullYear()}</Badge>
+                <Image src={"data:image/jpeg;base64, " + this.state.image} alt={"no image loaded"} fluid/>
                 <Form>
-                    <Image src={"data:image/jpeg;base64, " + this.state.image} alt={"no image loaded"} fluid/>
                     <FormGroup>
                         <FormLabel>Caption:</FormLabel>
                         <FormControl type={"text"} name={"newCaption"} value={this.state.newCaption}

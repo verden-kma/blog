@@ -3,7 +3,7 @@ import {IRecord} from "./RecordsPreviewPage";
 import {monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Link} from "react-router-dom";
 import {Button, Container, Image, Row} from "react-bootstrap";
-import "../local-styles.css"
+import "../record-styles.css"
 
 interface ICardProps extends IRecord {
     image?: string,

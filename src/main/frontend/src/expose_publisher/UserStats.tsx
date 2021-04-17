@@ -3,7 +3,7 @@ import axios, {AxiosResponse} from "axios";
 import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
 import defaultAva from "../assets/defaultAvatar.png";
 import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
-import "./local-styles.css"
+import "./publisher-styles.css"
 import {Button} from "react-bootstrap";
 
 interface IProps {

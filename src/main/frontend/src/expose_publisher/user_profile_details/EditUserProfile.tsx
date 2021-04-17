@@ -1,39 +1,64 @@
 import React from 'react';
 import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
-import {Button, Form, FormCheck, FormControl, FormFile, FormGroup, FormLabel} from "react-bootstrap";
+import {
+    Button,
+    Container,
+    DropdownButton,
+    Form,
+    FormControl,
+    FormFile,
+    FormGroup,
+    FormLabel,
+    Row
+} from "react-bootstrap";
 import axios from "axios";
 import {Redirect} from "react-router";
+import DropdownItem from "react-bootstrap/DropdownItem";
 
 interface IState {
     oldStatus?: string,
     oldDescription?: string,
 
-    newStatus: string,
-    newDescription: string,
+    newStatus?: string,
+    newDescription?: string,
 
     newAvatar?: File,
     newBanner?: File,
 
-    avatarUpdateMode: string,
-    bannerUpdateMode: string,
+    avatarUpdateMode: AlterOptions,
+    bannerUpdateMode: AlterOptions,
 
+    isEditing: boolean,
     hasEdited: boolean
 }
+
+enum AlterOptions {
+    SKIP = "<none>",
+    UPDATE = "update",
+    DELETE = "delete"
+}
+
+const alterOptionsReverse: Map<string, AlterOptions> = new Map([
+    ["<none>", AlterOptions.SKIP],
+    ["update", AlterOptions.UPDATE],
+    ["delete", AlterOptions.DELETE]
+])
+
 
 class EditUserProfile extends React.Component<IAuthProps, IState> {
     constructor(props: IAuthProps) {
         super(props);
         this.state = {
-            newStatus: "",
-            newDescription: "",
-            avatarUpdateMode: "update",
-            bannerUpdateMode: "update",
+            avatarUpdateMode: AlterOptions.SKIP,
+            bannerUpdateMode: AlterOptions.SKIP,
+            isEditing: false,
             hasEdited: false
         }
         this.handleChange = this.handleChange.bind(this);
         this.resetOld = this.resetOld.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
         this.updateImage = this.updateImage.bind(this);
+        this.handleAlterModeChange = this.handleAlterModeChange.bind(this);
     }
 
     componentDidMount() {
@@ -58,7 +83,6 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
             newProp = "newDescription";
             oldVal = this.state.oldDescription || "";
         }
-
         this.setState(oldState => ({...oldState, [newProp]: oldVal}));
     }
 
@@ -97,14 +121,14 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         Promise.all(updatePromises).then(() => this.setState(oldState => ({...oldState, hasEdited: true})));
     }
 
-    updateImage(mode: string, urlSuffix: string, newImage?: File): Promise<any> | undefined {
-        if (mode === "delete") {
+    updateImage(mode: AlterOptions, urlSuffix: string, newImage?: File): Promise<any> | undefined {
+        if (mode === AlterOptions.DELETE) {
             return axios.delete(`http://localhost:8080/users/${urlSuffix}`,
                 {
                     headers: {'Authorization': `Bearer ${this.props.token}`}
                 }).then(() => {
             }, error => console.log(error))
-        } else if (mode === "update" && newImage !== undefined) {
+        } else if (mode === AlterOptions.UPDATE && newImage !== undefined) {
             let body = new FormData();
             body.append("image", newImage);
             return axios.put(`http://localhost:8080/users/${urlSuffix}`, body, {
@@ -114,60 +138,94 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         }
     }
 
+    handleAlterModeChange(target: string, value: string | null) {
+        if (value === null) return;
+        this.setState(oldState => ({...oldState, [target]: alterOptionsReverse.get(value)}));
+    }
+
     render() {
-        // todo: add clear button (for files), restore current
         if (this.state.hasEdited) {
             return <Redirect to={`/profile/${this.props.username}`}/>
         }
         return (
-            <div>
+            <Container>
+                <Row className={"justify-content-center my-3"}>
+                    <h3>Edit your profile data</h3>
+                </Row>
+
                 <Form onSubmit={this.handleUpdate}>
-                    <FormGroup>
+                    <FormGroup className={"my-5"}>
                         <FormLabel>Edit status:</FormLabel>
-                        <FormControl name={"newStatus"} type={"text"} size={"lg"} value={this.state.newStatus}
+                        <FormControl name={"newStatus"} type={"text"} value={this.state.newStatus}
                                      onChange={this.handleChange}/>
-                        <Button onClick={this.resetOld.bind(this, "status")}>Restore current</Button>
+                        <Button onClick={this.resetOld.bind(this, "status")} variant={"light"}
+                                className={"float-right btn-outline-danger my-1 mx-3"}>
+                            Restore current
+                        </Button>
                     </FormGroup>
-                    <FormGroup>
+
+                    <FormGroup className={"my-5"}>
                         <FormLabel>Edit description:</FormLabel>
-                        <FormControl name={"newDescription"} type={"text"} size={"sm"} value={this.state.newDescription}
+                        <FormControl name={"newDescription"} type={"text"} as={"textarea"}
+                                     value={this.state.newDescription}
                                      onChange={this.handleChange}/>
-                        <Button onClick={this.resetOld.bind(this, "description")}>Restore current</Button>
+                        <Button onClick={this.resetOld.bind(this, "description")} variant={"light"}
+                                className={"float-right btn-outline-danger my-1 mx-3"}>
+                            Restore current
+                        </Button>
                     </FormGroup>
 
-                    <FormGroup>
+                    <div className={"d-flex justify-content-around"}>
                         <FormGroup>
-                            <FormCheck name={"avatarUpdateMode"} type={"radio"} label={"Update"} value={"update"}
-                                       checked={this.state.avatarUpdateMode === "update"} onChange={this.handleChange}/>
-                            <FormFile name={"newAvatar"} label={"New avatar:"}
-                                      disabled={this.state.avatarUpdateMode !== "update"}
-                                      accept={".jpg,.jpeg,.png"}
-                                      onChange={this.handleChange}/>
+                            <FormLabel>Alter avatar:</FormLabel>
+                            <DropdownButton variant={"info"} title={this.state.avatarUpdateMode}>
+                                <DropdownItem eventKey={AlterOptions.SKIP}
+                                              onSelect={(key) => this.handleAlterModeChange("avatarUpdateMode", key)}>
+                                    {AlterOptions.SKIP}
+                                </DropdownItem>
+                                <DropdownItem eventKey={AlterOptions.UPDATE}
+                                              onSelect={(key) => this.handleAlterModeChange("avatarUpdateMode", key)}>
+                                    {AlterOptions.UPDATE}
+                                </DropdownItem>
+                                <DropdownItem eventKey={AlterOptions.DELETE}
+                                              onSelect={(key) => this.handleAlterModeChange("avatarUpdateMode", key)}>
+                                    {AlterOptions.DELETE}
+                                </DropdownItem>
+                            </DropdownButton>
+                            {this.state.avatarUpdateMode === AlterOptions.UPDATE
+                            && <FormFile name={"newAvatar"} label={"New avatar:"}
+                                         accept={".jpg,.jpeg,.png"}
+                                         onChange={this.handleChange}/>}
                         </FormGroup>
-                        <FormGroup>
-                            <FormCheck name={"avatarUpdateMode"} type={"radio"} label={"Delete"} value={"delete"}
-                                       checked={this.state.avatarUpdateMode === "delete"} onChange={this.handleChange}/>
-                        </FormGroup>
-                    </FormGroup>
 
-                    <FormGroup>
                         <FormGroup>
-                            <FormCheck name={"bannerUpdateMode"} type={"radio"} label={"Update"} value={"update"}
-                                       checked={this.state.bannerUpdateMode === "update"} onChange={this.handleChange}/>
-                            <FormFile name={"newBanner"} label={"New banner:"}
-                                      disabled={this.state.bannerUpdateMode !== "update"}
-                                      accept={".jpg,.jpeg,.png"}
-                                      onChange={this.handleChange}/>
+                            <FormLabel>Alter banner:</FormLabel>
+                            <DropdownButton variant={"info"} title={this.state.bannerUpdateMode}>
+                                <DropdownItem eventKey={AlterOptions.SKIP}
+                                              onSelect={(key) => this.handleAlterModeChange("bannerUpdateMode", key)}>
+                                    {AlterOptions.SKIP}
+                                </DropdownItem>
+                                <DropdownItem eventKey={AlterOptions.UPDATE}
+                                              onSelect={(key) => this.handleAlterModeChange("bannerUpdateMode", key)}>
+                                    {AlterOptions.UPDATE}
+                                </DropdownItem>
+                                <DropdownItem eventKey={AlterOptions.DELETE}
+                                              onSelect={(key) => this.handleAlterModeChange("bannerUpdateMode", key)}>
+                                    {AlterOptions.DELETE}
+                                </DropdownItem>
+                            </DropdownButton>
+                            {this.state.bannerUpdateMode === AlterOptions.UPDATE
+                            && <FormFile name={"newBanner"} label={"New banner:"}
+                                         accept={".jpg,.jpeg,.png"}
+                                         onChange={this.handleChange}/>}
                         </FormGroup>
-                        <FormGroup>
-                            <FormCheck name={"bannerUpdateMode"} type={"radio"} label={"Delete"} value={"delete"}
-                                       checked={this.state.bannerUpdateMode === "delete"} onChange={this.handleChange}/>
-                        </FormGroup>
-                    </FormGroup>
+                    </div>
 
-                    <Button type={"submit"}>Edit my profile</Button>
+                    <Row className={"justify-content-center mt-3"}>
+                        <Button variant={"success"} type={"submit"}>Edit my profile</Button>
+                    </Row>
                 </Form>
-            </div>
+            </Container>
         );
     }
 }

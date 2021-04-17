@@ -1,28 +1,29 @@
 import React from 'react';
 import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
-import {Button, Form, Modal} from "react-bootstrap";
-import {Redirect} from "react-router";
+import {Button, Container, Form, Modal, Row} from "react-bootstrap";
+import {RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import store from "store2"
+
+interface IProps extends IAuthProps, RouteComponentProps<any> {
+}
 
 interface IState {
     suggestedCurrPassword: string,
     newPassword: string,
     newPassRepeat: string,
     changeRequest: boolean,
-    hasChanged: boolean,
     errors: Map<string, string>
 }
 
-class ChangePassword extends React.Component<IAuthProps, IState> {
-    constructor(props: IAuthProps) {
+class ChangePassword extends React.Component<IProps, IState> {
+    constructor(props: IProps) {
         super(props);
         this.state = {
             suggestedCurrPassword: "",
             newPassword: "",
             newPassRepeat: "",
             changeRequest: false,
-            hasChanged: false,
             errors: new Map()
         }
         this.handlePropertyChange = this.handlePropertyChange.bind(this);
@@ -42,6 +43,7 @@ class ChangePassword extends React.Component<IAuthProps, IState> {
             headers: {'Authorization': `Bearer ${this.props.token}`}
         }).then(() => {
             store.session.clearAll();
+            window.history.replaceState(null, "sprout", "/");
             window.location.reload();
         }, error => {
             if (error.response.status === 401) {
@@ -83,9 +85,6 @@ class ChangePassword extends React.Component<IAuthProps, IState> {
     }
 
     render() {
-        if (this.state.hasChanged) {
-            return <Redirect to={"/login"}/>
-        }
         return (
             <div>
                 <Modal show={this.state.changeRequest} onHide={this.handleCancelChange}>
@@ -98,40 +97,65 @@ class ChangePassword extends React.Component<IAuthProps, IState> {
                     </Modal.Footer>
                 </Modal>
 
-                <Form onSubmit={this.handleChangeRequest}>
-                    <Form.Group>
-                        <Form.Label>Current password</Form.Label>
-                        <Form.Control name={"suggestedCurrPassword"} type={"password"}
-                                      value={this.state.suggestedCurrPassword}
-                                      onChange={this.handlePropertyChange}
-                                      isInvalid={!!this.state.errors.get("currPass")}/>
-                        <Form.Control.Feedback type={"invalid"}>
-                            {this.state.errors.get("currPass")}
-                        </Form.Control.Feedback>
-                    </ Form.Group>
-                    <Form.Group>
-                        <Form.Label>New password</Form.Label>
-                        <Form.Control name={"newPassword"} type={"password"} value={this.state.newPassword}
-                                      onChange={this.handlePropertyChange}
-                                      isInvalid={!!this.state.errors.get("newPass")}/>
-                        <Form.Control.Feedback type={"invalid"}>
-                            {this.state.errors.get("newPass")}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label>Repeat new password</Form.Label>
-                        <Form.Control name={"newPassRepeat"} type={"password"} value={this.state.newPassRepeat}
-                                      onChange={this.handlePropertyChange}
-                                      isInvalid={!!this.state.errors.get("newPassMatch")}/>
-                        <Form.Control.Feedback type={"invalid"}>
-                            {this.state.errors.get("newPassMatch")}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    <Button type={"submit"}>Apply</Button>
-                </Form>
+                <Container>
+                    <Row className={"justify-content-center mt-5 mb-3"}>
+                        <h3>Change your password</h3>
+                    </Row>
+                    <Form onSubmit={this.handleChangeRequest}>
+                        <Row className={"justify-content-center"}>
+                            <div className={"col-sm-12 col-md-8 col-lg-6"}>
+                                <Form.Group>
+                                    <Form.Label>Confirm current password</Form.Label>
+                                    <Form.Control name={"suggestedCurrPassword"} type={"password"}
+                                                  value={this.state.suggestedCurrPassword}
+                                                  onChange={this.handlePropertyChange}
+                                                  isInvalid={!!this.state.errors.get("currPass")}/>
+                                    <Form.Control.Feedback type={"invalid"}>
+                                        {this.state.errors.get("currPass")}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </div>
+                        </Row>
+
+                        <Row className={"justify-content-center"}>
+                            <div className={"col-sm-12 col-md-8 col-lg-6"}>
+                                <Form.Group>
+                                    <Form.Label>New password</Form.Label>
+                                    <Form.Control name={"newPassword"} type={"password"} value={this.state.newPassword}
+                                                  onChange={this.handlePropertyChange}
+                                                  isInvalid={!!this.state.errors.get("newPass")}/>
+                                    <Form.Control.Feedback type={"invalid"}>
+                                        {this.state.errors.get("newPass")}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </div>
+                        </Row>
+
+                        <Row className={"justify-content-center"}>
+                            <div className={"col-sm-12 col-md-8 col-lg-6"}>
+                                <Form.Group>
+                                    <Form.Label>Repeat new password</Form.Label>
+                                    <Form.Control name={"newPassRepeat"} type={"password"}
+                                                  value={this.state.newPassRepeat}
+                                                  onChange={this.handlePropertyChange}
+                                                  isInvalid={!!this.state.errors.get("newPassMatch")}/>
+                                    <Form.Control.Feedback type={"invalid"}>
+                                        {this.state.errors.get("newPassMatch")}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                            </div>
+                        </Row>
+
+                        <Row className={"justify-content-center"}>
+                            <div>
+                                <Button type={"submit"}>Apply</Button>
+                            </div>
+                        </Row>
+                    </Form>
+                </Container>
             </div>
         );
     }
 }
 
-export default ChangePassword;
+export default withRouter(ChangePassword);
