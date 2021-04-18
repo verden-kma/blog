@@ -6,7 +6,7 @@ import store from "store2"
 import {IRecord} from "../multiple_records/RecordsPreviewPage";
 import Comment from "./Comment";
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
-import UserStats from "../../expose_publisher/UserStats";
+import UserStats from "../../expose_publisher/user_profile_details/UserStats";
 import {Link} from "react-router-dom";
 import {Button, Container, Image, Modal, ModalBody, ModalFooter, ModalTitle, Row} from "react-bootstrap";
 import ModalHeader from "react-bootstrap/ModalHeader";
@@ -198,7 +198,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         const {publisher, id} = this.state.recordJson;
         axios.delete(`http://localhost:8080/users/${publisher}/records/${id}`, {
             headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
-        }).then(success => this.setState({deleteAccomplished: true}), error => alert(error));
+        }).then(() => this.setState({deleteAccomplished: true}), error => alert(error));
     }
 
     handleCommentDeleteRequest(commId: number, blockNum: number) {
@@ -219,7 +219,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         axios.delete(`http://localhost:8080/users/${publisher}/records/${id}/comments/${targetId}`, {
             headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         })
-            .then(success =>
+            .then(() =>
                 this.setState((oldState: IState) => {
                     // @ts-ignore
                     const updCommsBlock = oldState.comments.get(targetBlock).filter(x => x.commentId !== targetId);

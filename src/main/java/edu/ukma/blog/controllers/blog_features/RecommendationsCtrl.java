@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/recommendations")
 @RequiredArgsConstructor
 public class RecommendationsCtrl {
-    @Value("${recordRecommendationSize}")
+    @Value("${record-recommendation-size}")
     private final int PUBLISHERS_RECOM_LIMIT;
 
-    @Value("${publisherRecommendationSize}")
+    @Value("${publisher-recommendation-size}")
     private final int RECORDS_RECOM_LIMIT;
 
-    @Value("${recordsPreviewBlock}")
+    @Value("${records-preview-block}")
     private final int RECORDS_PREVIEW_BLOCK;
 
     private final IRecommendService recommendService;
@@ -44,9 +44,9 @@ public class RecommendationsCtrl {
     public List<UserDataPreviewResponse> bySubscriptions(Principal principal) {
         List<Long> recomPubl = recommendService.getSubscriptionRecoms(userService.getUserIdByUsername(principal.getName()),
                 PUBLISHERS_RECOM_LIMIT);
-        BiMap<Long, String> idsBiMap = userService.getUserIdentifiersBimap(recomPubl);
+        long userId = userService.getUserIdByUsername(principal.getName());
         return recomPubl.stream()
-                .map(publ -> userService.getPublisherPreview(idsBiMap.get(publ), principal.getName(), RECORDS_PREVIEW_BLOCK))
+                .map(publ -> userService.getPublisherPreview(publ, userId, RECORDS_PREVIEW_BLOCK))
                 .collect(Collectors.toList());
     }
 

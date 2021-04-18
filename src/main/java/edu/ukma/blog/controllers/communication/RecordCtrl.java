@@ -40,7 +40,7 @@ import java.util.function.Function;
 @RequestMapping("/users/{publisher}/records")
 @RequiredArgsConstructor
 public class RecordCtrl {
-    @Value("${recordsPerPage}")
+    @Value("${records-per-page}")
     private final int RECORD_PAGE_SIZE;
 
     private final IRecordService recordService;

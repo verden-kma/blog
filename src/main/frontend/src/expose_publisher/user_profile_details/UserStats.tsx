@@ -1,10 +1,11 @@
 import React from 'react';
 import axios, {AxiosResponse} from "axios";
-import {IAuthProvider} from "../cms_backbone/CMSNavbarRouting";
-import defaultAva from "../assets/defaultAvatar.png";
-import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
-import "./publisher-styles.css"
+import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
+import defaultAva from "../../assets/defaultAvatar.png";
+import handleFollow, {IPublisherFollow} from "../../utils/HandleFollow";
+import "../publisher-styles.css"
 import {Button} from "react-bootstrap";
+import {Link} from "react-router-dom";
 
 interface IProps {
     authProvider: IAuthProvider,
@@ -105,6 +106,17 @@ class UserStats extends React.Component<IProps, IState> {
                         <h5>Dislikes: {this.state.userData.dislikes}</h5>
                         <h5>Comments: {this.state.userData.comments}</h5>
                         <h5>Followers: {this.state.userData.followers}</h5>
+
+                        <hr className={"publisher-stats-split"}/>
+
+                        <div className={"d-flex flex-column"}>
+                            <Link to={`/users/${this.state.userData.username}/followers`}>
+                                Show all followers
+                            </Link>
+                            <Link to={`/users/${this.state.userData.username}/subscriptions`}>
+                                Show all subscriptions
+                            </Link>
+                        </div>
 
                         {this.props.targetUsername !== this.props.authProvider.getAuth().username &&
                         <div className={"vertical-flex"}>

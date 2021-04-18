@@ -24,10 +24,10 @@ import java.security.Principal;
 @RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchCtrl {
-    @Value("${searchPageSize}")
+    @Value("${search-page-size}")
     private final int SEARCH_PAGE_SIZE;
 
-    @Value("${recordsPreviewBlock}")
+    @Value("${records-preview-block}")
     private final int RECORDS_PREVIEW_BLOCK_SIZE;
 
     private final ISearchService searchService;
@@ -47,7 +47,6 @@ public class SearchCtrl {
         return searchService.findPublishersWithPrefix(name, pageable, userId, RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
-    //feature-idea: add record_statistics entity to avoid querying stats every time
     @GetMapping("/records")
     public EagerContentPage<ResponseRecord> findRecords(@RequestParam @NotEmpty String title,
                                                         @RequestParam @Min(0) int page,

@@ -25,7 +25,7 @@ public class EvaluationCtrl {
      * therefore there are separate put and delete endpoints
      * */
 
-    @Value("${evaluatorsPerBlock}")
+    @Value("${evaluators-per-block}")
     private final int EVAL_BLOCK_SIZE;
 
     private final IRecordEvalService reactionService;

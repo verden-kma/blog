@@ -27,7 +27,7 @@ import java.security.Principal;
 @RequestMapping("/users/{publisher}/records/{recordId}/comments")
 @RequiredArgsConstructor
 public class CommentCtrl {
-    @Value("${commentsPerBlock}")
+    @Value("${comments-per-block}")
     private final int COMMENTS_BLOCK_SIZE;
 
     private final ICommentService commentService;

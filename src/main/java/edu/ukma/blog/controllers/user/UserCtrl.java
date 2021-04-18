@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserCtrl {
-    @Value("${recordsPreviewBlock}")
+    @Value("${records-preview-block}")
     private final int RECORDS_PREVIEW_BLOCK_SIZE;
     private final IUserService userService;
 
@@ -45,7 +45,9 @@ public class UserCtrl {
     public UserDataPreviewResponse getShortData(@PathVariable @NotEmpty String publisher,
                                                 Principal principal) {
         userService.assertActive(publisher);
-        return userService.getPublisherPreview(publisher, principal.getName(), RECORDS_PREVIEW_BLOCK_SIZE);
+        long publisherId = userService.getUserIdByUsername(publisher);
+        long userId = userService.getUserIdByUsername(principal.getName());
+        return userService.getPublisherPreview(publisherId, userId, RECORDS_PREVIEW_BLOCK_SIZE);
     }
 
     @PatchMapping("/details")

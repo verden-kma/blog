@@ -44,6 +44,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService implements IUserService {
 
-    @Value("${signupExpiration}")
+    @Value("${signup-expiration}")
     private final long SIGNUP_EXPIRATION;
 
     @PersistenceContext
@@ -131,14 +132,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDataPreviewResponse getPublisherPreview(String publisher, String user, int recPrevNum) {
-        long publisherId = getUserIdByUsername(publisher);
-        long userId = getUserIdByUsername(user);
-
+    public UserDataPreviewResponse getPublisherPreview(long publisherId, long userId, int recordPrevNum) {
         UserDataPreviewResponse preview = new UserDataPreviewResponse();
-        preview.setPublisher(publisher);
+        preview.setPublisher(this.getUsernamesByIds(Collections.singletonList(publisherId)).get(0));
         preview.setFollowed(followersRepo.existsById(new FollowerId(publisherId, userId)));
-        Pageable pageable = PageRequest.of(0, recPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
+        Pageable pageable = PageRequest.of(0, recordPrevNum, Sort.by(RecordEntity_.TIMESTAMP).descending());
         preview.setLastRecords(recordsRepo.findById_PublisherId(publisherId, pageable)
                 .stream()
                 .map(x -> x.getId().getRecordOwnId())

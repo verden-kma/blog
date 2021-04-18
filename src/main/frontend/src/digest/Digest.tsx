@@ -53,10 +53,12 @@ class Digest extends React.Component<IAuthProvider, IState> {
 
     render() {
         const thumbnails = this.state.records.map(record =>
-            <Thumbnail
-                key={record.publisher + "-" + record.recordOwnId}
-                authProvider={this.props}
-                data={record}/>
+            <div className={"col-sm-6 col-md-3 col-lg-2 p-0"}>
+                <Thumbnail
+                    key={record.publisher + "-" + record.recordOwnId}
+                    authProvider={this.props}
+                    data={record}/>
+            </div>
         )
 
         return (

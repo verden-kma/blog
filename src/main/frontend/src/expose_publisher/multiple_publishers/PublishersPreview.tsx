@@ -30,8 +30,17 @@ interface IPublisher {
 
 enum PublisherPreviewContext {
     SEARCH,
-    RECOMMENDATION
+    RECOMMENDATION,
+    FOLLOWERS,
+    SUBSCRIBERS
 }
+
+const previewContextCaptions: Map<PublisherPreviewContext, string> = new Map([
+    [PublisherPreviewContext.SEARCH, "Found publishers"],
+    [PublisherPreviewContext.RECOMMENDATION, "Recommended publishers"],
+    [PublisherPreviewContext.FOLLOWERS, "Followers"],
+    [PublisherPreviewContext.SUBSCRIBERS, "Subscriptions"]
+]);
 
 class PublishersPreview extends React.Component<IProps, IState> {
     constructor(props: IProps) {
@@ -44,7 +53,10 @@ class PublishersPreview extends React.Component<IProps, IState> {
             previewRecordCores: {},
         };
 
-        if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
+        const previewContext: PublisherPreviewContext = this.props.previewContext;
+        if (previewContext === PublisherPreviewContext.SEARCH
+            || previewContext === PublisherPreviewContext.FOLLOWERS
+            || previewContext === PublisherPreviewContext.SUBSCRIBERS) {
             compState.currPage = 0;
         }
 
@@ -59,9 +71,12 @@ class PublishersPreview extends React.Component<IProps, IState> {
             const publisherPrefix = new URLSearchParams(this.props.location.search).get("query");
             return `http://localhost:8080/search/publishers?name=${publisherPrefix}`;
         }
-        if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION) {
+        if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION)
             return "http://localhost:8080/recommendations/subscriptions";
-        }
+        if (this.props.previewContext === PublisherPreviewContext.FOLLOWERS)
+            return `http://localhost:8080/users/${this.props.match.params.publisher}/followers`;
+        if (this.props.previewContext === PublisherPreviewContext.SUBSCRIBERS)
+            return `http://localhost:8080/users/${this.props.match.params.username}/subscriptions`;
         throw new Error("Unknown PublisherPreviewContext");
     }
 
@@ -107,9 +122,12 @@ class PublishersPreview extends React.Component<IProps, IState> {
             params: {page: this.state.currPage}
         }).then(success => {
             let updState: { publisherJsons: Array<IPublisher>, totalPageNum?: number };
-            if (this.props.previewContext === PublisherPreviewContext.SEARCH) {
+            const previewContext = this.props.previewContext;
+            if (previewContext === PublisherPreviewContext.SEARCH
+                || previewContext === PublisherPreviewContext.FOLLOWERS
+                || previewContext === PublisherPreviewContext.SUBSCRIBERS) {
                 updState = {publisherJsons: success.data.pageItems, totalPageNum: success.data.totalPagesNum};
-            } else if (this.props.previewContext === PublisherPreviewContext.RECOMMENDATION) {
+            } else if (previewContext === PublisherPreviewContext.RECOMMENDATION) {
                 updState = {publisherJsons: success.data};
             } else {
                 console.log(`Provided state: ${this.props.previewContext}`);
@@ -205,12 +223,12 @@ class PublishersPreview extends React.Component<IProps, IState> {
                            lastRecords={this.state.previewRecordCores[pd.publisher]}
                            followCallback={this.handleFollow}/>
         );
-        return (<div style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "flex-start"
-            }}>
-                {publisherCards}
+        return (
+            <div className={"d-flex flex-column"}>
+                <h3 className={"ml-3 my-2"}>{previewContextCaptions.get(this.props.previewContext)}</h3>
+                <div className={"d-flex flex-wrap justify-content-start"}>
+                    {publisherCards}
+                </div>
             </div>
         );
     }

@@ -33,13 +33,13 @@ class Thumbnail extends React.Component<IProps, IState> {
 
     render() {
         return (
-            <div className={"col-sm-6 col-md-3 col-lg-2 p-0"}>
+            // <div className={"col-sm-6 col-md-3 col-lg-2 p-0"}>
                 <div className="digest-container">
                     <a href={`/users/${this.props.data.publisher}/records/${this.props.data.recordOwnId}`}>
                         <img src={"data:image/jpeg;base64, " + this.state.image} alt={`${this.props.data.caption}`}/>
                     </a>
                 </div>
-            </div>
+            // </div>
         )
     }
 }

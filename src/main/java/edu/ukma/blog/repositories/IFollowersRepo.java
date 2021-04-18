@@ -16,5 +16,11 @@ import java.util.Set;
 public interface IFollowersRepo extends JpaRepository<Follower, FollowerId> {
     Set<FollowerPublisherView> findById_SubscriberIdAndId_PublisherIdIn(long subscriberId, Collection<Long> publisherId);
 
-    List<FollowerSubscriberView> findAllById_PublisherId(long publisher, Pageable pageable);
+    List<FollowerSubscriberView> findById_PublisherId(long publisher, Pageable pageable);
+
+    int countAllById_PublisherId(long publisher);
+
+    List<FollowerPublisherView> findById_SubscriberId(long subscriber, Pageable pageable);
+
+    int countAllById_SubscriberId(long subscriber);
 }

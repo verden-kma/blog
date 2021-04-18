@@ -129,6 +129,18 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
                             <Route exact path={"/users/:publisher/records/:recordId/edit"}>
                                 <EditRecord {...{authProvider: authProviderProps}}/>
                             </Route>
+                            <Route exact path={"/users/:publisher/followers"}>
+                                <PublishersPreview key={"followers" + window.location.pathname} {...{
+                                    authProvider: authProviderProps,
+                                    previewContext: PublisherPreviewContext.FOLLOWERS
+                                }}/>
+                            </Route>
+                            <Route exact path={"/users/:username/subscriptions"}>
+                                <PublishersPreview key={"subscriptions" + window.location.pathname} {...{
+                                    authProvider: authProviderProps,
+                                    previewContext: PublisherPreviewContext.SUBSCRIBERS
+                                }}/>
+                            </Route>
                         </Switch>
                     </main>
                     <Footer/>

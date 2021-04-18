@@ -18,7 +18,7 @@ import javax.validation.constraints.Min;
 @RestController
 @RequiredArgsConstructor
 public class DigestCtrl {
-    @Value("${digestPageSize}")
+    @Value("${digest-page-size}")
     private final int DIGEST_PAGE_SIZE;
 
     private final IRecordService recordService;

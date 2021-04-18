@@ -2,7 +2,7 @@ import React from "react";
 import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
 import RecordPreview, {RecordPreviewContext} from "../../expose_record/multiple_records/RecordsPreviewPage";
 import axios from "axios";
-import UserStats from "../UserStats";
+import UserStats from "../user_profile_details/UserStats";
 import {withRouter} from "react-router";
 import {RouteComponentProps} from "react-router-dom";
 import {Container, Row} from "react-bootstrap";

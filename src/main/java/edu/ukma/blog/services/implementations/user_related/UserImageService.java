@@ -26,7 +26,7 @@ import static edu.ukma.blog.constants.ImageConstants.*;
 public class UserImageService implements IUserImageService, InitializingBean {
     private static final String PATH_PREFIX = ImageConstants.PATH_PREFIX + "/account";
     private static final File IMAGE_ROOT = new File(PATH_PREFIX);
-    @Value("${minUsernameLen}")
+    @Value("${min-username-len}")
     private final int MIN_USERNAME_LEN;
     @Value("#{T(edu.ukma.blog.services.implementations.user_related.UserImageService).buildPath(${minUsernameLen})}")
     private final String PATH_TEMPLATE;

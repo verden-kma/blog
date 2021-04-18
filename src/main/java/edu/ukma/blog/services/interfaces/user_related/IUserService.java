@@ -29,7 +29,7 @@ public interface IUserService extends UserDetailsService {
 
     UserDataResponse getPublisher(String user, String publisher);
 
-    UserDataPreviewResponse getPublisherPreview(String publisher, String user, int recPrevNum);
+    UserDataPreviewResponse getPublisherPreview(long publisherId, long userId, int recordPrevNum);
 
     void updateUser(String username, EditUserRequest update);
 

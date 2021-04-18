@@ -42,7 +42,7 @@ public class RecordImageService implements IRecordImageService, InitializingBean
     private final String PATH_TEMPLATE;
     @Value("${recordsDirectoriesDepth}")
     private final int DIR_DEPTH;
-    @Value("${compressionThreshold}")
+    @Value("${compression-threshold}")
     private final long COMPRESSION_THRESHOLD;
     private static final int IMG_ID_LENGTH = 8; // the complete id of an image is in form PATH_TEMPLATE/xxxxxxxx
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;

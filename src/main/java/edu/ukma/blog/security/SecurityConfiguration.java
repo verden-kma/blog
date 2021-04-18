@@ -31,9 +31,9 @@ import java.util.function.BiConsumer;
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final IJwtUtils jwtUtils;
-    @Value("${refreshTokenUrl}")
+    @Value("${refresh-token-url}")
     private final String refreshTokenUrl;
-    @Value("${expirationTime}")
+    @Value("${expiration-time}")
     private final long tokenExpiration;
     private IUserService userDetailsService; // ex-final
     private final IBlacklistTokenService blacklistTokenService;

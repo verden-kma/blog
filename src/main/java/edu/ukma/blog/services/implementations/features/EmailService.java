@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class EmailService implements IEmailService {
     @Value("${spring.mail.username}")
     private final String SENDER_EMAIL;
-    @Value("${frontendConfirmationUrl}")
+    @Value("${frontend-confirmation-url}")
     private final String CONFIRM_SIGNUP_FRONT;
     private final JavaMailSender mailSender;
 
