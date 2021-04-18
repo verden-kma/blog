@@ -2,9 +2,9 @@ import React from 'react';
 import NavDropdown from "react-bootstrap/NavDropdown";
 import store from "store2"
 import axios from "axios";
-import {IAuthProps} from "./CMSNavbarRouting";
+import {IAuth} from "./CMSNavbarRouting";
 
-class UserOptionsDropdown extends React.Component<any, IAuthProps> {
+class UserOptionsDropdown extends React.Component<any, IAuth> {
     constructor(props: any) {
         super(props);
         this.state = {

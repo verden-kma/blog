@@ -1,8 +1,8 @@
 import axios from "axios";
 import {IRecord} from "../expose_record/multiple_records/RecordsPreviewPage";
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuth} from "../cms_backbone/CMSNavbarRouting";
 
-function genericHandleEvaluation(record: IRecord, forLike: boolean, auth: IAuthProps,
+function genericHandleEvaluation(record: IRecord, forLike: boolean, auth: IAuth,
                                  updateStateCB: (updRec: IRecord) => void) {
     let updRecord: IRecord = {...record};
     if (record.reaction === forLike) {

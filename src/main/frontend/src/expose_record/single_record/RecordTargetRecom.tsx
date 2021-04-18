@@ -1,11 +1,11 @@
 import React from 'react';
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
 import axios, {AxiosResponse} from "axios";
 import {Image} from "react-bootstrap";
 import {Link} from "react-router-dom";
 
 interface IProps {
-    auth: IAuthProps,
+    authProvider: IAuthProvider,
     publisher: string,
     recordId: number
 }
@@ -29,10 +29,13 @@ class RecordTargetRecom extends React.Component<IProps, IState> {
 
     componentDidMount() {
         axios.get(`http://localhost:8080/recommendations/evaluations/${this.props.publisher}/${this.props.recordId}`,
-            {headers: {'Authorization': `Bearer ${this.props.auth.token}`}})
+            {headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}})
             .then((success: AxiosResponse<Array<IRecordId>>) => success.data.forEach(recId => {
                 axios.get(`http://localhost:8080/users/${recId.publisher}/records/${recId.recordOwnId}/image-icon`,
-                    {responseType: "arraybuffer", headers: {'Authorization': `Bearer ${this.props.auth.token}`}})
+                    {
+                        responseType: "arraybuffer",
+                        headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
+                    })
                     .then(imageResp => {
                         const image = Buffer.from(imageResp.data, 'binary').toString('base64');
                         this.setState(oldState => {

@@ -20,7 +20,7 @@ class RecordCard extends React.Component<ICardProps, any> {
 
         const date: Date = new Date(this.props.timestamp);
 
-        return (<Container className={"my-5 record-card"}>
+        return (<Container fluid className={"my-5 record-card"}>
             <Row className={"mx-3"}>
                 <div className={"record-card-title"}>
                     <span className={"mx-3 my-1"}>{this.props.caption}</span>

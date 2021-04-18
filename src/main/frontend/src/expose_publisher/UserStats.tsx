@@ -1,13 +1,13 @@
 import React from 'react';
 import axios, {AxiosResponse} from "axios";
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../cms_backbone/CMSNavbarRouting";
 import defaultAva from "../assets/defaultAvatar.png";
 import handleFollow, {IPublisherFollow} from "../utils/HandleFollow";
 import "./publisher-styles.css"
 import {Button} from "react-bootstrap";
 
 interface IProps {
-    auth: IAuthProps,
+    authProvider: IAuthProvider,
     targetUsername: string
 }
 
@@ -62,13 +62,13 @@ class UserStats extends React.Component<IProps, IState> {
             })
         }
 
-        handleFollow(pubFollowData, this.props.auth, updateStateCB);
+        handleFollow(pubFollowData, this.props.authProvider.getAuth(), updateStateCB);
     }
 
     componentDidMount() {
         axios.get(`http://localhost:8080/users/${this.props.targetUsername}/avatar`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then(success => {
             if (success.data) {
                 this.setState(oldState => ({
@@ -78,7 +78,7 @@ class UserStats extends React.Component<IProps, IState> {
             }
         }, error => console.log(error));
         axios.get(`http://localhost:8080/users/${this.props.targetUsername}`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then((success: AxiosResponse<IUserData>) => {
             this.setState(oldState => ({...oldState, userData: success.data}))
         }, error => console.log(error));
@@ -106,7 +106,7 @@ class UserStats extends React.Component<IProps, IState> {
                         <h5>Comments: {this.state.userData.comments}</h5>
                         <h5>Followers: {this.state.userData.followers}</h5>
 
-                        {this.props.targetUsername !== this.props.auth.username &&
+                        {this.props.targetUsername !== this.props.authProvider.getAuth().username &&
                         <div className={"vertical-flex"}>
                             <hr className={"publisher-stats-split"}/>
                             <div className={"follow-btn-wrapper"}>

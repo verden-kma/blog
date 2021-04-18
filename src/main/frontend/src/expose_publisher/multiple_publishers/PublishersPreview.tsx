@@ -1,5 +1,5 @@
 import React from "react"
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
 import axios, {AxiosResponse} from "axios";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import PublisherCard from "./PublisherCard";
@@ -7,7 +7,7 @@ import {IMiniRecord} from "../../digest/Digest";
 import handleFollow, {IPublisherFollow} from "../../utils/HandleFollow";
 
 interface IProps extends RouteComponentProps<any> {
-    auth: IAuthProps,
+    authProvider: IAuthProvider,
     previewContext: PublisherPreviewContext
 }
 
@@ -94,7 +94,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
             });
         }
 
-        handleFollow(pFlwData, this.props.auth, updFlwState);
+        handleFollow(pFlwData, this.props.authProvider.getAuth(), updFlwState);
     }
 
     componentDidMount() {
@@ -103,7 +103,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
 
     loadCurrentPage() {
         axios.get(this.getUrl(), {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`},
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`},
             params: {page: this.state.currPage}
         }).then(success => {
             let updState: { publisherJsons: Array<IPublisher>, totalPageNum?: number };
@@ -120,7 +120,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
             updState.publisherJsons.forEach((pd: IPublisher) => {
                 axios.get(`http://localhost:8080/users/${pd.publisher}/avatar`, {
                     responseType: 'arraybuffer',
-                    headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
                 }).then(success => {
                     if (success.data.byteLength) {
                         this.setState((oldState) => {
@@ -137,7 +137,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
 
                 axios.get(`http://localhost:8080/users/${pd.publisher}/top-banner`, {
                     responseType: 'arraybuffer',
-                    headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
                 }).then(success => {
                     if (success.data.byteLength) {
                         this.setState((oldState) => {
@@ -157,7 +157,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
                         params: {
                             rids: pd.lastRecords.join(",")
                         },
-                        headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                        headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
                     }).then((success: AxiosResponse<Array<IMiniRecord>>) => {
                         this.setState((oldState) => {
                             return {
@@ -195,7 +195,7 @@ class PublishersPreview extends React.Component<IProps, IState> {
     render() {
         const publisherCards = this.state.publisherJsons.map((pd: IPublisher) =>
             <PublisherCard key={pd.publisher}
-                           auth={this.props.auth}
+                           authProvider={this.props.authProvider}
                            publisher={pd.publisher}
                            publisherAva={this.state.publisherAvas[pd.publisher]}
                            publisherBanner={this.state.publisherBanners[pd.publisher]}

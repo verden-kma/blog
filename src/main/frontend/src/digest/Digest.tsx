@@ -1,7 +1,7 @@
 import React from "react";
 import axios, {AxiosResponse} from 'axios'
 import Thumbnail from "./Thumbnail";
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../cms_backbone/CMSNavbarRouting";
 import {Container, Row} from "react-bootstrap";
 
 interface IState {
@@ -21,8 +21,8 @@ interface ILazyRecordsPage {
     isLast: boolean
 }
 
-class Digest extends React.Component<IAuthProps, IState> {
-    constructor(props: IAuthProps) {
+class Digest extends React.Component<IAuthProvider, IState> {
+    constructor(props: IAuthProvider) {
         super(props);
         this.state = {
             records: [],
@@ -39,7 +39,7 @@ class Digest extends React.Component<IAuthProps, IState> {
     loadNextPage() {
         axios.get('http://localhost:8080/digest', {
             params: {page: this.state.nextPage},
-            headers: {'Authorization': `Bearer ${this.props.token}`}
+            headers: {'Authorization': `Bearer ${this.props.getAuth().token}`}
         }).then((response: AxiosResponse<ILazyRecordsPage>) => {
             this.setState(oldState => ({
                 records: oldState.records.concat(response.data.pageItems),
@@ -55,7 +55,7 @@ class Digest extends React.Component<IAuthProps, IState> {
         const thumbnails = this.state.records.map(record =>
             <Thumbnail
                 key={record.publisher + "-" + record.recordOwnId}
-                auth={this.props}
+                authProvider={this.props}
                 data={record}/>
         )
 

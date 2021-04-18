@@ -1,5 +1,5 @@
 import React from 'react';
-import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios from "axios";
 import store from "store2"
@@ -15,7 +15,7 @@ import "./../record-styles.css";
 
 
 interface IProps extends RouteComponentProps<any> {
-    auth: IAuthProps
+    authProvider: IAuthProvider
 }
 
 interface ICommDel {
@@ -84,14 +84,14 @@ class FullRecordView extends React.Component<IProps, IState> {
             })
         };
 
-        genericHandleEvaluation(this.state.recordJson, forLike, this.props.auth, handleStateUpdate)
+        genericHandleEvaluation(this.state.recordJson, forLike, this.props.authProvider.getAuth(), handleStateUpdate)
     }
 
     loadNextComments() {
         if (!this.state.hasMoreCommentPages) return;
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`},
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`},
             params: {block: this.state.nextCommentPage}
         }).then(success => {
             this.setState((oldState: IState) => {
@@ -107,7 +107,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                 success.data.pageItems.forEach((comment: IComment, index: number) => {
                     axios.get(`http://localhost:8080/users/${comment.commentator}/avatar`, {
                         responseType: 'arraybuffer',
-                        headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                        headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
                     }).then(success => {
                         if (success.data !== null) {
                             this.setState(oldState => {
@@ -134,14 +134,14 @@ class FullRecordView extends React.Component<IProps, IState> {
         const {publisher, recordId} = this.props.match.params;
         axios.post(`http://localhost:8080/users/${publisher}/records/${recordId}/comments`, {
             text: this.state.newCommentText
-        }, {headers: {'Authorization': `Bearer ${this.props.auth.token}`}})
+        }, {headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}})
             .then(success => {
                 this.setState((oldState: IState) => {
                     let topComments: Array<IComment> = oldState.comments.get(0) || [];
                     let updTopComments: Array<IComment> = [...topComments];
                     let newComment: IComment = {
                         commentId: success.data,
-                        commentator: this.props.auth.username,
+                        commentator: this.props.authProvider.getAuth().username,
                         text: oldState.newCommentText,
                         timestamp: new Date().toUTCString(),
                         commenterAva: store.session.get("userAva")
@@ -169,7 +169,7 @@ class FullRecordView extends React.Component<IProps, IState> {
     componentDidMount() {
         const {publisher, recordId} = this.props.match.params;
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -181,7 +181,7 @@ class FullRecordView extends React.Component<IProps, IState> {
 
         axios.get(`http://localhost:8080/users/${publisher}/records/${recordId}/image`, {
             responseType: 'arraybuffer',
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then(success => {
             this.setState((oldState: IState) => {
                 return {
@@ -197,7 +197,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         if (this.state.recordJson === undefined) return;
         const {publisher, id} = this.state.recordJson;
         axios.delete(`http://localhost:8080/users/${publisher}/records/${id}`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then(success => this.setState({deleteAccomplished: true}), error => alert(error));
     }
 
@@ -217,7 +217,7 @@ class FullRecordView extends React.Component<IProps, IState> {
         const {publisher, id} = this.state.recordJson;
         const {targetId, targetBlock} = this.state.commDel;
         axios.delete(`http://localhost:8080/users/${publisher}/records/${id}/comments/${targetId}`, {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
         })
             .then(success =>
                 this.setState((oldState: IState) => {
@@ -262,9 +262,10 @@ class FullRecordView extends React.Component<IProps, IState> {
             }
             // @ts-ignore
             commentComponents.push(...this.state.comments.get(i).map((cd: IComment) =>
-                <Comment key={cd.commentId} comment={cd} deleteCB={cd.commentator === this.props.auth.username
-                    ? () => this.handleCommentDeleteRequest(cd.commentId, i)
-                    : undefined}/>
+                <Comment key={cd.commentId} comment={cd}
+                         deleteCB={cd.commentator === this.props.authProvider.getAuth().username
+                             ? () => this.handleCommentDeleteRequest(cd.commentId, i)
+                             : undefined}/>
             ));
         }
 
@@ -334,7 +335,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                                             onClick={this.handleEvaluation.bind(this, false)}>Dislike {this.state.recordJson.dislikes}
                                     </Button>
 
-                                    {this.state.recordJson.publisher === this.props.auth.username &&
+                                    {this.state.recordJson.publisher === this.props.authProvider.getAuth().username &&
                                     <Link
                                         to={`/users/${this.props.match.params.publisher}/records/${this.state.recordJson.id}/edit`}>
                                         <Button variant={"dark"} className={"ml-3 mr-1 my-1 btn-outline-warning"}>
@@ -342,7 +343,7 @@ class FullRecordView extends React.Component<IProps, IState> {
                                         </Button>
                                     </Link>}
 
-                                    {this.state.recordJson.publisher === this.props.auth.username &&
+                                    {this.state.recordJson.publisher === this.props.authProvider.getAuth().username &&
                                     <Button variant={"dark"} className={"mr-3 ml-1 my-1 btn-outline-danger"}
                                             onClick={() => this.setState({deleteRequested: true})}>
                                         Delete record
@@ -357,12 +358,13 @@ class FullRecordView extends React.Component<IProps, IState> {
                             </div>
                         </div>
                         <div className={"col-3"}>
-                            <UserStats auth={this.props.auth} targetUsername={this.state.recordJson.publisher}/>
+                            <UserStats authProvider={this.props.authProvider}
+                                       targetUsername={this.state.recordJson.publisher}/>
                         </div>
                     </Row>
 
                     <Row className={"my-4"}>
-                        <RecordTargetRecom auth={this.props.auth}
+                        <RecordTargetRecom authProvider={this.props.authProvider}
                                            publisher={this.state.recordJson.publisher}
                                            recordId={this.state.recordJson.id}/>
                     </Row>
@@ -376,11 +378,14 @@ class FullRecordView extends React.Component<IProps, IState> {
                                onChange={this.handleChange}/>
                         <button>Send</button>
                     </form>
-                    <div>
+                    <Row>
                         {commentComponents}
+                    </Row>
+                    <Row>
                         {this.state.hasMoreCommentPages &&
-                        <button onClick={this.loadNextComments}>Load more comments</button>}
-                    </div>
+                        <button className={"col-sm-4 col-md-4 col-lg-3"} onClick={this.loadNextComments}>Load more
+                            comments</button>}
+                    </Row>
                 </Container>
             </div>
         );

@@ -61,6 +61,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .build();
 
         blacklistTokenService.removeInvalid(userDetails.getUsername());
+        response.setContentType("application/json");
         objectMapper.writeValue(response.getWriter(), loginResponse);
     }
 

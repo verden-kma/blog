@@ -1,10 +1,10 @@
 import React from 'react'
 import axios from 'axios'
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../cms_backbone/CMSNavbarRouting";
 import {IMiniRecord} from "./Digest";
 
 interface IProps {
-    auth: IAuthProps,
+    authProvider: IAuthProvider,
     data: IMiniRecord
 }
 
@@ -23,7 +23,7 @@ class Thumbnail extends React.Component<IProps, IState> {
             {
                 responseType: 'arraybuffer',
                 headers: {
-                    'Authorization': `Bearer ${this.props.auth.token}`,
+                    'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`,
                     'Accept': 'image/jpeg'
                 }
             }).then((response) => {

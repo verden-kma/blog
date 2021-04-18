@@ -1,18 +1,19 @@
 import React from "react"
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import axios, {AxiosResponse} from "axios";
 import RecordCard from "./RecordCard";
 import ReactPaginate from 'react-paginate';
 import genericHandleEvaluation from "../../utils/GenericHandleEvaluation";
+import {Container, Row} from "react-bootstrap";
+import "./pagination-styles.css";
 
 interface IProps extends RouteComponentProps<any> {
-    auth: IAuthProps,
+    authProvider: IAuthProvider,
     previewContext: RecordPreviewContext,
     targetUsername?: string
 }
 
-// user loads lazy page, publisher posts record, user loads 2nd page, gets duplicate, unable get access to the new record
 interface IState {
     recordJsons: Array<IRecord>,
     recordImgs: Map<string, string>,
@@ -78,7 +79,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
     componentDidMount() {
         if (this.props.previewContext === RecordPreviewContext.RECOMMENDATION) {
             axios.get(this.getUrl(), {
-                headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
             }).then((success: AxiosResponse<Array<IRecord>>) => {
                 this.setState({recordJsons: success.data},
                     () => this.loadImages())
@@ -88,7 +89,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
 
     loadCurrentPage() {
         axios.get(this.getUrl(), {
-            headers: {'Authorization': `Bearer ${this.props.auth.token}`},
+            headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`},
             params: {page: this.state.currPage}
         }).then((success: AxiosResponse<IEagerRecordsPage>) => {
             const {pageItems, totalPagesNum} = success.data;
@@ -102,7 +103,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
             axios.get(`http://localhost:8080/users/${publisher}/records/${id}/image-min`,
                 {
                     responseType: 'arraybuffer',
-                    headers: {'Authorization': `Bearer ${this.props.auth.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.authProvider.getAuth().token}`}
                 }).then(response => {
                 this.setState((oldState: IState) => {
                     let updImgs: Map<string, string> = new Map(oldState.recordImgs);
@@ -136,7 +137,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
             })
         }
 
-        genericHandleEvaluation(record, forLike, this.props.auth, handleStateUpdate);
+        genericHandleEvaluation(record, forLike, this.props.authProvider.getAuth(), handleStateUpdate);
     }
 
     componentDidUpdate(prevProps: Readonly<IProps>) {
@@ -187,12 +188,18 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
                                                                   pageRangeDisplayed={3}
                                                                   marginPagesDisplayed={2}
                                                                   onPageChange={this.handlePageChange}
+                                                                  containerClassName={"react-paginate"}
+                                                                  pageClassName={"px-2"}
+                                                                  activeClassName={"active"}
+                                                                  disabledClassName={"disabled"}
+                                                                  previousClassName={"mr-2"}
+                                                                  nextClassName={"ml-2"}
         />)
 
-        return (<div>
-            {records}
-            {pagination}
-        </div>)
+        return (<Container>
+            <Row>{records}</Row>
+            <Row>{pagination}</Row>
+        </Container>)
     }
 
 
@@ -200,7 +207,10 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
         console.log(event.selected)
         this.setState((oldState) => {
             return {...oldState, currPage: event.selected}
-        }, () => this.loadCurrentPage());
+        }, () => {
+            this.loadCurrentPage();
+            window.scrollTo(0, 0);
+        });
     }
 }
 

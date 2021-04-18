@@ -1,5 +1,5 @@
 import React from 'react';
-import {IAuthProps} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider} from "../../cms_backbone/CMSNavbarRouting";
 import {
     Button,
     Container,
@@ -45,8 +45,8 @@ const alterOptionsReverse: Map<string, AlterOptions> = new Map([
 ])
 
 
-class EditUserProfile extends React.Component<IAuthProps, IState> {
-    constructor(props: IAuthProps) {
+class EditUserProfile extends React.Component<IAuthProvider, IState> {
+    constructor(props: IAuthProvider) {
         super(props);
         this.state = {
             avatarUpdateMode: AlterOptions.SKIP,
@@ -62,8 +62,8 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.props.username}`, {
-            headers: {'Authorization': `Bearer ${this.props.token}`}
+        axios.get(`http://localhost:8080/users/${this.props.getAuth().username}`, {
+            headers: {'Authorization': `Bearer ${this.props.getAuth().token}`}
         }).then(success => {
             this.setState({
                 oldStatus: success.data.status,
@@ -106,7 +106,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         if (Object.keys(textUpdate).length > 0) {
             const textPromise: Promise<any> =
                 axios.patch(`http://localhost:8080/users/details`, textUpdate, {
-                    headers: {'Authorization': `Bearer ${this.props.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.getAuth().token}`}
                 }).then(() => {
                 }, error => console.log(error));
             updatePromises.push(textPromise);
@@ -125,14 +125,14 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
         if (mode === AlterOptions.DELETE) {
             return axios.delete(`http://localhost:8080/users/${urlSuffix}`,
                 {
-                    headers: {'Authorization': `Bearer ${this.props.token}`}
+                    headers: {'Authorization': `Bearer ${this.props.getAuth().token}`}
                 }).then(() => {
             }, error => console.log(error))
         } else if (mode === AlterOptions.UPDATE && newImage !== undefined) {
             let body = new FormData();
             body.append("image", newImage);
             return axios.put(`http://localhost:8080/users/${urlSuffix}`, body, {
-                headers: {'Authorization': `Bearer ${this.props.token}`}
+                headers: {'Authorization': `Bearer ${this.props.getAuth().token}`}
             }).then(() => {
             }, error => console.log(error))
         }
@@ -145,7 +145,7 @@ class EditUserProfile extends React.Component<IAuthProps, IState> {
 
     render() {
         if (this.state.hasEdited) {
-            return <Redirect to={`/profile/${this.props.username}`}/>
+            return <Redirect to={`/profile/${this.props.getAuth().username}`}/>
         }
         return (
             <Container>

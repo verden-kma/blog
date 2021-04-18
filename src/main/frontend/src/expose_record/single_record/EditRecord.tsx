@@ -1,12 +1,12 @@
 import React from 'react';
-import {IAuthProps, monthNames} from "../../cms_backbone/CMSNavbarRouting";
+import {IAuthProvider, monthNames} from "../../cms_backbone/CMSNavbarRouting";
 import {Redirect, RouteComponentProps, withRouter} from "react-router";
 import axios, {AxiosResponse} from "axios";
 import {IRecord} from "../multiple_records/RecordsPreviewPage";
 import {Badge, Button, Container, Form, FormControl, FormGroup, FormLabel, Image, Row} from "react-bootstrap";
 
 interface IProps extends RouteComponentProps<any> {
-    auth: IAuthProps
+    authProvider: IAuthProvider
 }
 
 interface IState {
@@ -34,8 +34,8 @@ class EditRecord extends React.Component<IProps, IState> {
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${this.props.match.params.recordId}`, {
-            headers: {Authorization: `Bearer ${this.props.auth.token}`}
+        axios.get(`http://localhost:8080/users/${this.props.authProvider.getAuth().username}/records/${this.props.match.params.recordId}`, {
+            headers: {Authorization: `Bearer ${this.props.authProvider.getAuth().token}`}
         }).then((success: AxiosResponse<IRecord>) => {
             const record = success.data;
             this.setState({
@@ -48,8 +48,8 @@ class EditRecord extends React.Component<IProps, IState> {
             })
         });
 
-        axios.get(`http://localhost:8080/users/${this.props.auth.username}/records/${this.props.match.params.recordId}/image-min`, {
-            headers: {Authorization: `Bearer ${this.props.auth.token}`},
+        axios.get(`http://localhost:8080/users/${this.props.authProvider.getAuth().username}/records/${this.props.match.params.recordId}/image-min`, {
+            headers: {Authorization: `Bearer ${this.props.authProvider.getAuth().token}`},
             responseType: "arraybuffer"
         }).then(success => {
             const imageStr = Buffer.from(success.data, 'binary').toString('base64');
@@ -64,10 +64,10 @@ class EditRecord extends React.Component<IProps, IState> {
 
     handleSubmit(event: React.MouseEvent<HTMLElement>) {
         event.preventDefault();
-        axios.patch(`http://localhost:8080/users/${this.props.auth.username}/records/${this.props.match.params.recordId}`, {
+        axios.patch(`http://localhost:8080/users/${this.props.authProvider.getAuth().username}/records/${this.props.match.params.recordId}`, {
                 caption: this.state.newCaption,
                 adText: this.state.newAdText
-            }, {headers: {Authorization: `Bearer ${this.props.auth.token}`}}
+            }, {headers: {Authorization: `Bearer ${this.props.authProvider.getAuth().token}`}}
         ).then(() => this.setState({redirectRequested: true}), error => alert(error));
     }
 

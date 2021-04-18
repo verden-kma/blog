@@ -1,5 +1,5 @@
 import axios from "axios";
-import {IAuthProps} from "../cms_backbone/CMSNavbarRouting";
+import {IAuth} from "../cms_backbone/CMSNavbarRouting";
 
 interface IPublisherFollow {
     publisherName: string,
@@ -7,7 +7,7 @@ interface IPublisherFollow {
     followers: number
 }
 
-function handleFollow(publisher: IPublisherFollow, auth: IAuthProps, setStateCB: (updPubl: IPublisherFollow) => void) {
+function handleFollow(publisher: IPublisherFollow, auth: IAuth, setStateCB: (updPubl: IPublisherFollow) => void) {
     axios(
         {
             method: publisher.isFollowed ? "delete" : "put",

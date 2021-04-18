@@ -17,15 +17,19 @@ import 'bootstrap/dist/css/bootstrap.css';
 import MainPage from "./MainPage";
 import axios from "axios";
 
-interface IAuthProps {
+interface IAuth {
     username: string,
     token: string,
     permissions?: Array<any> // todo: user enum
 }
 
+interface IAuthProvider {
+    getAuth: () => IAuth
+}
+
 interface IState {
     query: string,
-    auth: IAuthProps
+    auth: IAuth
 }
 
 class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState> {
@@ -38,6 +42,12 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
                 token: store.session.get("token")
             }
         }
+        this.getAuth = this.getAuth.bind(this);
+    }
+
+    getAuth(): IAuth {
+        console.log(this.state.auth)
+        return this.state.auth;
     }
 
     componentDidMount() {
@@ -47,7 +57,7 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
                 headers: {'Authorization': `Bearer ${store.session.get('token')}`}
             }).then(success => {
                     store.session.set('token', success.data);
-                    this.setState(oldState => ({auth: {username: oldState.auth.username, token: oldState.auth.token}}))
+                    this.setState(oldState => ({auth: {username: oldState.auth.username, token: success.data}}))
                 },
                 error => {
                     console.log(error);
@@ -61,6 +71,8 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
             return <Redirect to={"/login"}/>
         }
 
+        const authProviderProps: IAuthProvider = {getAuth: this.getAuth};
+
         return (
             <BrowserRouter>
                 <div id={"content"}>
@@ -71,51 +83,51 @@ class CMSNavbarRouting extends React.Component<RouteComponentProps<any>, IState>
                                 <MainPage/>
                             </Route>
                             <Route exact path={"/digest"}>
-                                <Digest {...this.state.auth} />
+                                <Digest {...authProviderProps} />
                             </Route>
                             <Route exact path={"/publishers"}>
                                 <PublishersPreview key={"publisher"} {...{
-                                    auth: this.state.auth,
+                                    authProvider: authProviderProps,
                                     previewContext: PublisherPreviewContext.RECOMMENDATION
                                 }} />
                             </Route>
                             <Route exact path={"/records"}>
                                 <RecordsPreviewPage key={"records"} {...{
-                                    auth: this.state.auth,
+                                    authProvider: authProviderProps,
                                     previewContext: RecordPreviewContext.RECOMMENDATION
                                 }}/>
                             </Route>
                             <Route exact path={"/post-record"}>
-                                <PostRecord {...this.state.auth}/>
+                                <PostRecord {...authProviderProps}/>
                             </Route>
                             <Route exact path={"/profile/:targetUsername"}>
-                                <PublisherMainPage auth={this.state.auth}/>
+                                <PublisherMainPage authProvider={authProviderProps}/>
                             </Route>
                             <Route exact path={"/search/record"}>
                                 <RecordsPreviewPage key={"search-records" + this.state.query}
                                                     {...{
-                                                        auth: this.state.auth,
+                                                        authProvider: authProviderProps,
                                                         previewContext: RecordPreviewContext.SEARCH
                                                     }}
                                 />
                             </Route>
                             <Route exact path={"/search/publisher"}>
                                 <PublishersPreview key={"search-publisher" + this.state.query} {...{
-                                    auth: this.state.auth,
+                                    authProvider: authProviderProps,
                                     previewContext: PublisherPreviewContext.SEARCH
                                 }}/>
                             </Route>
                             <Route exact path={"/users/:publisher/records/:recordId"}>
-                                <FullRecordView key={window.location.pathname} {...{auth: this.state.auth}}/>
+                                <FullRecordView key={window.location.pathname} {...{authProvider: authProviderProps}}/>
                             </Route>
                             <Route exact path={"/edit-user-details"}>
-                                <EditUserProfile {...this.state.auth}/>
+                                <EditUserProfile {...authProviderProps}/>
                             </Route>
                             <Route exact path={"/change-password"}>
-                                <ChangePassword  {...this.state.auth}/>
+                                <ChangePassword  {...authProviderProps}/>
                             </Route>
                             <Route exact path={"/users/:publisher/records/:recordId/edit"}>
-                                <EditRecord {...{auth: this.state.auth}}/>
+                                <EditRecord {...{authProvider: authProviderProps}}/>
                             </Route>
                         </Switch>
                     </main>
@@ -131,6 +143,7 @@ const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
 
-export type {IAuthProps};
+export type {IAuth};
+export type {IAuthProvider};
 export {monthNames};
 export default withRouter(CMSNavbarRouting);

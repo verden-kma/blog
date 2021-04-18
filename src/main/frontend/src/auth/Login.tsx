@@ -42,7 +42,6 @@ class Login extends React.Component<any, IState> {
             username: this.state.username,
             password: this.state.password
         }).then((response: AxiosResponse<LoginResponse>) => {
-            console.log("logged in");
             store.session.set('username', this.state.username)
             store.session.set('token', response.data.token)
             store.session.set('isAuthorized', true);

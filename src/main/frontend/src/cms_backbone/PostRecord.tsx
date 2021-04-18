@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {IAuthProps} from "./CMSNavbarRouting";
+import {IAuthProvider} from "./CMSNavbarRouting";
 import {
     Button,
     Container,
@@ -26,8 +26,8 @@ interface IState {
     selectedFileName: string
 }
 
-class PostRecord extends React.Component<IAuthProps, IState> {
-    constructor(props: IAuthProps) {
+class PostRecord extends React.Component<IAuthProvider, IState> {
+    constructor(props: IAuthProvider) {
         super(props);
         this.state = {
             caption: "",
@@ -68,11 +68,11 @@ class PostRecord extends React.Component<IAuthProps, IState> {
 
         axios({
             method: 'post',
-            url: `http://localhost:8080/users/${this.props.username}/records`,
+            url: `http://localhost:8080/users/${this.props.getAuth().username}/records`,
             data: body,
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${this.props.token}`
+                'Authorization': `Bearer ${this.props.getAuth().token}`
             }
         }).then(success => {
                 this.setState({
@@ -111,12 +111,7 @@ class PostRecord extends React.Component<IAuthProps, IState> {
 
 
                     <Row className={"justify-content-center"}>
-                        {/*{this.state.file && <div className={"col-sm-9 col-md-5 col-lg-4 d-flex justify-content-center"}>*/}
-                        {/*    <Image src={URL.createObjectURL(this.state.file)} alt={this.state.selectedFileName} thumbnail/>*/}
-                        {/*</div>}*/}
                         <div className={"col-sm-8 col-md-6 col-lg-5"}>
-
-
                             <Form onSubmit={this.handleSubmit}>
                                 <FormGroup>
                                     <FormLabel>Caption:</FormLabel>
@@ -135,16 +130,11 @@ class PostRecord extends React.Component<IAuthProps, IState> {
                                                  placeholder="what else do you have to tell?"/>
                                 </FormGroup>
                                 <FormGroup className={"d-flex"}>
-                                    {/*<FormLabel className={"file-label"} style={{cursor : "pointer"}}>*/}
-                                    {/*    {this.state.selectedFileName === '' ? "Select an image" : "Change the image"}*/}
                                     <FormFile
                                         name={"selectedFileName"} value={this.state.selectedFileName}
                                         accept={".jpg,.jpeg,.png"}
                                         onChange={this.handleChange}
-                                        // hidden
                                     />
-
-                                    {/*</FormLabel>*/}
                                 </FormGroup>
                                 <div className={"d-flex justify-content-center"}>
                                     <Button type="submit">
