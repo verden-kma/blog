@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.util.Objects;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "edu.ukma.blog.repositories")
+@EnableJpaRepositories("edu.ukma.blog.repositories")
 @EntityScan("edu.ukma.blog.models")
 @PropertySource("classpath:application-test.properties")
 @EnableTransactionManagement

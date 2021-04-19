@@ -20,7 +20,7 @@ import axios from "axios";
 interface IAuth {
     username: string,
     token: string,
-    permissions?: Array<any> // todo: user enum
+    permissions?: Array<any> // feature-idea: user roles enum
 }
 
 interface IAuthProvider {

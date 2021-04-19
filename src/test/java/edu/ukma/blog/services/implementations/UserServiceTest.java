@@ -63,6 +63,4 @@ public class UserServiceTest {
         assertEquals(ue.getDescription(), uds.getDescription());
         assertEquals(ue.getStatistics(), ps);
     }
-
-
 }

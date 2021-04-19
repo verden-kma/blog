@@ -36,7 +36,7 @@ public class IconHandlerTest {
             BufferedImage image = ImageIO.read(imgFile);
             assertTrue(imgFile.exists());
             assertEquals(iconSize, image.getHeight());
-            assertTrue(image.getWidth() == image.getHeight());
+            assertEquals(image.getHeight(), image.getWidth());
         } catch (IOException e) {
             fail(e.getMessage());
         }

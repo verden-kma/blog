@@ -29,7 +29,7 @@ public class RecordImageServiceTest {
     private static final String TARGET_SUFFIX = '.' + TARGET_IMAGE_FORMAT;
     private static final String COMPRESSED_SUFFIX = "-min." + TARGET_IMAGE_FORMAT;
     private static final String ICON_SUFFIX = "-icon." + TARGET_IMAGE_FORMAT;
-    private final String root = "src/test/resources/test_files/";
+    private final String ROOT = "src/test/resources/test_files/";
     private final RecordImageService recordImageService;
     private String outputPath;
 
@@ -61,9 +61,9 @@ public class RecordImageServiceTest {
 
     @AfterEach
     void clean() {
-        new File(root, outputPath + TARGET_SUFFIX).delete();
-        new File(root, outputPath + COMPRESSED_SUFFIX).delete();
-        new File(root, outputPath + ICON_SUFFIX).delete();
+        new File(ROOT, outputPath + TARGET_SUFFIX).delete();
+        new File(ROOT, outputPath + COMPRESSED_SUFFIX).delete();
+        new File(ROOT, outputPath + ICON_SUFFIX).delete();
     }
 
     @Test
@@ -71,16 +71,16 @@ public class RecordImageServiceTest {
     void shouldPassIfCreatesTargetMinIconImages() throws IOException {
         MultipartFile image = new MockMultipartFile("test-img.jpg", "rand-size.jpg",
                 MediaType.IMAGE_JPEG_VALUE,
-                new FileInputStream(new File(root, "valid-image.jpg")));
+                new FileInputStream(new File(ROOT, "valid-image.jpg")));
 
         outputPath = recordImageService.saveImage(image);
 
-        File target = new File(root, outputPath + TARGET_SUFFIX);
-        File compressed = new File(root, outputPath + COMPRESSED_SUFFIX);
+        File target = new File(ROOT, outputPath + TARGET_SUFFIX);
+        File compressed = new File(ROOT, outputPath + COMPRESSED_SUFFIX);
         assertTrue(target.exists());
         assertTrue(compressed.exists());
         assertTrue(target.length() > compressed.length());
-        assertTrue(new File(root, outputPath + ICON_SUFFIX).exists());
+        assertTrue(new File(ROOT, outputPath + ICON_SUFFIX).exists());
     }
 
     @Test

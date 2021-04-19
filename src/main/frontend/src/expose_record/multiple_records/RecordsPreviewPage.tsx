@@ -41,6 +41,12 @@ enum RecordPreviewContext {
     RECOMMENDATION
 }
 
+const previewContextCaptions: Map<RecordPreviewContext, string> = new Map([
+    [RecordPreviewContext.PUBLISHER_RECORDS, "Publisher records"],
+    [RecordPreviewContext.SEARCH, "Found records"],
+    [RecordPreviewContext.RECOMMENDATION, "Recommended records"],
+]);
+
 interface IEagerRecordsPage {
     pageItems: Array<IRecord>,
     totalPagesNum: number
@@ -197,6 +203,7 @@ class RecordsPreviewPage extends React.Component<IProps, IState> {
         />)
 
         return (<Container>
+            <Row><h3>{previewContextCaptions.get(this.props.previewContext)}</h3></Row>
             <Row>{records}</Row>
             <Row>{pagination}</Row>
         </Container>)

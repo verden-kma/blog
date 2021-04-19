@@ -38,7 +38,6 @@ public interface IRecordsRepo extends JpaRepository<RecordEntity, RecordId> {
 
     List<RecordOwnIdView> findById_PublisherId(long publisherId, Pageable pageable);
 
-    // TODO: maybe there is a way to make this query more general
     @Query(value = "SELECT publisher_id, record_own_id FROM (\n" +
             "    SELECT publisher_id, \n" +
             "           record_own_id, \n" +

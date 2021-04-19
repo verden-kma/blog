@@ -93,18 +93,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public SignupResponse confirmRequest(UUID token) {
-        RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
-                .orElseThrow(SignupRequestTimedOut::new);
-
-        UserEntity newUser = registrationRequest_userMapper.toUserEntity(registrationRequest);
-        newUser.setStatistics(new PublisherStats(newUser));
-
-        if (usersRepo.existsUserByUsername(newUser.getUsername()))
-            throw new UsernameDuplicateException(newUser.getUsername());
-        usersRepo.save(newUser);
-
-        return userEntity_signupResponseMapper.toSignupResponse(newUser);
+    public void createAdmin(UserSignupRequest signupRequest) {
+        UserEntity newAdmin = signupRequest_userEntity.toUserEntity(signupRequest);
+        newAdmin.setEncryptedPassword(passwordEncoder.encode(signupRequest.getPassword()));
+        PublisherStats adminStats = new PublisherStats(newAdmin);
+        newAdmin.setStatistics(adminStats);
+        newAdmin.setActive(true);
+        newAdmin.setRole(roleRepo.findByRole(UserRole.ADMIN));
+        usersRepo.save(newAdmin);
     }
 
     @Override
@@ -182,13 +178,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void createAdmin(UserSignupRequest signupRequest) {
-        UserEntity newAdmin = signupRequest_userEntity.toUserEntity(signupRequest);
-        newAdmin.setEncryptedPassword(passwordEncoder.encode(signupRequest.getPassword()));
-        PublisherStats adminStats = new PublisherStats(newAdmin);
-        newAdmin.setStatistics(adminStats);
-        newAdmin.setRole(roleRepo.findByRole(UserRole.ADMIN));
-        usersRepo.save(newAdmin);
+    public SignupResponse confirmRequest(UUID token) {
+        RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
+                .orElseThrow(SignupRequestTimedOut::new);
+
+        UserEntity newUser = registrationRequest_userMapper.toUserEntity(registrationRequest);
+        newUser.setStatistics(new PublisherStats(newUser));
+        newUser.setActive(true);
+        newUser.setRole(roleRepo.findByRole(UserRole.PUBLISHER));
+
+        if (usersRepo.existsUserByUsername(newUser.getUsername()))
+            throw new UsernameDuplicateException(newUser.getUsername());
+        usersRepo.save(newUser);
+
+        return userEntity_signupResponseMapper.toSignupResponse(newUser);
     }
 
     @Override

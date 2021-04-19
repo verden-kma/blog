@@ -45,12 +45,12 @@ public interface IRecordNodesRepo extends Neo4jRepository<RecordGraphEntity, UUI
             "count(simDislikeRecs) AS strength")
     List<RecordRecomView> getRecordCounterRecoms(long userId, Collection<String> recomCandidates);
 
-    // Long or Iterable<Long> is required as the return type of a Delete query
-//     void deleteByPublisherIdAndRecordOwnId(long publisherId, int recordOwnId);
-
-    // todo: check if @Query is indeed compulsory
-
     @Modifying
     @Query("MATCH (r:RecordGraphEntity {publisherId : {0}, recordOwnId : {1}}) DETACH DELETE r")
     void deleteByPublisherIdAndRecordOwnId(long publisherId, int recordOwnId);
+
+//     Long or Iterable<Long> is required as the return type of a Delete query
+//     but return value is never user
+//    void deleteByPublisherIdAndRecordOwnId(long publisherId, int recordOwnId);
+
 }

@@ -39,7 +39,7 @@ class ConfirmRegistration extends React.Component<RouteComponentProps<any>, ISta
             return (
                 <div>
                     <h3>Congratulations, {this.state.username}</h3>
-                    <p>By activating your account via <span>{this.state.email}</span>
+                    <p>By activating your account via <span>'{this.state.email}'</span>&nbsp;
                         you have completed registration to Sprout.</p>
                 </div>
             )

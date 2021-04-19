@@ -90,7 +90,6 @@ class PostRecord extends React.Component<IAuthProvider, IState> {
     }
 
     render() {
-        // todo: validation
         return (
             <div>
                 <Modal show={this.state.uploadResult !== undefined}
