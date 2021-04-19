@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class IconHandlerTest {
     private static final String OUTPUT_IMAGE_LOCATION = "outputTest.".concat(ImageConstants.TARGET_IMAGE_FORMAT);
 

@@ -38,7 +38,7 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
             "UserEntity user INNER JOIN user.statistics stats " +
             "WHERE user.username LIKE CONCAT(:usernamePrefix, '%') " +
             "ORDER BY stats.followers DESC")
-    List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(String usernamePrefix, Pageable pageable);
+    List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(@Param("usernamePrefix") String usernamePrefix, Pageable pageable);
 
     int countAllByUsernameStartingWithIgnoreCase(String usernamePrefix);
 
