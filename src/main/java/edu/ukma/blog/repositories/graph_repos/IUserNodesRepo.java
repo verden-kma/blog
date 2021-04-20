@@ -8,15 +8,15 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import java.util.List;
 
 public interface IUserNodesRepo extends Neo4jRepository<UserGraphEntity, Long> {
-    @Query("MATCH (subs:UserGraphEntity {userId: {0}}), (publ:UserGraphEntity {userId: {1}}) CREATE (subs)-[:FOLLOWS]->(publ)")
+    @Query("MATCH (subs:UserGraphEntity {userId: $subscriberId}), (publ:UserGraphEntity {userId: $publisherId}) CREATE (subs)-[:FOLLOWS]->(publ)")
     void setFollow(long subscriberId, long publisherId);
 
-    @Query("MATCH (subs:UserGraphEntity {userId: {0}})-[f:FOLLOWS]->(publ:UserGraphEntity {userId: {1}}) DELETE f")
+    @Query("MATCH (subs:UserGraphEntity {userId: $subscriberId})-[f:FOLLOWS]->(publ:UserGraphEntity {userId: $publisherId}) DELETE f")
     void setUnfollow(long subscriberId, long publisherId);
 
-    @Query("MATCH (target:UserGraphEntity{userId:{0}})-[:FOLLOWS]->(publs:UserGraphEntity), " +
+    @Query("MATCH (target:UserGraphEntity{userId:$customerId})-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(similarPubls:UserGraphEntity) WHERE similarPubls <> publs " +
-            "RETURN similarPubls.userId AS recommendation, COUNT(*) AS strength ORDER BY strength LIMIT {1}")
+            "RETURN similarPubls.userId AS recommendation, COUNT(*) AS strength ORDER BY strength LIMIT $limit")
     List<UserRecomView> getRecommendations(long customerId, int limit);
 }
