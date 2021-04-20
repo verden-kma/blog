@@ -5,6 +5,7 @@ import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.*;
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
+import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
@@ -21,6 +22,7 @@ import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.*;
+import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
 import edu.ukma.blog.services.interfaces.features.IEmailService;
@@ -70,6 +72,7 @@ public class UserService implements IUserService {
     private final ISignupRequest_UserEntity signupRequest_userEntity;
     private final IEmailService emailService;
     private final IRoleReadonlyRepo roleRepo;
+    private final IUserNodesRepo userNodesRepo;
 
     @Override
     @Transactional
@@ -100,7 +103,8 @@ public class UserService implements IUserService {
         newAdmin.setStatistics(adminStats);
         newAdmin.setActive(true);
         newAdmin.setRole(roleRepo.findByRole(UserRole.ADMIN));
-        usersRepo.save(newAdmin);
+        UserEntity managedAdmin = usersRepo.saveAndFlush(newAdmin);
+        userNodesRepo.save(new UserGraphEntity(managedAdmin.getId()));
     }
 
     @Override
@@ -189,7 +193,8 @@ public class UserService implements IUserService {
 
         if (usersRepo.existsUserByUsername(newUser.getUsername()))
             throw new UsernameDuplicateException(newUser.getUsername());
-        usersRepo.save(newUser);
+        UserEntity managedUser = usersRepo.saveAndFlush(newUser);
+        userNodesRepo.save(new UserGraphEntity(managedUser.getId()));
 
         return userEntity_signupResponseMapper.toSignupResponse(newUser);
     }
