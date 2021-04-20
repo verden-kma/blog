@@ -17,7 +17,7 @@ public interface IRecordNodesRepo extends Neo4jRepository<RecordGraphEntity, UUI
             "CREATE (user)-[:LIKES]->(record)")
     void setLike(@Param("userId") Long userId, @Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
-    @Query("MATCH (user:UserGraphEntity {userId: userId}), (record:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) " +
+    @Query("MATCH (user:UserGraphEntity {userId: $userId}), (record:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) " +
             "CREATE (user)-[:DISLIKES]->(record)")
     void setDislike(@Param("userId") Long userId, @Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
@@ -28,14 +28,14 @@ public interface IRecordNodesRepo extends Neo4jRepository<RecordGraphEntity, UUI
             "(users)-[:LIKES]->(records:RecordGraphEntity)\n" +
             "WHERE records.publisherId <> $userId AND NOT exists ((:UserGraphEntity {userId : $userId})-[:LIKES]->(records))\n" +
             "RETURN records.publisherId AS publisherId, records.recordOwnId AS recordOwnId, COUNT(*) AS Strength ORDER BY Strength DESC LIMIT $limit")
-    List<RecordView> getRecordRecomsSimilarToRecord(@Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId, @Param("userId") Long userId, @Param("") Integer limit);
+    List<RecordView> getRecordRecomsSimilarToRecord(@Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId, @Param("userId") Long userId, @Param("limit") Integer limit);
 
     @Query("MATCH (target:UserGraphEntity {userId:$userId})-[:LIKES]->(likeRecs:RecordGraphEntity), " +
             "(simLikeUsr:UserGraphEntity)-[:LIKES]->(likeRecs), " +
             "(simLikeUsr)-[:LIKES]->(simLikeRecs:RecordGraphEntity)\n" +
             "WHERE simLikeRecs <> likeRecs AND NOT exists((target)-[:DISLIKES]->(simLikeRecs))\n" +
             "RETURN simLikeRecs.uuid AS uuid, simLikeRecs.publisherId AS publisherId, simLikeRecs.recordOwnId AS recordOwnId, " +
-            "count(simLikeRecs) AS strength ORDER BY strength DESC LIMIT limit")
+            "count(simLikeRecs) AS strength ORDER BY strength DESC LIMIT $limit")
     List<RecordRecomView> getRecordsRecoms(@Param("userId") Long userId, @Param("limit") Integer limit);
 
     @Query("MATCH (target:UserGraphEntity {userId:$userId})-[:DISLIKES]->(dislikeRecs:RecordGraphEntity), " +
