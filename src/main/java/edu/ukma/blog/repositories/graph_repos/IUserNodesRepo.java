@@ -10,14 +10,14 @@ import java.util.List;
 
 public interface IUserNodesRepo extends Neo4jRepository<UserGraphEntity, Long> {
     @Query("MATCH (subs:UserGraphEntity {userId: $subscriberId}), (publ:UserGraphEntity {userId: $publisherId}) CREATE (subs)-[:FOLLOWS]->(publ)")
-    void setFollow(@Param("subscriberId") long subscriberId, @Param("publisherId") long publisherId);
+    void setFollow(@Param("subscriberId") Long subscriberId, @Param("publisherId") Long publisherId);
 
     @Query("MATCH (subs:UserGraphEntity {userId: $subscriberId})-[f:FOLLOWS]->(publ:UserGraphEntity {userId: $publisherId}) DELETE f")
-    void setUnfollow(@Param("subscriberId") long subscriberId, @Param("publisherId") long publisherId);
+    void setUnfollow(@Param("subscriberId") Long subscriberId, @Param("publisherId") Long publisherId);
 
     @Query("MATCH (target:UserGraphEntity{userId:$customerId})-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(publs:UserGraphEntity), " +
             "(similarUsr:UserGraphEntity)-[:FOLLOWS]->(similarPubls:UserGraphEntity) WHERE similarPubls <> publs " +
             "RETURN similarPubls.userId AS recommendation, COUNT(*) AS strength ORDER BY strength LIMIT $limit")
-    List<UserRecomView> getRecommendations(@Param("customerId") long customerId, @Param("limit") int limit);
+    List<UserRecomView> getRecommendations(@Param("customerId") Long customerId, @Param("limit") Integer limit);
 }
