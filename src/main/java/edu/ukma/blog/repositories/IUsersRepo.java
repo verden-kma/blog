@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
     boolean existsUserByUsername(String username);
 
-    UserEntity findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     @Query("SELECT user FROM UserEntity user WHERE user.username = :username")
     PasswordView getEnpassByUsername(@Param("username") String username);
