@@ -1,4 +1,4 @@
-package edu.ukma.blog.repositories.projections.record;
+package edu.ukma.blog.repositories.relational_repos.projections.record;
 
 import edu.ukma.blog.models.composite_id.RecordId;
 

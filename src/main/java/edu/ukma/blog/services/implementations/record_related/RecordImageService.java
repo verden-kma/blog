@@ -3,7 +3,7 @@ package edu.ukma.blog.services.implementations.record_related;
 import edu.ukma.blog.constants.ImageConstants;
 import edu.ukma.blog.exceptions.server_internal.ServerCriticalError;
 import edu.ukma.blog.exceptions.server_internal.WrongFileFormatException;
-import edu.ukma.blog.repositories.IRecordsRepo;
+import edu.ukma.blog.repositories.relational_repos.record_related.IRecordsRepo;
 import edu.ukma.blog.services.interfaces.record_related.IRecordImageService;
 import edu.ukma.blog.utils.AlphaNumGenerator;
 import edu.ukma.blog.utils.IconHandler;

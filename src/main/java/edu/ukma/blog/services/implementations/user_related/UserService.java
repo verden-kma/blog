@@ -21,10 +21,14 @@ import edu.ukma.blog.models.user.requests.UserSignupRequest;
 import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
-import edu.ukma.blog.repositories.*;
 import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
-import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
-import edu.ukma.blog.repositories.projections.user.UserNameView;
+import edu.ukma.blog.repositories.relational_repos.projections.user.UserEntityIdsView;
+import edu.ukma.blog.repositories.relational_repos.projections.user.UserNameView;
+import edu.ukma.blog.repositories.relational_repos.record_related.IRecordsRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IFollowersRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IRegistrationRequestRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IRoleReadonlyRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IUsersRepo;
 import edu.ukma.blog.services.interfaces.features.IEmailService;
 import edu.ukma.blog.services.interfaces.user_related.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -65,14 +69,13 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final IFollowersRepo followersRepo;
     private final IRecordsRepo recordsRepo;
-    //    private final IUserNodesRepo userNodesRepo;
+    private final IUserNodesRepo userNodesRepo;
     private final IRegistrationRequestRepo signupRepo;
     private final IRegistrationRequest_UserEntity registrationRequest_userMapper;
     private final IUserEntity_SignupResponse userEntity_signupResponseMapper;
     private final ISignupRequest_UserEntity signupRequest_userEntity;
     private final IEmailService emailService;
     private final IRoleReadonlyRepo roleRepo;
-    private final IUserNodesRepo userNodesRepo;
 
     @Override
     @Transactional

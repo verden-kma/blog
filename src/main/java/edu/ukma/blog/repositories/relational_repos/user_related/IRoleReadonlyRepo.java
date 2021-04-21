@@ -1,4 +1,4 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.user_related;
 
 import edu.ukma.blog.models.user.authorization.UserRole;
 import edu.ukma.blog.models.user.authorization.UserRoleEntity;

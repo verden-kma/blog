@@ -1,9 +1,9 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.user_related;
 
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.simple_interaction.Follower;
-import edu.ukma.blog.repositories.projections.user.FollowerPublisherView;
-import edu.ukma.blog.repositories.projections.user.FollowerSubscriberView;
+import edu.ukma.blog.repositories.relational_repos.projections.user.FollowerPublisherView;
+import edu.ukma.blog.repositories.relational_repos.projections.user.FollowerSubscriberView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,7 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.repositories.projections.record.MultiRecordEvalView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.MultiRecordEvalView;
+import edu.ukma.blog.repositories.relational_repos.record_related.IEvaluatorsRepo;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

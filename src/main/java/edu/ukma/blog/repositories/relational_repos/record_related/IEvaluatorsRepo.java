@@ -1,11 +1,11 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.record_related;
 
 
 import edu.ukma.blog.models.composite_id.EvaluatorId;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
-import edu.ukma.blog.repositories.projections.record.MultiRecordEvalView;
-import edu.ukma.blog.repositories.projections.record.RecordEvaluationView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.MultiRecordEvalView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordEvaluationView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package edu.ukma.blog.repositories.projections.user;
+package edu.ukma.blog.repositories.relational_repos.projections.user;
 
 public interface FollowerSubscriberView {
     DataPair getId();

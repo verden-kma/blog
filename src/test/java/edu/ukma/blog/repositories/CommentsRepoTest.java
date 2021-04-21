@@ -1,6 +1,7 @@
 package edu.ukma.blog.repositories;
 
-import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordCommentsNumView;
+import edu.ukma.blog.repositories.relational_repos.record_related.ICommentsRepo;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

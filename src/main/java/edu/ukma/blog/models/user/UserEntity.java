@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "user_id_gen")
-    @TableGenerator(name = "user_id_gen", initialValue = 11, allocationSize = 1)
+    @TableGenerator(name = "user_id_gen", initialValue = 0, allocationSize = 1)
     @Column(name = "id")
     private long id;
 

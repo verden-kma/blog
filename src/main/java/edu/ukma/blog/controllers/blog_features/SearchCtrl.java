@@ -34,10 +34,6 @@ public class SearchCtrl {
 
     private final IUserService userService;
 
-    // feature-idea: add prioritizing options
-//    private static final Map<String, String> PRIORITIZING_METHOD = Collections.unmodifiableMap(
-//            new HashMap<String, String>() {{put("most recent", RecordEntity_.TIMESTAMP);}});
-
     @GetMapping("/publishers")
     public EagerContentPage<UserDataPreviewResponse> findPublishers(@RequestParam @NotEmpty String name,
                                                                     @RequestParam @Min(0) int page,

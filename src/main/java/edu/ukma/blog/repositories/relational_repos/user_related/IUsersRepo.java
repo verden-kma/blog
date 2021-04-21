@@ -1,7 +1,7 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.user_related;
 
 import edu.ukma.blog.models.user.UserEntity;
-import edu.ukma.blog.repositories.projections.user.*;
+import edu.ukma.blog.repositories.relational_repos.projections.user.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

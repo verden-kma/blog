@@ -1,9 +1,9 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.record_related;
 
 import edu.ukma.blog.models.comment.CommentEntity;
 import edu.ukma.blog.models.composite_id.CommentId;
 import edu.ukma.blog.models.composite_id.RecordId;
-import edu.ukma.blog.repositories.projections.record.RecordCommentsNumView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordCommentsNumView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,11 +1,11 @@
-package edu.ukma.blog.repositories;
+package edu.ukma.blog.repositories.relational_repos.record_related;
 
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.record.RecordEntity;
-import edu.ukma.blog.repositories.projections.record.MinRecordView;
-import edu.ukma.blog.repositories.projections.record.RecordIdView;
-import edu.ukma.blog.repositories.projections.record.RecordImgLocationView;
-import edu.ukma.blog.repositories.projections.record.RecordOwnIdView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.MinRecordView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordIdView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordImgLocationView;
+import edu.ukma.blog.repositories.relational_repos.projections.record.RecordOwnIdView;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

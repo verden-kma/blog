@@ -4,11 +4,11 @@ import edu.ukma.blog.models.composite_id.EvaluatorId;
 import edu.ukma.blog.models.composite_id.RecordId;
 import edu.ukma.blog.models.simple_interaction.Evaluation;
 import edu.ukma.blog.models.simple_interaction.Evaluation_;
-import edu.ukma.blog.repositories.IEvaluatorsRepo;
-import edu.ukma.blog.repositories.IPublisherStatsRepo;
-import edu.ukma.blog.repositories.IUsersRepo;
 import edu.ukma.blog.repositories.graph_repos.IRecordNodesRepo;
-import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
+import edu.ukma.blog.repositories.relational_repos.projections.user.UserEntityIdsView;
+import edu.ukma.blog.repositories.relational_repos.record_related.IEvaluatorsRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IPublisherStatsRepo;
+import edu.ukma.blog.repositories.relational_repos.user_related.IUsersRepo;
 import edu.ukma.blog.services.interfaces.record_related.IRecordEvalService;
 import edu.ukma.blog.utils.LazyContentPage;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// 'synchronized' feels wrong, but @Lock does not work and there is no much time left
+// 'synchronized' feels wrong, but @Lock does not work and there is not much time left
 @Service
 public class RecordEvalService implements IRecordEvalService {
     @PersistenceContext
