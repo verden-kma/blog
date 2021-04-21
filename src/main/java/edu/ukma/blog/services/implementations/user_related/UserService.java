@@ -5,6 +5,7 @@ import com.google.common.collect.HashBiMap;
 import edu.ukma.blog.exceptions.user.*;
 import edu.ukma.blog.models.composite_id.FollowerId;
 import edu.ukma.blog.models.record.RecordEntity_;
+import edu.ukma.blog.models.simple_interaction.graph_models.UserGraphEntity;
 import edu.ukma.blog.models.user.PublisherStats;
 import edu.ukma.blog.models.user.UserEntity;
 import edu.ukma.blog.models.user.UserEntity_;
@@ -21,6 +22,7 @@ import edu.ukma.blog.models.user.responses.SignupResponse;
 import edu.ukma.blog.models.user.responses.UserDataPreviewResponse;
 import edu.ukma.blog.models.user.responses.UserDataResponse;
 import edu.ukma.blog.repositories.*;
+import edu.ukma.blog.repositories.graph_repos.IUserNodesRepo;
 import edu.ukma.blog.repositories.projections.user.UserEntityIdsView;
 import edu.ukma.blog.repositories.projections.user.UserNameView;
 import edu.ukma.blog.services.interfaces.features.IEmailService;
@@ -70,6 +72,7 @@ public class UserService implements IUserService {
     private final ISignupRequest_UserEntity signupRequest_userEntity;
     private final IEmailService emailService;
     private final IRoleReadonlyRepo roleRepo;
+    private final IUserNodesRepo userNodesRepo;
 
     @Override
     @Transactional
@@ -100,7 +103,8 @@ public class UserService implements IUserService {
         newAdmin.setStatistics(adminStats);
         newAdmin.setActive(true);
         newAdmin.setRole(roleRepo.findByRole(UserRole.ADMIN));
-        usersRepo.save(newAdmin);
+        UserEntity managedAdmin = usersRepo.save(newAdmin);
+        userNodesRepo.save(new UserGraphEntity(managedAdmin.getId()));
     }
 
     @Override
@@ -118,13 +122,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserDataResponse getPublisher(String user, String publisher) {
-        UserDataResponse respUser = new UserDataResponse();
-        UserEntity pUser = usersRepo.findByUsername(publisher);
-        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserIdByUsername(publisher), getUserIdByUsername(user))));
-        BeanUtils.copyProperties(pUser, respUser);
-        BeanUtils.copyProperties(pUser.getStatistics(), respUser);
-        return respUser;
+    public SignupResponse confirmRequest(UUID token) {
+        RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
+                .orElseThrow(SignupRequestTimedOut::new);
+
+        UserEntity newUser = registrationRequest_userMapper.toUserEntity(registrationRequest);
+        newUser.setStatistics(new PublisherStats(newUser));
+        newUser.setActive(true);
+        newUser.setRole(roleRepo.findByRole(UserRole.PUBLISHER));
+
+        if (usersRepo.existsUserByUsername(newUser.getUsername()))
+            throw new UsernameDuplicateException(newUser.getUsername());
+        UserEntity managedUser = usersRepo.save(newUser);
+        userNodesRepo.save(new UserGraphEntity(managedUser.getId()));
+
+        return userEntity_signupResponseMapper.toSignupResponse(newUser);
     }
 
     @Override
@@ -178,20 +190,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public SignupResponse confirmRequest(UUID token) {
-        RegistrationRequestEntity registrationRequest = signupRepo.findByTokenAndExpiresAfter(token, LocalDateTime.now())
-                .orElseThrow(SignupRequestTimedOut::new);
-
-        UserEntity newUser = registrationRequest_userMapper.toUserEntity(registrationRequest);
-        newUser.setStatistics(new PublisherStats(newUser));
-        newUser.setActive(true);
-        newUser.setRole(roleRepo.findByRole(UserRole.PUBLISHER));
-
-        if (usersRepo.existsUserByUsername(newUser.getUsername()))
-            throw new UsernameDuplicateException(newUser.getUsername());
-        usersRepo.save(newUser);
-
-        return userEntity_signupResponseMapper.toSignupResponse(newUser);
+    public UserDataResponse getPublisher(String user, String publisher) {
+        UserDataResponse respUser = new UserDataResponse();
+        UserEntity pUser = usersRepo.findByUsername(publisher).orElseThrow(() -> new NoSuchUserException(publisher));
+        respUser.setFollowed(followersRepo.existsById(new FollowerId(getUserIdByUsername(publisher), getUserIdByUsername(user))));
+        BeanUtils.copyProperties(pUser, respUser);
+        BeanUtils.copyProperties(pUser.getStatistics(), respUser);
+        return respUser;
     }
 
     @Override
@@ -224,7 +229,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = usersRepo.findByUsername(username);
+        UserEntity user = usersRepo.findByUsername(username).orElseThrow(() -> new NoSuchUserException(username));
         if (user == null) throw new UsernameNotFoundException(username);
         if (!user.isActive()) throw new AttemptToAccessBannedUserException(username);
         return new User(user.getUsername(), user.getEncryptedPassword(), user.getRole().getPermissions()

@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
     boolean existsUserByUsername(String username);
 
-    UserEntity findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     @Query("SELECT user FROM UserEntity user WHERE user.username = :username")
     PasswordView getEnpassByUsername(@Param("username") String username);
@@ -38,7 +38,7 @@ public interface IUsersRepo extends JpaRepository<UserEntity, Long> {
             "UserEntity user INNER JOIN user.statistics stats " +
             "WHERE user.username LIKE CONCAT(:usernamePrefix, '%') " +
             "ORDER BY stats.followers DESC")
-    List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(String usernamePrefix, Pageable pageable);
+    List<PublisherPreviewBaseView> findPopularPublishersWithUsernamePrefix(@Param("usernamePrefix") String usernamePrefix, Pageable pageable);
 
     int countAllByUsernameStartingWithIgnoreCase(String usernamePrefix);
 

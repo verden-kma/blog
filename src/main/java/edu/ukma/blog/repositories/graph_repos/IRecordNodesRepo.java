@@ -6,51 +6,52 @@ import edu.ukma.blog.repositories.graph_repos.graph_projections.RecordView;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 public interface IRecordNodesRepo extends Neo4jRepository<RecordGraphEntity, UUID> {
-    @Query("MATCH (user:UserGraphEntity {userId: {0}}), (record:RecordGraphEntity {publisherId : {1}, recordOwnId : {2}}) " +
+    @Query("MATCH (user:UserGraphEntity {userId: $userId}), (record:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) " +
             "CREATE (user)-[:LIKES]->(record)")
-    void setLike(long userId, long publisherId, int recordOwnId);
+    void setLike(@Param("userId") Long userId, @Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
-    @Query("MATCH (user:UserGraphEntity {userId: {0}}), (record:RecordGraphEntity {publisherId : {1}, recordOwnId : {2}}) " +
+    @Query("MATCH (user:UserGraphEntity {userId: $userId}), (record:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) " +
             "CREATE (user)-[:DISLIKES]->(record)")
-    void setDislike(long userId, long publisherId, int recordOwnId);
+    void setDislike(@Param("userId") Long userId, @Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
-    @Query("MATCH (user:UserGraphEntity {userId: {0}})-[rel]->(record:RecordGraphEntity {publisherId : {1}, recordOwnId : {2}}) DELETE rel")
-    void unset(long userId, long publisherId, int recordOwnId);
+    @Query("MATCH (user:UserGraphEntity {userId: $userId})-[rel]->(record:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) DELETE rel")
+    void unset(@Param("userId") Long userId, @Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
-    @Query("MATCH (users:UserGraphEntity)-[:LIKES]->(:RecordGraphEntity {publisherId : {0}, recordOwnId : {1}}),\n" +
+    @Query("MATCH (users:UserGraphEntity)-[:LIKES]->(:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}),\n" +
             "(users)-[:LIKES]->(records:RecordGraphEntity)\n" +
-            "WHERE records.publisherId <> {2} AND NOT exists ((:UserGraphEntity {userId : {2}})-[:LIKES]->(records))\n" +
-            "RETURN records.publisherId AS publisherId, records.recordOwnId AS recordOwnId, COUNT(*) AS Strength ORDER BY Strength DESC LIMIT {3}")
-    List<RecordView> getRecordRecomsSimilarToRecord(long publisherId, int recordOwnId, long userId, int limit);
+            "WHERE records.publisherId <> $userId AND NOT exists ((:UserGraphEntity {userId : $userId})-[:LIKES]->(records))\n" +
+            "RETURN records.publisherId AS publisherId, records.recordOwnId AS recordOwnId, COUNT(*) AS Strength ORDER BY Strength DESC LIMIT $limit")
+    List<RecordView> getRecordRecomsSimilarToRecord(@Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId, @Param("userId") Long userId, @Param("limit") Integer limit);
 
-    @Query("MATCH (target:UserGraphEntity {userId:{0}})-[:LIKES]->(likeRecs:RecordGraphEntity), " +
+    @Query("MATCH (target:UserGraphEntity {userId:$userId})-[:LIKES]->(likeRecs:RecordGraphEntity), " +
             "(simLikeUsr:UserGraphEntity)-[:LIKES]->(likeRecs), " +
             "(simLikeUsr)-[:LIKES]->(simLikeRecs:RecordGraphEntity)\n" +
             "WHERE simLikeRecs <> likeRecs AND NOT exists((target)-[:DISLIKES]->(simLikeRecs))\n" +
             "RETURN simLikeRecs.uuid AS uuid, simLikeRecs.publisherId AS publisherId, simLikeRecs.recordOwnId AS recordOwnId, " +
-            "count(simLikeRecs) AS strength ORDER BY strength DESC LIMIT {1}")
-    List<RecordRecomView> getRecordsRecoms(long userId, int limit);
+            "count(simLikeRecs) AS strength ORDER BY strength DESC LIMIT $limit")
+    List<RecordRecomView> getRecordsRecoms(@Param("userId") Long userId, @Param("limit") Integer limit);
 
-    @Query("MATCH (target:UserGraphEntity {userId:{0}})-[:DISLIKES]->(dislikeRecs:RecordGraphEntity), " +
+    @Query("MATCH (target:UserGraphEntity {userId:$userId})-[:DISLIKES]->(dislikeRecs:RecordGraphEntity), " +
             "(simDislikeUsr:UserGraphEntity)-[:DISLIKES]->(dislikeRecs), " +
             "(simDislikeUsr)-[:DISLIKES]->(simDislikeRecs:RecordGraphEntity)\n" +
-            "WHERE simDislikeRecs.uuid IN {1}\n" +
+            "WHERE simDislikeRecs.uuid IN $recomCandidates\n" +
             "RETURN simDislikeRecs.publisherId AS publisherId, simDislikeRecs.recordOwnId AS recordOwnId, " +
             "count(simDislikeRecs) AS strength")
-    List<RecordRecomView> getRecordCounterRecoms(long userId, Collection<String> recomCandidates);
+    List<RecordRecomView> getRecordCounterRecoms(@Param("userId") Long userId, @Param("recomCandidates") Collection<String> recomCandidates);
 
     @Modifying
-    @Query("MATCH (r:RecordGraphEntity {publisherId : {0}, recordOwnId : {1}}) DETACH DELETE r")
-    void deleteByPublisherIdAndRecordOwnId(long publisherId, int recordOwnId);
+    @Query("MATCH (r:RecordGraphEntity {publisherId : $publisherId, recordOwnId : $recordOwnId}) DETACH DELETE r")
+    void deleteByPublisherIdAndRecordOwnId(@Param("publisherId") Long publisherId, @Param("recordOwnId") Integer recordOwnId);
 
 //     Long or Iterable<Long> is required as the return type of a Delete query
 //     but return value is never user
-//    void deleteByPublisherIdAndRecordOwnId(long publisherId, int recordOwnId);
+//    void deleteByPublisherIdAndRecordOwnId(Long publisherId, Integer recordOwnId);
 
 }
