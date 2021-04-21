@@ -177,3 +177,4 @@ src\main\frontend\yarn-error.log*
 src/main/frontend/src/react-app-env.d.ts
 src/main/frontend/.eslintcache
 /userImages/
+/src/main/frontend/node_modules/
